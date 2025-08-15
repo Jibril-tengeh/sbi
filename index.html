@@ -4,291 +4,450 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Adhkar Application</title>
-
-<!--
-Single-file offline-first app.
-- Fetches LARGE dua data from GitHub (set BASE_URL below)
-- Works on any device with internet; caches for offline after first load
-- Header icons order: Search — Dark — Language
-- Settings FAB (transparent), collapsible sections
-- Display Settings dropdown: show/hide, font sizes, Arabic fonts
-- 25 themes + custom theme creator
-- Favorites view
-- Share / Favorite / Copy / Play on each dua
-- "Developed by Jibril SBI TENGEH" appears ONLY in About (no footer)
--->
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <style>
-/* ===== RESET & THEME VARS ===== */
+/* ============ RESET & THEME VARS ============ */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --primary:#16a34a; --secondary:#0e9f6e; --accent:#f05252;
-  --bg:#f9fafb; --text:#111827; --muted:#6B7280; --border:#E5E7EB; --card:#ffffff;
-  --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.10);
-  --font-arabic-size:1.6rem; --font-translation-size:1rem; --font-transliteration-size:1rem;
+  --primary:#16a34a;
+  --secondary:#0e9f6e;
+  --accent:#f05252;
+  --bg:#f9fafb;
+  --text:#111827;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --card:#ffffff;
+  --card-contrast:#1f2937;
+  --radius:14px;
+  --shadow:0 8px 24px rgba(0,0,0,.08);
+  --font-arabic-size: 1.35rem;
+  --font-translation-size: 1rem;
+  --font-transliteration-size: 1rem;
+
+  --arabic-font: "Amiri", serif;
 }
+@font-face{font-family:"Amiri-BoldSlanted";src:local("Amiri Bold Slanted"),local("Amiri-BoldSlanted")}
+@font-face{font-family:"albayan";src:local("Al Bayan"),local("albayan")}
+@font-face{font-family:"471btehran";src:local("B Tehran"),local("471btehran")}
+@font-face{font-family:"AmiriQuranColored";src:local("Amiri Quran Colored"),local("AmiriQuranColored")}
+@font-face{font-family:"amiri-bold";src:local("Amiri Bold"),local("amiri-bold")}
+
 html,body{height:100%}
-body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans";transition:background .25s,color .25s}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";transition:background .25s,color .25s}
 .theme-fade{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .35s ease;z-index:9999}
 .theme-fade.show{opacity:1}
 
-/* ===== HEADER ===== */
+/* ============ HEADER ============ */
 header{
   position:sticky;top:0;z-index:20;
   background:linear-gradient(135deg,var(--primary),var(--secondary));
   color:#fff;padding:12px 14px;box-shadow:0 4px 16px rgba(0,0,0,.12);
   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
 }
-.logo{display:flex;gap:10px;align-items:center;font-weight:800;font-size:1.05rem}
+.logo{display:flex;gap:10px;align-items:center;font-weight:700;font-size:1.1rem}
 .header-icons{display:flex;gap:10px;align-items:center}
-.header-icon{width:38px;height:38px;border-radius:999px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s,background .2s;position:relative}
+.header-icon{
+  width:38px;height:38px;border-radius:999px;background:rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s,background .2s;position:relative
+}
 .header-icon:hover{transform:translateY(-1px);background:rgba(255,255,255,.28)}
-.language-text{position:absolute;bottom:-16px;font-size:.68rem;font-weight:700;letter-spacing:.04em}
-.header-icon svg{width:18px;height:18px;fill:#fff}
+.language-text{position:absolute;bottom:-16px;font-size:.68rem;font-weight:600;letter-spacing:.04em}
 
 /* Search bar */
-#searchBarContainer{width:100%;padding:8px;background:rgba(255,255,255,0.2);display:none}
-#searchBar{width:100%;padding:10px 12px;border:none;border-radius:10px;font-size:1rem}
+#searchBarContainer{
+  width:100%;padding:8px;background:rgba(255,255,255,0.2);
+  display:none; /* hidden until toggled */
+}
+#searchBar{
+  width:100%;padding:8px 12px;border:none;border-radius:8px;font-size:1rem;
+}
 
-/* ===== MAIN LAYOUT ===== */
-.container{max-width:1000px;margin:16px auto 120px;padding:0 14px}
-.section-title{text-align:center;margin:6px 0 16px;color:var(--primary);font-size:1.5rem}
+/* ============ MAIN ============ */
+.container{max-width:1000px;margin:16px auto 110px;padding:0 14px}
+.section-title-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.section-title{margin:6px 0 6px;color:var(--primary);font-size:1.5rem}
+.section-actions{display:flex;gap:8px;align-items:center}
+.pill-btn{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text);box-shadow:var(--shadow);font-size:.9rem;cursor:pointer}
+.pill-btn.active{border-color:var(--primary);color:var(--primary)}
 
-/* ===== CATEGORIES ===== */
+/* ============ LISTS ============ */
 .categories-list{list-style:none;max-width:860px;margin:0 auto}
-.category-item{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;gap:12px;align-items:center;margin-bottom:10px;box-shadow:var(--shadow);transition:border-color .2s,transform .16s,box-shadow .16s;cursor:pointer}
-.category-item:hover{border-color:var(--primary);transform:translateY(-1px);box-shadow:0 12px 32px rgba(0,0,0,.12)}
+.category-item{
+  background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:14px;display:flex;gap:12px;align-items:center;margin-bottom:10px;
+  box-shadow:var(--shadow);transition:border-color .2s,transform .16s,box-shadow .16s;cursor:pointer
+}
+.category-item:hover{border-color:var(--primary);transform:translateY(-1px);box-shadow:0 10px 26px rgba(0,0,0,.12)}
 .category-arrow{color:var(--primary);font-size:1rem}
-.category-title{flex:1;font-weight:700}
+.category-title{flex:1;font-weight:600}
+.category-count{min-width:34px;text-align:center;color:var(--primary);font-weight:700}
 
-/* ===== DUA VIEW ===== */
-.back-btn{display:inline-flex;gap:8px;align-items:center;margin:6px 0 12px 2px;padding:10px 14px;background:var(--primary);color:white;border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.18);transition:transform .15s}
+/* ============ DUA VIEW ============ */
+.back-btn{
+  display:inline-flex;gap:8px;align-items:center;margin:6px 0 12px 2px;padding:10px 14px;
+  background:var(--primary);color:white;border:none;border-radius:10px;cursor:pointer;
+  box-shadow:0 6px 16px rgba(0,0,0,.18);transition:transform .15s,opacity .15s
+}
 .back-btn:hover{transform:translateY(-1px)}
 .dua-list{max-width:860px;margin:0 auto 20px}
+.dua-item{
+  background:var(--card);border-left:5px solid var(--primary);border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:var(--shadow);position:relative
+}
+.dua-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;color:var(--muted);font-size:.9rem}
+.dua-arabic{
+  font-size:var(--font-arabic-size);line-height:2;direction:rtl;text-align:right;margin-bottom:6px;
+  font-family:var(--arabic-font);
+}
+.dua-transliteration{font-size:var(--font-transliteration-size);font-style:italic;margin-top:4px;color:#374151}
+.dua-translation{font-size:var(--font-translation-size);margin-top:6px}
+.dua-reference{margin-top:6px;color:var(--muted);font-size:.92rem}
+.dua-actions{
+  display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:10px;padding-top:8px;border-top:1px dashed var(--border)
+}
+.icon-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);
+  background:var(--card);color:var(--text);cursor:pointer;transition:transform .12s,border-color .12s,background .12s;
+}
+.icon-btn:hover{transform:translateY(-1px);border-color:var(--primary)}
+.icon-btn .fa{font-size:1rem}
+.icon-btn.fav.active{color:#b91c1c;border-color:#b91c1c}
 
-/* Dua card (no number) */
-.dua-item{background:var(--card);border-radius:18px;padding:14px 14px 8px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--border)}
-.dua-action-row{display:flex;gap:12px;justify-content:flex-start;align-items:center;margin-bottom:8px;flex-wrap:wrap}
-.dua-circle{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.15);transition:transform .12s, filter .12s}
-.dua-circle:hover{transform:translateY(-1px);filter:brightness(1.03)}
-.circle-share{background:#4CAF50}
-.circle-fav{background:#F4B400}
-.circle-copy{background:#29B6F6}
-.circle-play{background:#EF5350}
-
-.dua-arabic{font-size:var(--font-arabic-size);line-height:2.2;direction:rtl;text-align:center;margin:10px 6px;color:var(--text)}
-.dua-transliteration{font-size:var(--font-transliteration-size);font-style:italic;margin:10px 4px;color:#374151}
-.dua-translation{font-size:var(--font-translation-size);margin:10px 4px}
-.dua-reference{margin:8px 4px;color:var(--muted);font-size:.92rem;border-top:1px dashed var(--border);padding-top:8px}
-
-/* ===== STATES ===== */
+/* ============ STATES ============ */
 .loading,.error,.no-results{text-align:center;color:var(--muted);padding:18px}
 
-/* ===== SETTINGS FAB (transparent) ===== */
-#settingsFab{position:fixed;right:15px;bottom:15px;z-index:60;width:58px;height:58px;border-radius:999px;background:var(--secondary);border:none;box-shadow:0 12px 28px rgba(0,0,0,.28);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.55;transition:opacity .2s, transform .2s}
-#settingsFab:hover{opacity:1;transform:translateY(-1px)}
-#settingsFab svg{width:24px;height:24px;fill:#fff}
+/* ============ FLOATING SETTINGS BUTTON ============ */
+#settingsFab{
+  position:fixed;right:15px;bottom:15px;width:56px;height:56px;border-radius:50%;
+  background:rgba(255,255,255,.25);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.4);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:40;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);color:#111
+}
+#settingsFab:hover{transform:translateY(-1px)}
+#settingsFab i{font-size:1.2rem}
 
-/* ===== SETTINGS PANEL (collapsible sections) ===== */
-#settingsOverlay{position:fixed;inset:0;background:rgba(0,0,0,.25);backdrop-filter:saturate(140%) blur(2px);z-index:55;display:none}
-#settingsPanel{position:fixed;right:12px;bottom:12px;z-index:70;width:min(420px,92vw);max-height:86vh;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,255,255,.96));color:var(--text);border-radius:18px;box-shadow:0 18px 44px rgba(0,0,0,.28);transform:translateY(20px);opacity:0;pointer-events:none;transition:transform .26s ease,opacity .26s ease;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--border)}
-#settingsPanel.open{transform:translateY(0);opacity:1;pointer-events:auto}
-.panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--card)}
-.panel-title{font-weight:900;color:var(--primary)}
-.panel-close{background:none;border:none;font-size:24px;cursor:pointer;line-height:1;color:var(--muted)}
-.panel-content{padding:12px;overflow:auto}
+/* ============ SETTINGS PANEL (SHEET) ============ */
+.sheet{
+  position:fixed;inset:auto 0 0 0;height:78vh;background:var(--card);border-top-left-radius:18px;border-top-right-radius:18px;
+  box-shadow:0 -10px 30px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .28s ease;z-index:50;border:1px solid var(--border)
+}
+.sheet.show{transform:translateY(0)}
+.sheet-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
+.sheet-title{font-weight:700}
+.sheet-close{border:none;background:transparent;font-size:1.2rem;cursor:pointer}
+.sheet-content{padding:10px 16px 18px;overflow:auto;height:calc(78vh - 54px)}
 
-.group{border:1px solid var(--border);border-radius:14px;background:var(--card);margin-bottom:12px}
-.group summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:800;color:var(--primary);display:flex;align-items:center;justify-content:space-between}
-.group summary::-webkit-details-marker{display:none}
-.group .body{padding:12px 14px;border-top:1px dashed var(--border)}
-.row{display:flex;align-items:center;justify-content:space-between;margin:10px 0}
-.label{font-weight:600}
-.inline-controls{display:flex;gap:6px;align-items:center}
-.btn{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--bg);cursor:pointer}
+.section{border:1px solid var(--border);border-radius:12px;background:var(--card);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+.section summary{
+  list-style:none;cursor:pointer;padding:12px 14px;font-weight:700;display:flex;align-items:center;justify-content:space-between
+}
+.section summary::-webkit-details-marker{display:none}
+.section .section-body{padding:10px 14px 12px;border-top:1px dashed var(--border)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
+.row label{font-size:.95rem}
+.row .controls{display:flex;align-items:center;gap:8px}
+.switch{
+  position:relative;width:48px;height:26px;border-radius:999px;background:#e5e7eb;cursor:pointer;flex-shrink:0;border:1px solid var(--border)
+}
+.switch input{display:none}
+.switch::after{
+  content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:white;box-shadow:var(--shadow);transition:left .18s
+}
+.switch input:checked + .thumb{left:24px}
+.switch.on{background:#22c55e}
+.thumb{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:white;box-shadow:var(--shadow);transition:left .18s}
 
-/* ===== THEME GRID ===== */
-.theme-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.theme-swatch{height:28px;border-radius:8px;border:1px solid var(--border);cursor:pointer;box-shadow:var(--shadow);overflow:hidden}
-.theme-swatch>div{height:100%}
+/* range + selects */
+input[type="range"]{width:160px}
+select, input[type="text"], input[type="color"]{
+  padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)
+}
 
-/* ===== Optional local Arabic fonts ===== */
-@font-face{font-family:"Amiri-BoldSlanted";src:url("./Amiri-BoldSlanted.woff2") format("woff2");font-style:italic;font-weight:bold;font-display:swap}
-@font-face{font-family:"albayan";src:url("./albayan.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"471btehran";src:url("./471btehran.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"AmiriQuranColored";src:url("./AmiriQuranColored.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"amiri-bold";src:url("./amiri-bold.woff2") format("woff2");font-weight:bold;font-display:swap}
+/* Theme grid */
+.theme-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:8px}
+.theme-card{
+  height:42px;border-radius:10px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem
+}
+.theme-card .swatch{width:100%;height:100%;border-radius:9px}
+
+/* Modal (About) */
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.28);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:60
+}
+.modal.show{display:flex}
+.modal-card{max-width:520px;width:92%;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+.modal-head{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-body{padding:14px}
+
+/* Toasts */
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);
+  bottom:90px;background:var(--card);color:var(--text);
+  border:1px solid var(--border);box-shadow:var(--shadow);
+  padding:10px 14px;border-radius:12px;z-index:80;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s
+}
+.toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(-6px)}
+.toast.success{border-color:#16a34a}
+.toast.info{border-color:#2563eb}
+.toast.warn{border-color:#f59e0b}
+.toast.error{border-color:#ef4444}
+
+/* Footer actions (sticky) */
+.footer-actions{
+  position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:8px 12px;z-index:30
+}
+
+/* Dark theme helper when user toggles “moon/sun” only switches palette index */
+body.dark .logo i,
+body.dark .category-arrow{color:#fbbf24}
 </style>
 </head>
 <body>
 <div class="theme-fade" id="themeFade"></div>
 
-<!-- ===== HEADER (Search — Dark — Language) ===== -->
+<!-- ======= HEADER ======= -->
 <header>
-  <div class="logo">
-    <svg viewBox="0 0 24 24" style="fill:#fff;width:18px;height:18px;margin-right:8px"><path d="M14.5 2a8.5 8.5 0 1 0 7.21 12.98A7.5 7.5 0 1 1 14.5 2z"/></svg>
-    <span>Adhkar</span>
-  </div>
+  <div class="logo"><i class="fas fa-star-and-crescent"></i><span>Adhkar</span></div>
   <div class="header-icons">
+    <!-- Order: search — dark mode — languages -->
     <div class="header-icon" id="searchToggle" title="Search">
-      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.471 6.471 0 001.48-5.34C15.21 5.01 12.2 2 8.6 2S2 5.01 2 8.39s3.01 6.4 6.6 6.4a6.47 6.47 0 004.06-1.4l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6.9 0A5.1 5.1 0 013.5 8.39 5.1 5.1 0 018.6 3.3a5.1 5.1 0 015.1 5.09 5.1 5.1 0 01-5.1 5.1z"/></svg>
+      <i class="fas fa-search"></i>
     </div>
-    <div class="header-icon" id="themeToggle" title="Toggle Dark">
-      <svg id="darkIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/></svg>
-    </div>
+    <div class="header-icon" id="themeToggle" title="Toggle Sun/Moon"><i class="fas fa-moon"></i></div>
     <div class="header-icon" id="languageToggle" title="Language">
-      <svg viewBox="0 0 24 24"><path d="M12 3l4 8H8l4-8zm0 18l-4-8h8l-4 8z"/></svg>
+      <i class="fas fa-language"></i>
       <div class="language-text" id="languageText">EN</div>
     </div>
   </div>
+  <!-- Search bar container -->
   <div id="searchBarContainer">
     <input type="text" id="searchBar" placeholder="Search categories or duas...">
   </div>
 </header>
 
-<!-- ===== MAIN ===== -->
+<!-- ======= MAIN ======= -->
 <div class="container">
-  <h1 class="section-title" id="sectionTitle">Categories</h1>
+  <div class="section-title-wrap">
+    <h1 class="section-title">Categories</h1>
+    <div class="section-actions">
+      <button class="pill-btn" id="favoritesViewBtn" title="View favorites"><i class="fa fa-heart"></i> <span class="fav-count">0</span></button>
+      <button class="pill-btn" id="aboutBtn"><i class="fa fa-circle-info"></i> About</button>
+    </div>
+  </div>
+
   <ul id="categoriesList" class="categories-list">
     <li class="loading">Loading categories...</li>
   </ul>
 
   <div id="categoryDetails" style="display:none;">
-    <button class="back-btn" id="backBtn">
-      <svg viewBox="0 0 24 24" style="fill:#fff;width:18px;height:18px;margin-right:6px"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-      <span data-i18n="back">Back</span>
-    </button>
-
-    <div id="favoritesBar" style="display:none;margin:6px 0 12px">
-      <button id="clearFavoritesBtn" class="back-btn" style="background:#f05252">
-        <svg viewBox="0 0 24 24" style="fill:#fff;width:18px;height:18px;margin-right:6px"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-        <span data-i18n="remove_all_fav">Remove All Favorites</span>
-      </button>
-    </div>
-
+    <button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
     <div id="duaContainer" class="dua-list"></div>
   </div>
 </div>
 
-<!-- ===== SETTINGS FAB + PANEL ===== -->
-<button id="settingsFab" title="Settings">
-  <svg viewBox="0 0 24 24"><path d="M19.14,12.94a7.43,7.43,0,0,0,.05-.94,7.43,7.43,0,0,0-.05-.94l2.11-1.65a.5.5,0,0,0,.12-.64l-2-3.46a.5.5,0,0,0-.6-.22l-2.49,1a7.28,7.28,0,0,0-1.63-.94l-.38-2.65a.5.5,0,0,0-.5-.42H9.23a.5.5,0,0,0-.5.42L8.35,4.15a7.28,7.28,0,0,0-1.63.94l-2.49-1a.5.5,0,0,0-.6.22l-2,3.46a.5.5,0,0,0,.12.64L3.86,11.06a7.43,7.43,0,0,0-.05.94,7.43,7.43,0,0,0,.05.94L1.75,14.59a.5.5,0,0,0-.12.64l2,3.46a.5.5,0,0,0,.6.22l2.49-1a7.28,7.28,0,0,0,1.63.94l.38,2.65a.5.5,0,0,0,.5.42h3.54a.5.5,0,0,0,.5-.42l.38-2.65a7.28,7.28,0,0,0,1.63-.94l2.49,1a.5.5,0,0,0,.6-.22l2-3.46a.5.5,0,0,0,.12-.64ZM12,15.5A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>
-</button>
+<!-- ======= FLOATING SETTINGS BUTTON ======= -->
+<button id="settingsFab" aria-label="Settings"><i class="fa fa-sliders"></i></button>
 
-<div id="settingsOverlay"></div>
-<div id="settingsPanel" aria-hidden="true">
-  <div class="panel-header">
-    <div class="panel-title" id="settingsTitle">Settings</div>
-    <button class="panel-close" id="settingsClose" aria-label="Close">×</button>
+<!-- ======= SETTINGS SHEET ======= -->
+<div class="sheet" id="settingsSheet" aria-hidden="true">
+  <div class="sheet-header">
+    <div class="sheet-title" id="settingsTitle">Settings</div>
+    <button class="sheet-close" id="closeSettings"><i class="fa fa-xmark"></i></button>
   </div>
-  <div class="panel-content">
+  <div class="sheet-content">
+    <!-- Display (Collapsible default OPEN) -->
+    <details class="section" id="displaySection" open>
+      <summary>
+        <span id="displayTitle">Display</span>
+        <i class="fa fa-chevron-down"></i>
+      </summary>
+      <div class="section-body">
+        <div class="row">
+          <label for="toggleTranslations">Show Translations</label>
+          <div class="controls">
+            <div class="switch" id="toggleTranslationsSwitch">
+              <input type="checkbox" id="toggleTranslations">
+              <span class="thumb"></span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <label for="toggleTransliterations">Show Transliterations</label>
+          <div class="controls">
+            <div class="switch" id="toggleTransliterationsSwitch">
+              <input type="checkbox" id="toggleTransliterations">
+              <span class="thumb"></span>
+            </div>
+          </div>
+        </div>
 
-    <!-- ===== Display Settings (dropdown EXACT order) ===== -->
-    <details class="group" id="displayGroup" open>
-      <summary><span data-i18n="display">Display Settings</span><span>▾</span></summary>
-      <div class="body">
         <div class="row">
-          <span class="label" data-i18n="show_translations">Show Translations</span>
-          <input type="checkbox" id="toggleTranslations">
-        </div>
-        <div class="row">
-          <span class="label" data-i18n="show_transliterations">Show Transliteration</span>
-          <input type="checkbox" id="toggleTransliterations">
-        </div>
-        <div class="row">
-          <span class="label" data-i18n="arabic_size">Arabic size</span>
-          <div class="inline-controls">
-            <button class="btn" id="arabicDec">−</button>
-            <button class="btn" id="arabicInc">+</button>
+          <label>Arabic size</label>
+          <div class="controls">
+            <input type="range" id="arabicSize" min="18" max="44" value="22">
+            <span id="arabicSizeVal">22px</span>
           </div>
         </div>
         <div class="row">
-          <span class="label" data-i18n="translation_size">Translation size</span>
-          <div class="inline-controls">
-            <button class="btn" id="translationDec">−</button>
-            <button class="btn" id="translationInc">+</button>
+          <label>Translation size</label>
+          <div class="controls">
+            <input type="range" id="translationSize" min="12" max="28" value="16">
+            <span id="translationSizeVal">16px</span>
           </div>
         </div>
         <div class="row">
-          <span class="label" data-i18n="transliteration_size">Transliteration size</span>
-          <div class="inline-controls">
-            <button class="btn" id="translitDec">−</button>
-            <button class="btn" id="translitInc">+</button>
+          <label>Transliteration size</label>
+          <div class="controls">
+            <input type="range" id="transliterationSize" min="12" max="28" value="16">
+            <span id="transliterationSizeVal">16px</span>
           </div>
         </div>
-        <div class="row" style="gap:8px">
-          <span class="label" data-i18n="arabic_font">Arabic Font</span>
-          <select id="arabicFontSelect" class="btn" style="flex:1">
-            <option value="" data-i18n="default_font">Default</option>
-            <option value="Amiri-BoldSlanted">Amiri-BoldSlanted</option>
-            <option value="albayan">albayan</option>
-            <option value="471btehran">471btehran</option>
-            <option value="AmiriQuranColored">AmiriQuranColored</option>
-            <option value="amiri-bold">amiri-bold</option>
-          </select>
+
+        <div class="row">
+          <label>Arabic Font</label>
+          <div class="controls">
+            <select id="arabicFont">
+              <option value="Amiri-BoldSlanted">Amiri-BoldSlanted</option>
+              <option value="albayan">albayan</option>
+              <option value="471btehran">471btehran</option>
+              <option value="AmiriQuranColored">AmiriQuranColored</option>
+              <option value="amiri-bold">amiri-bold</option>
+              <option value="Amiri">Amiri (system)</option>
+            </select>
+          </div>
         </div>
       </div>
     </details>
 
-    <!-- ===== Theme & Dark Mode ===== -->
-    <details class="group">
-      <summary><span data-i18n="themes">Theme & Dark Mode</span><span>▾</span></summary>
-      <div class="body">
-        <div class="row">
-          <label for="darkToggle" class="label" data-i18n="dark_mode">Dark Mode</label>
-          <input type="checkbox" id="darkToggle">
-        </div>
-        <div style="margin:8px 0"><strong data-i18n="choose_theme">Choose Theme</strong></div>
-        <div id="themeGrid" class="theme-grid"></div>
-        <div style="margin-top:10px"><strong data-i18n="custom_theme">Create your theme</strong></div>
-        <div class="row" style="gap:8px;flex-wrap:wrap">
-          <label class="label" data-i18n="primary">Primary</label><input type="color" id="cPrimary" value="#16a34a" class="btn">
-          <label class="label" data-i18n="secondary">Secondary</label><input type="color" id="cSecondary" value="#0e9f6e" class="btn">
-          <label class="label" data-i18n="accent">Accent</label><input type="color" id="cAccent" value="#f05252" class="btn">
-          <label class="label" data-i18n="bg">Background</label><input type="color" id="cBg" value="#f9fafb" class="btn">
-          <label class="label" data-i18n="card">Card</label><input type="color" id="cCard" value="#ffffff" class="btn">
-          <label class="label" data-i18n="text">Text</label><input type="color" id="cText" value="#111827" class="btn">
+    <!-- Theme -->
+    <details class="section" id="themeSection">
+      <summary>
+        <span id="themeTitle">Theme</span>
+        <i class="fa fa-chevron-down"></i>
+      </summary>
+      <div class="section-body">
+        <button class="pill-btn" id="openThemeGridBtn"><i class="fa fa-palette"></i> Choose Theme</button>
+        <div id="themeGrid" class="theme-grid" style="display:none;"></div>
+
+        <div class="row" style="margin-top:10px">
+          <label>Create your theme</label>
         </div>
         <div class="row">
-          <button class="btn" id="applyCustomTheme" data-i18n="apply">Apply</button>
-          <button class="btn" id="resetTheme" data-i18n="reset">Reset</button>
+          <label>Primary</label>
+          <input type="color" id="cPrimary" value="#16a34a">
+          <label>Secondary</label>
+          <input type="color" id="cSecondary" value="#0e9f6e">
+        </div>
+        <div class="row">
+          <label>Accent</label>
+          <input type="color" id="cAccent" value="#f05252">
+          <label>BG</label>
+          <input type="color" id="cBg" value="#f9fafb">
+        </div>
+        <div class="row">
+          <label>Text</label>
+          <input type="color" id="cText" value="#111827">
+          <label>Card</label>
+          <input type="color" id="cCard" value="#ffffff">
+        </div>
+        <div class="row">
+          <label>Border</label>
+          <input type="color" id="cBorder" value="#e5e7eb">
+        </div>
+        <button class="pill-btn" id="applyCustomTheme"><i class="fa fa-check"></i> Apply Custom Theme</button>
+      </div>
+    </details>
+
+    <!-- Language -->
+    <details class="section" id="languageSection">
+      <summary>
+        <span id="languageTitle">Language</span>
+        <i class="fa fa-chevron-down"></i>
+      </summary>
+      <div class="section-body">
+        <div class="row">
+          <label>Current</label>
+          <div class="controls">
+            <span id="currentLangLabel">EN</span>
+          </div>
+        </div>
+        <div class="row">
+          <label>Switch</label>
+          <div class="controls">
+            <button class="pill-btn" id="cycleLangBtn"><i class="fa fa-language"></i> Cycle</button>
+          </div>
         </div>
       </div>
     </details>
 
-    <!-- ===== Language ===== -->
-    <details class="group">
-      <summary><span>Language</span><span>▾</span></summary>
-      <div class="body">
-        <div class="row" style="gap:8px">
-          <select id="languageSelect" class="btn" style="flex:1">
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-            <option value="ru">Русский</option>
-            <option value="zh">中文</option>
-            <option value="ha">Hausa</option>
-          </select>
-        </div>
+    <!-- About -->
+    <details class="section" id="aboutSection">
+      <summary>
+        <span id="aboutTitle">About</span>
+        <i class="fa fa-chevron-down"></i>
+      </summary>
+      <div class="section-body">
+        <p style="margin-bottom:6px">Adhkar & Dua Application</p>
+        <p style="color:var(--muted);font-size:.95rem">Developed by <strong>Jibril SBI TENGEH</strong>.</p>
       </div>
-    </details>
-
-    <!-- ===== About ===== -->
-    <details class="group">
-      <summary><span>About</span><span>▾</span></summary>
-      <div class="body"><strong>Developed by Jibril SBI TENGEH</strong></div>
     </details>
   </div>
 </div>
 
-<script>
-/* ============================== CONFIG: GITHUB BASE ============================== */
-/* Replace USERNAME and REPO (and branch) with your repo details */
-const BASE_URL = 'https://raw.githubusercontent.com/USERNAME/REPO/main'; // e.g., 'https://raw.githubusercontent.com/jibrilsbit/adhkar-data/main'
+<!-- ======= ABOUT MODAL (optional quick access) ======= -->
+<div class="modal" id="aboutModal" aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-head">
+      <strong>About</strong>
+      <button class="sheet-close" id="closeAbout"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>This app presents categories and duas from JSON files, with offline caching, favorites, sharing, and rich settings.</p>
+      <p style="margin-top:8px;color:var(--muted)">Developed by <strong>Jibril SBI TENGEH</strong>.</p>
+    </div>
+  </div>
+</div>
 
-/* ============================== STATE ============================== */
-let currentLanguage = 'en';
+<!-- ======= TOAST ======= -->
+<div class="toast" id="toast"></div>
+
+<!-- ======= FOOTER (sticky actions bar; not “developed by”) ======= -->
+<div class="footer-actions" id="footerBar">
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="pill-btn" id="homeBtn"><i class="fa fa-house"></i> Home</button>
+    <button class="pill-btn" id="favOnlyBtn"><i class="fa fa-heart"></i> Favorites</button>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span style="color:var(--muted);font-size:.9rem" id="statusText">Ready</span>
+  </div>
+</div>
+
+<script>
+/* ================== CONFIG (GitHub raw) ================== */
+const GITHUB_USER  = "jibril-tengeh";
+const GITHUB_REPO  = "sbi";
+const GITHUB_BRANCH= "main"; // change if your default branch is different
+const GITHUB_BASE  = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`;
+
+/* ================== STATE ================== */
+let currentLanguage = localStorage.getItem('lang') || 'en';
 let categoriesData = [];
-let duasData = [];
+let duasData = [];      // current category
+let favorites = JSON.parse(localStorage.getItem('favorites')||'{}'); // {duaId:boolean}
+let showTransliterations = JSON.parse(localStorage.getItem('showTransliterations')||'true');
+let showTranslations = JSON.parse(localStorage.getItem('showTranslations')||'true');
+
+let fontArabic = localStorage.getItem('fontArabic') || 'Amiri';
+let fontSizeArabic = parseInt(localStorage.getItem('fontSizeArabic')||'22',10);
+let fontSizeTranslation = parseInt(localStorage.getItem('fontSizeTranslation')||'16',10);
+let fontSizeTransliteration = parseInt(localStorage.getItem('fontSizeTransliteration')||'16',10);
+
+let themeIndex = parseInt(localStorage.getItem('themeIndex')||'0',10); // 0..24
+let customTheme = JSON.parse(localStorage.getItem('customTheme')||'null');
+
+let viewingFavorites = false;
+
+/* ================== UI ELEMENTS ================== */
 const els = {
   categoriesList: document.getElementById('categoriesList'),
   categoryDetails: document.getElementById('categoryDetails'),
@@ -299,426 +458,529 @@ const els = {
   searchToggle: document.getElementById('searchToggle'),
   searchBarContainer: document.getElementById('searchBarContainer'),
   searchBar: document.getElementById('searchBar'),
-  sectionTitle: document.getElementById('sectionTitle'),
-  favoritesBar: document.getElementById('favoritesBar'),
-  clearFavoritesBtn: document.getElementById('clearFavoritesBtn'),
-  themeFade: document.getElementById('themeFade'),
-  // Settings
+  sectionTitle: document.querySelector('.section-title'),
+  favoritesViewBtn: document.getElementById('favoritesViewBtn'),
+  favOnlyBtn: document.getElementById('favOnlyBtn'),
+  homeBtn: document.getElementById('homeBtn'),
+  aboutBtn: document.getElementById('aboutBtn'),
+  aboutModal: document.getElementById('aboutModal'),
+  closeAbout: document.getElementById('closeAbout'),
   settingsFab: document.getElementById('settingsFab'),
-  settingsOverlay: document.getElementById('settingsOverlay'),
-  settingsPanel: document.getElementById('settingsPanel'),
-  settingsClose: document.getElementById('settingsClose'),
-  darkToggle: document.getElementById('darkToggle'),
+  settingsSheet: document.getElementById('settingsSheet'),
+  closeSettings: document.getElementById('closeSettings'),
+  currentLangLabel: document.getElementById('currentLangLabel'),
+  cycleLangBtn: document.getElementById('cycleLangBtn'),
+  toast: document.getElementById('toast'),
+  statusText: document.getElementById('statusText'),
+
+  // Settings controls
   toggleTranslations: document.getElementById('toggleTranslations'),
+  toggleTranslationsSwitch: document.getElementById('toggleTranslationsSwitch'),
   toggleTransliterations: document.getElementById('toggleTransliterations'),
-  arabicInc: document.getElementById('arabicInc'),
-  arabicDec: document.getElementById('arabicDec'),
-  translationInc: document.getElementById('translationInc'),
-  translationDec: document.getElementById('translationDec'),
-  translitInc: document.getElementById('translitInc'),
-  translitDec: document.getElementById('translitDec'),
-  arabicFontSelect: document.getElementById('arabicFontSelect'),
+  toggleTransliterationsSwitch: document.getElementById('toggleTransliterationsSwitch'),
+  arabicSize: document.getElementById('arabicSize'),
+  arabicSizeVal: document.getElementById('arabicSizeVal'),
+  translationSize: document.getElementById('translationSize'),
+  translationSizeVal: document.getElementById('translationSizeVal'),
+  transliterationSize: document.getElementById('transliterationSize'),
+  transliterationSizeVal: document.getElementById('transliterationSizeVal'),
+  arabicFont: document.getElementById('arabicFont'),
+  openThemeGridBtn: document.getElementById('openThemeGridBtn'),
   themeGrid: document.getElementById('themeGrid'),
   applyCustomTheme: document.getElementById('applyCustomTheme'),
-  resetTheme: document.getElementById('resetTheme'),
+
   cPrimary: document.getElementById('cPrimary'),
   cSecondary: document.getElementById('cSecondary'),
   cAccent: document.getElementById('cAccent'),
   cBg: document.getElementById('cBg'),
-  cCard: document.getElementById('cCard'),
   cText: document.getElementById('cText'),
-  languageSelect: document.getElementById('languageSelect'),
+  cCard: document.getElementById('cCard'),
+  cBorder: document.getElementById('cBorder'),
 };
 
-/* ============================== I18N ============================== */
-const I18N = {
-  en:{back:"Back",remove_all_fav:"Remove All Favorites",display:"Display Settings",show_translations:"Show Translations",show_transliterations:"Show Transliteration",arabic_size:"Arabic size",translation_size:"Translation size",transliteration_size:"Transliteration size",arabic_font:"Arabic Font",default_font:"Default",themes:"Theme & Dark Mode",dark_mode:"Dark Mode",choose_theme:"Choose Theme",custom_theme:"Create your theme",primary:"Primary",secondary:"Secondary",accent:"Accent",bg:"Background",card:"Card",text:"Text",apply:"Apply",reset:"Reset",settings:"Settings"},
-  fr:{back:"Retour",remove_all_fav:"Tout supprimer",display:"Affichage",show_translations:"Afficher les traductions",show_transliterations:"Afficher la translittération",arabic_size:"Taille arabe",translation_size:"Taille traduction",transliteration_size:"Taille translittération",arabic_font:"Police arabe",default_font:"Par défaut",themes:"Thèmes & Mode sombre",dark_mode:"Mode sombre",choose_theme:"Choisir un thème",custom_theme:"Créer votre thème",primary:"Principal",secondary:"Secondaire",accent:"Accent",bg:"Arrière-plan",card:"Carte",text:"Texte",apply:"Appliquer",reset:"Réinitialiser",settings:"Paramètres"},
-  ru:{back:"Назад",remove_all_fav:"Очистить избранное",display:"Отображение",show_translations:"Показывать переводы",show_transliterations:"Показывать транслитерацию",arabic_size:"Размер арабского",translation_size:"Размер перевода",transliteration_size:"Размер транслитерации",arabic_font:"Арабский шрифт",default_font:"По умолчанию",themes:"Темы и тьма",dark_mode:"Тёмная тема",choose_theme:"Выбор темы",custom_theme:"Своя тема",primary:"Основной",secondary:"Доп.",accent:"Акцент",bg:"Фон",card:"Карточка",text:"Текст",apply:"Применить",reset:"Сброс",settings:"Настройки"},
-  zh:{back:"返回",remove_all_fav:"清除收藏",display:"显示设置",show_translations:"显示翻译",show_transliterations:"显示音译",arabic_size:"阿文大小",translation_size:"译文大小",transliteration_size:"音译大小",arabic_font:"阿拉伯字体",default_font:"默认",themes:"主题与深色模式",dark_mode:"深色模式",choose_theme:"选择主题",custom_theme:"创建主题",primary:"主色",secondary:"次色",accent:"强调色",bg:"背景",card:"卡片",text:"文字",apply:"应用",reset:"重置",settings:"设置"},
-  ha:{back:"Komawa",remove_all_fav:"Goge duk Masoya",display:"Nuni",show_translations:"Nuna Fassara",show_transliterations:"Nuna Haruffa",arabic_size:"Girman Larabci",translation_size:"Girman Fassara",transliteration_size:"Girman Haruffa",arabic_font:"Font ɗin Larabci",default_font:"Tsoho",themes:"Jigo & Duhu",dark_mode:"Yanayin Duƙiƙe",choose_theme:"Zaɓi jigo",custom_theme:"Ƙirƙiri jigo",primary:"Na farko",secondary:"Na biyu",accent:"Lalata",bg:"Baya",card:"Kati",text:"Rubutu",apply:"Aiwatar",reset:"Sake saiti",settings:"Saituna"},
-};
-function t(key){return (I18N[currentLanguage] && I18N[currentLanguage][key]) || I18N.en[key] || key;}
-function applyI18N(){
-  document.querySelectorAll('[data-i18n]').forEach(n=>n.textContent=t(n.getAttribute('data-i18n')));
-  document.getElementById('searchBar').placeholder =
-    currentLanguage==='fr'?'Rechercher catégories ou duas...':
-    currentLanguage==='ru'?'Поиск категорий или дуа...':
-    currentLanguage==='zh'?'搜索分类或祈祷...':
-    currentLanguage==='ha'?'Bincika rukuni ko addu’o’i...':
-    'Search categories or duas...';
-  document.getElementById('settingsTitle').textContent=t('settings');
-  document.querySelector('#backBtn span').textContent=t('back');
-  document.querySelector('#clearFavoritesBtn span').textContent=t('remove_all_fav');
-}
-
-/* ============================== STORAGE ============================== */
-const LS = { get(k,d){try{return JSON.parse(localStorage.getItem(k)) ?? d}catch{return d}}, set(k,v){localStorage.setItem(k, JSON.stringify(v))} };
-function langKey(base){ return `${base}:${currentLanguage}` }
-
-/* ============================== FAVORITES ============================== */
-function getFavorites(){return LS.get(langKey('favorites'), [])}
-function setFavorites(arr){LS.set(langKey('favorites'), arr)}
-function toggleFavorite(dua){
-  let fav = getFavorites();
-  const exists = fav.some(x=>x.id===dua.id);
-  fav = exists ? fav.filter(x=>x.id!==dua.id) : [...fav, dua];
-  setFavorites(fav);
-}
-function isFavorite(dua){return getFavorites().some(x=>x.id===dua.id)}
-
-/* ============================== THEMES / DARK ============================== */
+/* ================== THEMES (25 presets) ================== */
 const THEMES = [
-  {primary:"#16a34a",secondary:"#0e9f6e",accent:"#f05252",bg:"#f9fafb",text:"#111827",card:"#ffffff"},
-  {primary:"#0ea5e9",secondary:"#0284c7",accent:"#f97316",bg:"#f1f5f9",text:"#0f172a",card:"#ffffff"},
-  {primary:"#8b5cf6",secondary:"#7c3aed",accent:"#f43f5e",bg:"#faf5ff",text:"#1f2937",card:"#ffffff"},
-  {primary:"#ef4444",secondary:"#dc2626",accent:"#0ea5e9",bg:"#fff1f2",text:"#111827",card:"#ffffff"},
-  {primary:"#22c55e",secondary:"#16a34a",accent:"#eab308",bg:"#ecfeff",text:"#0f172a",card:"#ffffff"},
-  {primary:"#eab308",secondary:"#ca8a04",accent:"#ef4444",bg:"#fffbeb",text:"#111827",card:"#ffffff"},
-  {primary:"#14b8a6",secondary:"#0d9488",accent:"#f43f5e",bg:"#ecfeff",text:"#0f172a",card:"#ffffff"},
-  {primary:"#f43f5e",secondary:"#e11d48",accent:"#06b6d4",bg:"#fff1f2",text:"#111827",card:"#ffffff"},
-  {primary:"#06b6d4",secondary:"#0891b2",accent:"#f59e0b",bg:"#ecfeff",text:"#0f172a",card:"#ffffff"},
-  {primary:"#a3e635",secondary:"#65a30d",accent:"#0ea5e9",bg:"#f7fee7",text:"#111827",card:"#ffffff"},
-  {primary:"#fb7185",secondary:"#f43f5e",accent:"#22c55e",bg:"#fff1f2",text:"#111827",card:"#ffffff"},
-  {primary:"#f59e0b",secondary:"#d97706",accent:"#10b981",bg:"#fffbeb",text:"#111827",card:"#ffffff"},
-  {primary:"#84cc16",secondary:"#65a30d",accent:"#0ea5e9",bg:"#f7fee7",text:"#111827",card:"#ffffff"},
-  {primary:"#ef4444",secondary:"#b91c1c",accent:"#22c55e",bg:"#fee2e2",text:"#111827",card:"#ffffff"},
-  {primary:"#10b981",secondary:"#059669",accent:"#eab308",bg:"#ecfdf5",text:"#0f172a",card:"#ffffff"},
-  {primary:"#3b82f6",secondary:"#2563eb",accent:"#f97316",bg:"#eff6ff",text:"#0f172a",card:"#ffffff"},
-  {primary:"#f97316",secondary:"#ea580c",accent:"#22c55e",bg:"#fff7ed",text:"#111827",card:"#ffffff"},
-  {primary:"#7c3aed",secondary:"#6d28d9",accent:"#f59e0b",bg:"#faf5ff",text:"#1f2937",card:"#ffffff"},
-  {primary:"#0ea5e9",secondary:"#0284c7",accent:"#ef4444",bg:"#e0f2fe",text:"#0f172a",card:"#ffffff"},
-  {primary:"#64748b",secondary:"#475569",accent:"#f59e0b",bg:"#f1f5f9",text:"#0f172a",card:"#ffffff"},
-  {primary:"#0d9488",secondary:"#0f766e",accent:"#f43f5e",bg:"#ecfeff",text:"#0f172a",card:"#ffffff"},
-  {primary:"#dc2626",secondary:"#b91c1c",accent:"#06b6d4",bg:"#fee2e2",text:"#111827",card:"#ffffff"},
-  {primary:"#4f46e5",secondary:"#4338ca",accent:"#f97316",bg:"#eef2ff",text:"#0f172a",card:"#ffffff"},
-  {primary:"#9333ea",secondary:"#7e22ce",accent:"#22c55e",bg:"#faf5ff",text:"#1f2937",card:"#ffffff"},
-  {primary:"#14b8a6",secondary:"#0ea5e9",accent:"#f43f5e",bg:"#f0fdfa",text:"#0f172a",card:"#ffffff"},
+  {name:"Emerald", primary:"#16a34a",secondary:"#0e9f6e",accent:"#f05252",bg:"#f9fafb",text:"#111827",border:"#e5e7eb",card:"#ffffff"},
+  {name:"Ocean", primary:"#0284c7",secondary:"#0ea5e9",accent:"#f97316",bg:"#f1f5f9",text:"#0f172a",border:"#e2e8f0",card:"#ffffff"},
+  {name:"Rose", primary:"#e11d48",secondary:"#fb7185",accent:"#22c55e",bg:"#fff1f2",text:"#111827",border:"#fecdd3",card:"#ffffff"},
+  {name:"Grape", primary:"#7c3aed",secondary:"#a78bfa",accent:"#06b6d4",bg:"#f5f3ff",text:"#111827",border:"#ddd6fe",card:"#ffffff"},
+  {name:"Sunset", primary:"#f59e0b",secondary:"#f97316",accent:"#10b981",bg:"#fff7ed",text:"#111827",border:"#fed7aa",card:"#ffffff"},
+  {name:"Forest", primary:"#166534",secondary:"#16a34a",accent:"#f59e0b",bg:"#ecfdf5",text:"#052e16",border:"#bbf7d0",card:"#ffffff"},
+  {name:"Slate", primary:"#334155",secondary:"#64748b",accent:"#ef4444",bg:"#f1f5f9",text:"#0f172a",border:"#e2e8f0",card:"#ffffff"},
+  {name:"Sky", primary:"#0ea5e9",secondary:"#38bdf8",accent:"#6366f1",bg:"#e0f2fe",text:"#0c4a6e",border:"#bae6fd",card:"#ffffff"},
+  {name:"Mint", primary:"#10b981",secondary:"#34d399",accent:"#f43f5e",bg:"#ecfeff",text:"#052e16",border:"#a7f3d0",card:"#ffffff"},
+  {name:"Cocoa", primary:"#7c3f00",secondary:"#a16207",accent:"#ef4444",bg:"#fff7ed",text:"#3f2d1c",border:"#f4d6b0",card:"#ffffff"},
+  {name:"Royal", primary:"#1d4ed8",secondary:"#6366f1",accent:"#22c55e",bg:"#eff6ff",text:"#0b1a51",border:"#bfdbfe",card:"#ffffff"},
+  {name:"Crimson", primary:"#dc2626",secondary:"#ef4444",accent:"#06b6d4",bg:"#fef2f2",text:"#111827",border:"#fecaca",card:"#ffffff"},
+  {name:"Lime", primary:"#84cc16",secondary:"#65a30d",accent:"#0ea5e9",bg:"#f7fee7",text:"#1a2e05",border:"#d9f99d",card:"#ffffff"},
+  {name:"Aubergine", primary:"#581c87",secondary:"#7e22ce",accent:"#22c55e",bg:"#faf5ff",text:"#2e1065",border:"#e9d5ff",card:"#ffffff"},
+  {name:"Gold", primary:"#d97706",secondary:"#f59e0b",accent:"#10b981",bg:"#fffbeb",text:"#111827",border:"#fde68a",card:"#ffffff"},
+  {name:"Teal", primary:"#0f766e",secondary:"#14b8a6",accent:"#f59e0b",bg:"#ecfeff",text:"#0f172a",border:"#99f6e4",card:"#ffffff"},
+  {name:"Lagoon", primary:"#0891b2",secondary:"#06b6d4",accent:"#a78bfa",bg:"#ecfeff",text:"#0e7490",border:"#67e8f9",card:"#ffffff"},
+  {name:"Steel", primary:"#1f2937",secondary:"#4b5563",accent:"#f59e0b",bg:"#f3f4f6",text:"#111827",border:"#e5e7eb",card:"#ffffff"},
+  {name:"WarmGrey", primary:"#6b7280",secondary:"#9ca3af",accent:"#f97316",bg:"#f9fafb",text:"#111827",border:"#e5e7eb",card:"#ffffff"},
+  {name:"CyanPop", primary:"#06b6d4",secondary:"#22d3ee",accent:"#ef4444",bg:"#ecfeff",text:"#0e7490",border:"#a5f3fc",card:"#ffffff"},
+  {name:"Dark", primary:"#14b8a6",secondary:"#0ea5e9",accent:"#ef4444",bg:"#0b1020",text:"#f4f4f5",border:"#1f2937",card:"#0f172a"},
+  {name:"Midnight", primary:"#6366f1",secondary:"#7c3aed",accent:"#22c55e",bg:"#0f172a",text:"#e5e7eb",border:"#1f2937",card:"#111827"},
+  {name:"Charcoal", primary:"#94a3b8",secondary:"#64748b",accent:"#22c55e",bg:"#0b1220",text:"#e2e8f0",border:"#1e293b",card:"#111827"},
+  {name:"Olive", primary:"#84cc16",secondary:"#65a30d",accent:"#22c55e",bg:"#111827",text:"#e5e7eb",border:"#334155",card:"#0b1220"},
+  {name:"Ink", primary:"#22c55e",secondary:"#0ea5e9",accent:"#f97316",bg:"#0b0f19",text:"#e5e7eb",border:"#1f2937",card:"#111827"},
 ];
+
+/* ================== HELPERS ================== */
+const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+
+function toast(msg,type="info",ms=2000){
+  els.toast.textContent = msg;
+  els.toast.className = `toast ${type} show`;
+  setTimeout(()=>{els.toast.classList.remove('show')}, ms);
+}
+
+function setStatus(msg){ els.statusText.textContent = msg; }
+
 function applyTheme(theme){
-  const r=document.documentElement;
+  const r = document.documentElement;
   r.style.setProperty('--primary', theme.primary);
   r.style.setProperty('--secondary', theme.secondary);
   r.style.setProperty('--accent', theme.accent);
   r.style.setProperty('--bg', theme.bg);
   r.style.setProperty('--text', theme.text);
+  r.style.setProperty('--border', theme.border);
   r.style.setProperty('--card', theme.card);
-  LS.set('themeActive', theme);
-  const cs=getComputedStyle(r); const a=cs.getPropertyValue('--primary'), b=cs.getPropertyValue('--secondary');
-  document.getElementById('themeFade').style.background=`linear-gradient(135deg, ${a}, ${b})`;
-  document.getElementById('themeFade').classList.add('show'); setTimeout(()=>document.getElementById('themeFade').classList.remove('show'),300);
-}
-function setDarkMode(on){
-  const r=document.documentElement;
-  if(on){ r.style.setProperty('--bg','#0b1020'); r.style.setProperty('--text','#f7fafc'); r.style.setProperty('--card','#0f172a'); r.style.setProperty('--border','#1f2a44'); }
-  else{ const th=LS.get('themeActive', THEMES[0]); r.style.setProperty('--bg',th.bg); r.style.setProperty('--text',th.text); r.style.setProperty('--card',th.card); r.style.setProperty('--border','#e5e7eb'); }
-  LS.set('darkMode', !!on);
-}
-function buildThemeGrid(){
-  els.themeGrid.innerHTML='';
-  THEMES.forEach((th,i)=>{
-    const sw=document.createElement('button');
-    sw.className='theme-swatch';
-    sw.title=`Theme ${i+1}`;
-    sw.innerHTML=`<div style="background:linear-gradient(90deg, ${th.primary}, ${th.secondary})"></div>`;
-    sw.onclick=()=>{ applyTheme(th); if(LS.get('darkMode',false)) setDarkMode(true); };
-    els.themeGrid.appendChild(sw);
-  });
+
+  // toggle dark class hint (used for small styling touches)
+  const darkBg = tinyColor(theme.bg).isDark();
+  document.body.classList.toggle('dark', darkBg);
 }
 
-/* ============================== FETCH HELPERS ============================== */
-async function fetchJSON(path){
-  const res = await fetch(path, {cache:'no-store'});
-  if(!res.ok) throw new Error(`${res.status} @ ${path}`);
-  return await res.json();
+function tinyColor(hex){
+  // mini color helper to detect luminance
+  const c = hex.replace('#','');
+  const r = parseInt(c.substring(0,2),16);
+  const g = parseInt(c.substring(2,4),16);
+  const b = parseInt(c.substring(4,6),16);
+  const luma = (0.2126*r + 0.7152*g + 0.0722*b)/255;
+  return {
+    isDark: ()=> luma < 0.5
+  }
 }
-function urlCategories(lang){ return `${BASE_URL}/categories/${lang}.json`; }
-function urlDuas(catId, lang){ return `${BASE_URL}/duas/categories_${catId}/${lang}.json`; }
 
-/* ============================== CATEGORIES & DUAS ============================== */
-async function loadCategories(){
-  els.categoriesList.innerHTML = '<li class="loading">Loading categories...</li>';
+function savePrefs(){
+  localStorage.setItem('lang', currentLanguage);
+  localStorage.setItem('showTranslations', JSON.stringify(showTranslations));
+  localStorage.setItem('showTransliterations', JSON.stringify(showTransliterations));
+  localStorage.setItem('fontArabic', fontArabic);
+  localStorage.setItem('fontSizeArabic', fontSizeArabic);
+  localStorage.setItem('fontSizeTranslation', fontSizeTranslation);
+  localStorage.setItem('fontSizeTransliteration', fontSizeTransliteration);
+  localStorage.setItem('themeIndex', themeIndex);
+  if(customTheme) localStorage.setItem('customTheme', JSON.stringify(customTheme));
+}
+
+function updateFontVars(){
+  document.documentElement.style.setProperty('--font-arabic-size', fontSizeArabic + 'px');
+  document.documentElement.style.setProperty('--font-translation-size', fontSizeTranslation + 'px');
+  document.documentElement.style.setProperty('--font-transliteration-size', fontSizeTransliteration + 'px');
+  document.documentElement.style.setProperty('--arabic-font', `"${fontArabic}", serif`);
+}
+
+/* ================== FETCHERS (with cache fallback) ================== */
+async function fetchJSONWithCache(url, cacheKey){
   try{
-    const remote = await fetchJSON(urlCategories(currentLanguage));
-    categoriesData = (Array.isArray(remote)? remote : []).map((c, idx)=>({ id: c.id ?? (idx+1), title: c.title || c.name || `Category ${idx+1}` }));
-  }catch(e){
-    console.error(e);
-    els.categoriesList.innerHTML = '<li class="error">Failed to load categories.</li>';
-    categoriesData = [];
+    const res = await fetch(url, {cache:'no-store'});
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    localStorage.setItem(cacheKey, JSON.stringify({ts:Date.now(), data}));
+    return data;
+  }catch(err){
+    const cached = localStorage.getItem(cacheKey);
+    if(cached){
+      setStatus('Offline – using cached data');
+      return JSON.parse(cached).data;
+    }
+    throw err;
   }
-  const fav = getFavorites();
-  if(fav.length){
-    const favTitle = {en:"★ Favorites", fr:"★ Favoris", ru:"★ Избранное", zh:"★ 收藏", ha:"★ Masoya"}[currentLanguage] || "★ Favorites";
-    categoriesData = [{id:'fav', title:favTitle}, ...categoriesData];
-  }
-  renderCategories();
 }
 
+async function loadCategories(){
+  try{
+    els.categoriesList.innerHTML = '<li class="loading">Loading categories...</li>';
+    const url = `${GITHUB_BASE}categories/${currentLanguage}.json`;
+    const cacheKey = `categories_${currentLanguage}`;
+    categoriesData = await fetchJSONWithCache(url, cacheKey);
+    renderCategories();
+    setStatus('Categories loaded');
+  }catch(err){
+    console.error('Categories error:', err);
+    els.categoriesList.innerHTML = '<li class="error">Failed to load categories.</li>';
+    setStatus('Failed to load categories');
+  }
+}
+
+async function loadCategoryDuas(categoryId, categoryName){
+  try{
+    els.categoryDetails.style.display = 'block';
+    els.categoriesList.style.display = 'none';
+    els.sectionTitle.textContent = categoryName;
+    els.duaContainer.innerHTML = '<div class="loading">Loading duas...</div>';
+    const url = `${GITHUB_BASE}duas/categories_${categoryId}/${currentLanguage}.json`;
+    const cacheKey = `duas_${categoryId}_${currentLanguage}`;
+    duasData = await fetchJSONWithCache(url, cacheKey);
+    renderDuas();
+    setStatus('Duas loaded');
+  }catch(err){
+    console.error('Duas error:', err);
+    els.duaContainer.innerHTML = '<div class="error">Failed to load duas.</div>';
+    setStatus('Failed to load duas');
+  }
+}
+
+/* ================== RENDERERS ================== */
 function renderCategories(filter=''){
   const ul = els.categoriesList; ul.innerHTML = '';
   let filtered = categoriesData;
-  if(filter){ filtered = categoriesData.filter(cat=> (cat.title||'').toLowerCase().includes(filter.toLowerCase())); }
+  if(filter){
+    filtered = categoriesData.filter(cat=>cat.title.toLowerCase().includes(filter.toLowerCase()));
+  }
   if(!filtered.length){ ul.innerHTML = '<li class="no-results">No categories available</li>'; return; }
-  filtered.forEach((cat)=>{
+  filtered.forEach((cat, idx)=>{
+    // Note: we assume category id is (idx+1) matching your folder names categories_1, categories_2, ...
     const li = document.createElement('li'); li.className = 'category-item';
-    li.innerHTML = `<div class="category-arrow">›</div><div class="category-title">${cat.title}</div>`;
-    li.addEventListener('click', ()=>loadCategoryDuas(cat.id, cat.title));
+    li.innerHTML = `
+      <div class="category-arrow"><i class="fas fa-chevron-right"></i></div>
+      <div class="category-title">${cat.title}</div>
+      <div class="category-count">${idx+1}</div>
+    `;
+    li.addEventListener('click', ()=>loadCategoryDuas(idx+1, cat.title));
     ul.appendChild(li);
   });
 }
 
-async function loadCategoryDuas(categoryId, categoryName){
-  els.categoryDetails.style.display = 'block';
-  els.categoriesList.style.display = 'none';
-  els.sectionTitle.textContent = categoryName;
-  els.duaContainer.innerHTML = '<div class="loading">Loading duas...</div>';
-
-  if(categoryId==='fav'){
-    duasData = getFavorites();
-    els.favoritesBar.style.display = 'block';
-    renderDuas();
-    return;
-  } else {
-    els.favoritesBar.style.display = 'none';
-  }
-
-  try{
-    const remote = await fetchJSON(urlDuas(categoryId, currentLanguage));
-    duasData = (Array.isArray(remote)? remote : []).map((d, idx)=>({ id: d.id ?? `${categoryId}-${idx+1}`, ...d }));
-  }catch(e){
-    console.error(e);
-    els.duaContainer.innerHTML = `<div class="error">Failed to load duas for this category.</div>`;
-    duasData = [];
-    return;
-  }
-  renderDuas();
-}
-
 function renderDuas(filter=''){
   const container = els.duaContainer; container.innerHTML = '';
-  let filtered = duasData;
+  let list = duasData;
+
+  if(viewingFavorites){
+    const favKeys = Object.keys(favorites).filter(k=>favorites[k]);
+    list = duasData.filter(d=> favKeys.includes(String(d.id)));
+  }
+
   if(filter){
-    const q=filter.toLowerCase();
-    filtered = duasData.filter(dua=>
-      (dua.translation && String(dua.translation).toLowerCase().includes(q)) ||
-      (dua.transliteration && String(dua.transliteration).toLowerCase().includes(q)) ||
-      (dua.arabic && String(dua.arabic).includes(filter))
+    const f = filter.toLowerCase();
+    list = list.filter(dua => 
+      (dua.translation && dua.translation.toLowerCase().includes(f)) ||
+      (dua.transliteration && dua.transliteration.toLowerCase().includes(f)) ||
+      (dua.arabic && dua.arabic.includes(filter))
     );
   }
-  if(!filtered.length){ container.innerHTML = '<div class="no-results">No duas available</div>'; return; }
 
-  const showTr = LS.get('showTranslations', true);
-  const showTl = LS.get('showTransliterations', true);
-  const arabicFont = LS.get('arabicFont','') || 'inherit';
+  if(!list.length){ container.innerHTML = '<div class="no-results">No duas available</div>'; updateFavCount(); return; }
 
-  filtered.forEach(dua=>{
-    const card = document.createElement('div'); card.className = 'dua-item';
+  list.forEach(dua=>{
+    const isFav = !!favorites[dua.id];
+    const d = document.createElement('div'); d.className = 'dua-item';
 
-    // ACTION ROW
-    const row = document.createElement('div'); row.className = 'dua-action-row';
-    row.innerHTML = `
-      <div class="dua-circle circle-share" title="Share" data-action="share">${icons.share}</div>
-      <div class="dua-circle circle-fav ${isFavorite(dua)?'active':''}" title="Favorite" data-action="favorite">${icons.bookmark}</div>
-      <div class="dua-circle circle-copy" title="Copy" data-action="copy">${icons.copy}</div>
-      <div class="dua-circle circle-play" title="Play" data-action="play">${icons.play}</div>
+    const translitHtml = showTransliterations && dua.transliteration ? `<div class="dua-transliteration">${dua.transliteration}</div>` : '';
+    const transHtml = showTranslations && dua.translation ? `<div class="dua-translation">${dua.translation}</div>` : '';
+
+    d.innerHTML = `
+      <div class="dua-header">
+        <div class="ref-left">${dua.reference ? dua.reference : ''}</div>
+        <div class="ref-right"></div>
+      </div>
+      ${dua.arabic ? `<div class="dua-arabic">${dua.arabic}</div>` : ''}
+      ${translitHtml}
+      ${transHtml}
+      ${dua.source ? `<div class="dua-reference">${dua.source}</div>` : ''}
+      <div class="dua-actions">
+        <button class="icon-btn fav ${isFav?'active':''}" title="Favorite"><i class="fa fa-heart"></i></button>
+        <button class="icon-btn share" title="Share"><i class="fa fa-share-nodes"></i></button>
+        <button class="icon-btn save" title="Save"><i class="fa fa-download"></i></button>
+        <button class="icon-btn copy" title="Copy"><i class="fa fa-copy"></i></button>
+      </div>
     `;
-    card.appendChild(row);
 
-    // TEXTS
-    if(dua.arabic){
-      const a = document.createElement('div');
-      a.className = 'dua-arabic';
-      a.style.fontFamily = arabicFont;
-      a.textContent = dua.arabic;
-      card.appendChild(a);
-    }
-    if(showTl && dua.transliteration){
-      const tl = document.createElement('div'); tl.className='dua-transliteration'; tl.textContent=dua.transliteration; card.appendChild(tl);
-    }
-    if(showTr && dua.translation){
-      const tr = document.createElement('div'); tr.className='dua-translation'; tr.textContent=dua.translation; card.appendChild(tr);
-    }
-    if(dua.reference){
-      const rf = document.createElement('div'); rf.className='dua-reference'; rf.textContent=dua.reference; card.appendChild(rf);
-    }
-
-    // Attach actions
-    row.querySelectorAll('.dua-circle').forEach(btn=>{
-      btn.addEventListener('click', ()=>handleCardAction(btn.dataset.action, dua, row));
+    // actions
+    d.querySelector('.fav').addEventListener('click', ()=>{
+      favorites[dua.id] = !favorites[dua.id];
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      d.querySelector('.fav').classList.toggle('active', !!favorites[dua.id]);
+      updateFavCount();
+      toast(favorites[dua.id] ? 'Added to favorites' : 'Removed from favorites','success',2000);
     });
 
-    container.appendChild(card);
+    d.querySelector('.share').addEventListener('click', async ()=>{
+      const text = buildDuaPlainText(dua);
+      if(navigator.share){
+        try{ await navigator.share({title:'Dua', text}); toast('Shared','success',2000);}catch(e){}
+      }else{
+        await copyToClipboard(text);
+        toast('Copied for sharing','info',2000);
+      }
+    });
+
+    d.querySelector('.save').addEventListener('click', ()=>{
+      const text = buildDuaPlainText(dua);
+      const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `dua_${dua.id||'item'}.txt`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      toast('Saved as file','success',2000);
+    });
+
+    d.querySelector('.copy').addEventListener('click', async ()=>{
+      await copyToClipboard(buildDuaPlainText(dua));
+      toast('Copied','success',2000);
+    });
+
+    container.appendChild(d);
   });
+
+  updateFavCount();
 }
 
-/* ============================== CARD ACTIONS ============================== */
-function handleCardAction(action, dua, rowEl){
-  const text = `${dua.arabic || ''}\n${dua.transliteration || ''}\n${dua.translation || ''}\n${dua.reference || ''}`.trim();
-  if(action==='share'){
-    if(navigator.share){ navigator.share({title:'Dua', text}).catch(()=>copyFallback(text)); }
-    else copyFallback(text);
-  }
-  if(action==='favorite'){
-    toggleFavorite(dua);
-    const favBtn = rowEl.querySelector('[data-action="favorite"]');
-    favBtn.classList.toggle('active');
-  }
-  if(action==='copy'){
-    copyFallback(text);
-  }
-  if(action==='play'){
-    try{
-      const utter = new SpeechSynthesisUtterance(dua.arabic || '');
-      utter.lang = 'ar-SA';
-      speechSynthesis.cancel(); speechSynthesis.speak(utter);
-    }catch{ alert('Audio not supported on this device.'); }
+function buildDuaPlainText(dua){
+  let t = '';
+  if(dua.arabic) t += dua.arabic + '\n\n';
+  if(showTransliterations && dua.transliteration) t += dua.transliteration + '\n\n';
+  if(showTranslations && dua.translation) t += dua.translation + '\n\n';
+  if(dua.reference) t += '('+dua.reference+')\n';
+  if(dua.source) t += 'Source: '+dua.source+'\n';
+  return t.trim();
+}
+
+async function copyToClipboard(text){
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(_){}; document.body.removeChild(ta);
   }
 }
-function copyFallback(text){
-  try{navigator.clipboard.writeText(text); alert('Copied!')}catch{alert('Copy failed')}
+
+function updateFavCount(){
+  const count = Object.values(favorites).filter(Boolean).length;
+  document.querySelector('.fav-count').textContent = count;
 }
 
-/* ============================== SETTINGS: VISIBILITY, FONTS, SIZES ============================== */
-function applySizeVars(){
-  document.documentElement.style.setProperty('--font-arabic-size', LS.get('fsArabic','1.6rem'));
-  document.documentElement.style.setProperty('--font-translation-size', LS.get('fsTranslation','1rem'));
-  document.documentElement.style.setProperty('--font-transliteration-size', LS.get('fsTranslit','1rem'));
-}
-function stepSize(cur, delta){ const n=parseFloat(cur)||1; let next=Math.max(0.6, n+delta); return next.toFixed(2)+'rem'; }
-function bindSizeControls(){
-  els.arabicInc.onclick = ()=>{ const cur=LS.get('fsArabic','1.6rem'); const nxt=stepSize(cur,.1); LS.set('fsArabic',nxt); applySizeVars(); };
-  els.arabicDec.onclick = ()=>{ const cur=LS.get('fsArabic','1.6rem'); const nxt=stepSize(cur,-.1); LS.set('fsArabic',nxt); applySizeVars(); };
-  els.translationInc.onclick = ()=>{ const cur=LS.get('fsTranslation','1rem'); const nxt=stepSize(cur,.1); LS.set('fsTranslation',nxt); applySizeVars(); };
-  els.translationDec.onclick = ()=>{ const cur=LS.get('fsTranslation','1rem'); const nxt=stepSize(cur,-.1); LS.set('fsTranslation',nxt); applySizeVars(); };
-  els.translitInc.onclick = ()=>{ const cur=LS.get('fsTranslit','1rem'); const nxt=stepSize(cur,.1); LS.set('fsTranslit',nxt); applySizeVars(); };
-  els.translitDec.onclick = ()=>{ const cur=LS.get('fsTranslit','1rem'); const nxt=stepSize(cur,-.1); LS.set('fsTranslit',nxt); applySizeVars(); };
-}
-function bindVisibility(){
-  els.toggleTranslations.checked = LS.get('showTranslations', true);
-  els.toggleTransliterations.checked = LS.get('showTransliterations', true);
-  els.toggleTranslations.onchange = ()=>{ LS.set('showTranslations', els.toggleTranslations.checked); renderDuas(els.searchBar.value); };
-  els.toggleTransliterations.onchange = ()=>{ LS.set('showTransliterations', els.toggleTransliterations.checked); renderDuas(els.searchBar.value); };
-}
-function bindArabicFont(){
-  els.arabicFontSelect.value = LS.get('arabicFont','');
-  els.arabicFontSelect.onchange = ()=>{
-    LS.set('arabicFont', els.arabicFontSelect.value || '');
-    renderDuas(els.searchBar.value);
-  };
-}
-
-/* ============================== CUSTOM THEME ============================== */
-function bindCustomTheme(){
-  els.applyCustomTheme.onclick = ()=>{
-    const th = { primary:els.cPrimary.value, secondary:els.cSecondary.value, accent:els.cAccent.value, bg:els.cBg.value, card:els.cCard.value, text:els.cText.value };
-    applyTheme(th);
-    if(els.darkToggle.checked) setDarkMode(true);
-  };
-  els.resetTheme.onclick = ()=>{ applyTheme(THEMES[0]); setDarkMode(LS.get('darkMode',false)); };
-}
-
-/* ============================== SETTINGS PANEL ============================== */
-function openSettings(){ els.settingsOverlay.style.display='block'; els.settingsPanel.classList.add('open'); els.settingsPanel.setAttribute('aria-hidden','false'); }
-function closeSettings(){ els.settingsOverlay.style.display='none'; els.settingsPanel.classList.remove('open'); els.settingsPanel.setAttribute('aria-hidden','true'); }
-els.settingsFab.addEventListener('click', openSettings);
-els.settingsOverlay.addEventListener('click', closeSettings);
-els.settingsClose.addEventListener('click', closeSettings);
-
-/* ============================== HEADER EVENTS ============================== */
+/* ================== EVENTS ================== */
+// Language cycle (header icon)
 document.getElementById('languageToggle').addEventListener('click', ()=>{
   const langs = ['en','fr','ru','zh','ha'];
   const i = langs.indexOf(currentLanguage);
   currentLanguage = langs[(i+1)%langs.length];
   els.languageText.textContent = currentLanguage.toUpperCase();
+  els.currentLangLabel.textContent = currentLanguage.toUpperCase();
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
   els.sectionTitle.textContent = 'Categories';
-  applyI18N();
+  savePrefs();
   loadCategories();
 });
+
+// Back button
 els.backBtn.addEventListener('click', ()=>{
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
   els.sectionTitle.textContent = 'Categories';
-  applyI18N();
-  loadCategories();
+  viewingFavorites = false;
+  setStatus('Back to categories');
 });
-document.getElementById('themeToggle').addEventListener('click', ()=>{
-  const on = !LS.get('darkMode', false);
-  setDarkMode(on);
-  els.darkToggle.checked = on;
+
+// Theme toggle (icon only toggles between a light preset and a dark preset)
+els.themeToggle.addEventListener('click', ()=>{
+  // toggle between current and Dark theme quickly
+  if(themeIndex === 21){ // Dark preset index in list is 21 (0-based? we added 25; check index)
+    themeIndex = 0;
+  }else{
+    themeIndex = 21; // Dark
+  }
+  applyTheme(THEMES[themeIndex]);
+  savePrefs();
+  // icon swap
+  const icon = els.themeToggle.querySelector('i');
+  icon.className = (themeIndex === 21) ? 'fas fa-sun' : 'fas fa-moon';
 });
+
+// Search toggle
 els.searchToggle.addEventListener('click', ()=>{
   els.searchBarContainer.style.display = els.searchBarContainer.style.display === 'none' ? 'block' : 'none';
   els.searchBar.focus();
 });
+
+// Search input filter
 els.searchBar.addEventListener('input', ()=>{
-  if(els.categoryDetails.style.display === 'block'){ renderDuas(els.searchBar.value); }
-  else{ renderCategories(els.searchBar.value); }
-});
-els.darkToggle.addEventListener('change', (e)=> setDarkMode(e.target.checked));
-els.clearFavoritesBtn.addEventListener('click', ()=>{
-  if(confirm('Clear all favorites?')){
-    setFavorites([]);
-    if(els.sectionTitle.textContent.includes('★') || els.sectionTitle.textContent.includes('Favoris') || els.sectionTitle.textContent.includes('Избранное') || els.sectionTitle.textContent.includes('收藏') || els.sectionTitle.textContent.includes('Masoya')){
-      loadCategoryDuas('fav', els.sectionTitle.textContent);
-    }
+  if(els.categoryDetails.style.display === 'block'){
+    renderDuas(els.searchBar.value);
+  } else {
+    renderCategories(els.searchBar.value);
   }
 });
-els.languageSelect.addEventListener('change', ()=>{
-  currentLanguage = els.languageSelect.value;
-  els.languageText.textContent = currentLanguage.toUpperCase();
-  closeSettings();
+
+// Favorites quick filter in footer bar
+els.favOnlyBtn.addEventListener('click', ()=>{
+  if(els.categoryDetails.style.display !== 'block'){
+    toast('Open a category first','warn',2000);
+    return;
+  }
+  viewingFavorites = !viewingFavorites;
+  els.favOnlyBtn.classList.toggle('active', viewingFavorites);
+  renderDuas(els.searchBar.value);
+});
+
+// Favorites view badge at header
+els.favoritesViewBtn.addEventListener('click', ()=>{
+  if(els.categoryDetails.style.display !== 'block'){
+    toast('Open a category first','warn',2000);
+    return;
+  }
+  viewingFavorites = !viewingFavorites;
+  els.favoritesViewBtn.classList.toggle('active', viewingFavorites);
+  renderDuas(els.searchBar.value);
+});
+
+// Home
+els.homeBtn.addEventListener('click', ()=>{
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
   els.sectionTitle.textContent = 'Categories';
-  applyI18N(); loadCategories();
+  viewingFavorites = false;
 });
 
-/* ============================== ICONS ============================== */
-const icons = {
-  share:`<svg viewBox="0 0 24 24" width="24" height="24"><path fill="#fff" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7a3.27 3.27 0 000-1.39l7-4.11A2.99 2.99 0 0018 7.91a3 3 0 10-2.83-2.01l-7 4.11a3 3 0 100 4.01l7.13 4.19A3 3 0 1018 16.08z"/></svg>`,
-  bookmark:`<svg viewBox="0 0 24 24" width="24" height="24"><path fill="#fff" d="M6 2h12a2 2 0 012 2v18l-8-4-8 4V4a2 2 0 012-2z"/></svg>`,
-  copy:`<svg viewBox="0 0 24 24" width="24" height="24"><path fill="#fff" d="M16 1H4a2 2 0 00-2 2v12h2V3h12V1zm3 4H8a2 2 0 00-2 2v16l6-3 6 3V7a2 2 0 00-2-2z"/></svg>`,
-  play:`<svg viewBox="0 0 24 24" width="24" height="24"><path fill="#fff" d="M8 5v14l11-7z"/></svg>`
-};
+// About modal
+els.aboutBtn.addEventListener('click', ()=> els.aboutModal.classList.add('show'));
+els.closeAbout.addEventListener('click', ()=> els.aboutModal.classList.remove('show'));
+els.aboutModal.addEventListener('click', (e)=>{ if(e.target===els.aboutModal) els.aboutModal.classList.remove('show'); });
 
-/* ============================== INIT ============================== */
-(function init(){
-  // Theme + dark
-  applyTheme(LS.get('themeActive', THEMES[0]));
-  const dm = LS.get('darkMode', false); setDarkMode(dm); els.darkToggle.checked = dm;
-  buildThemeGrid();
+// Settings sheet
+els.settingsFab.addEventListener('click', ()=> els.settingsSheet.classList.add('show'));
+els.closeSettings.addEventListener('click', ()=> els.settingsSheet.classList.remove('show'));
 
-  // Display settings / visibility + sizes + font
-  applySizeVars(); bindSizeControls(); bindVisibility(); bindArabicFont();
+// Settings: Display toggles
+function syncDisplayControls(){
+  // toggles
+  els.toggleTranslations.checked = !!showTranslations;
+  els.toggleTransliterations.checked = !!showTransliterations;
+  // switches background color hint
+  els.toggleTranslationsSwitch.classList.toggle('on', !!showTranslations);
+  els.toggleTransliterationsSwitch.classList.toggle('on', !!showTransliterations);
 
-  // i18n + data
-  applyI18N();
+  // ranges
+  els.arabicSize.value = fontSizeArabic; els.arabicSizeVal.textContent = fontSizeArabic+'px';
+  els.translationSize.value = fontSizeTranslation; els.translationSizeVal.textContent = fontSizeTranslation+'px';
+  els.transliterationSize.value = fontSizeTransliteration; els.transliterationSizeVal.textContent = fontSizeTransliteration+'px';
+
+  // font select
+  els.arabicFont.value = fontArabic;
+}
+
+els.toggleTranslations.addEventListener('change', ()=>{
+  showTranslations = els.toggleTranslations.checked;
+  els.toggleTranslationsSwitch.classList.toggle('on', showTranslations);
+  savePrefs();
+  if(els.categoryDetails.style.display==='block') renderDuas(els.searchBar.value);
+});
+
+els.toggleTransliterations.addEventListener('change', ()=>{
+  showTransliterations = els.toggleTransliterations.checked;
+  els.toggleTransliterationsSwitch.classList.toggle('on', showTransliterations);
+  savePrefs();
+  if(els.categoryDetails.style.display==='block') renderDuas(els.searchBar.value);
+});
+
+els.arabicSize.addEventListener('input', ()=>{
+  fontSizeArabic = parseInt(els.arabicSize.value,10);
+  els.arabicSizeVal.textContent = fontSizeArabic+'px';
+  updateFontVars(); savePrefs();
+});
+els.translationSize.addEventListener('input', ()=>{
+  fontSizeTranslation = parseInt(els.translationSize.value,10);
+  els.translationSizeVal.textContent = fontSizeTranslation+'px';
+  updateFontVars(); savePrefs();
+});
+els.transliterationSize.addEventListener('input', ()=>{
+  fontSizeTransliteration = parseInt(els.transliterationSize.value,10);
+  els.transliterationSizeVal.textContent = fontSizeTransliteration+'px';
+  updateFontVars(); savePrefs();
+});
+els.arabicFont.addEventListener('change', ()=>{
+  fontArabic = els.arabicFont.value;
+  updateFontVars(); savePrefs();
+});
+
+// Theme grid
+function buildThemeGrid(){
+  els.themeGrid.innerHTML = '';
+  THEMES.forEach((t,idx)=>{
+    const card = document.createElement('div');
+    card.className = 'theme-card';
+    card.title = t.name;
+    card.innerHTML = `<div class="swatch" style="background:linear-gradient(135deg, ${t.primary}, ${t.secondary}); border:2px solid ${t.border}"></div>`;
+    card.addEventListener('click', ()=>{
+      themeIndex = idx;
+      applyTheme(t);
+      savePrefs();
+      toast(`Theme: ${t.name}`,'success',1200);
+    });
+    els.themeGrid.appendChild(card);
+  });
+}
+els.openThemeGridBtn.addEventListener('click', ()=>{
+  els.themeGrid.style.display = els.themeGrid.style.display==='none' ? 'grid' : 'none';
+});
+
+// Custom theme apply
+els.applyCustomTheme.addEventListener('click', ()=>{
+  customTheme = {
+    primary: els.cPrimary.value,
+    secondary: els.cSecondary.value,
+    accent: els.cAccent.value,
+    bg: els.cBg.value,
+    text: els.cText.value,
+    border: els.cBorder.value,
+    card: els.cCard.value,
+  };
+  applyTheme(customTheme);
+  savePrefs();
+  toast('Custom theme applied','success',1600);
+});
+
+// Settings: language section
+els.currentLangLabel.textContent = currentLanguage.toUpperCase();
+els.cycleLangBtn.addEventListener('click', ()=>{
+  const langs = ['en','fr','ru','zh','ha'];
+  const i = langs.indexOf(currentLanguage);
+  currentLanguage = langs[(i+1)%langs.length];
+  els.languageText.textContent = currentLanguage.toUpperCase();
+  els.currentLangLabel.textContent = currentLanguage.toUpperCase();
+  savePrefs();
+  // back to categories on switch
+  els.categoryDetails.style.display = 'none';
+  els.categoriesList.style.display = 'block';
+  els.sectionTitle.textContent = 'Categories';
   loadCategories();
+});
 
-  // Service worker (offline for GitHub-fetched JSON after first load)
-  if('serviceWorker' in navigator){
-    const swCode = `
-      const CACHE='adhkar-gh-v1';
-      const CORE=['./','index.html'];
-      self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
-      self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))); self.clients.claim();});
-      self.addEventListener('fetch',e=>{
-        const u=new URL(e.request.url);
-        const isGH = u.hostname==='raw.githubusercontent.com';
-        if(isGH && (u.pathname.includes('/categories/')||u.pathname.includes('/duas/'))){
-          e.respondWith(fetch(e.request).then(res=>{const copy=res.clone(); caches.open(CACHE).then(c=>c.put(e.request,copy)); return res;}).catch(()=>caches.match(e.request)));
-          return;
-        }
-        e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const copy=res.clone(); caches.open(CACHE).then(c=>c.put(e.request,copy)); return res;})));
-      });
-    `;
-    const blob = new Blob([swCode],{type:'text/javascript'});
-    const swUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl);
-  }
-})();
+/* ================== INIT ================== */
+function initTheme(){
+  if(customTheme){ applyTheme(customTheme); }
+  else applyTheme(THEMES[themeIndex] || THEMES[0]);
+  // set icon according to theme darkness
+  const icon = els.themeToggle.querySelector('i');
+  icon.className = (themeIndex === 21) ? 'fas fa-sun' : 'fas fa-moon';
+}
+function init(){
+  els.languageText.textContent = currentLanguage.toUpperCase();
+  updateFontVars();
+  initTheme();
+  buildThemeGrid();
+  syncDisplayControls();
+  loadCategories();
+  setStatus('Ready');
+}
+init();
 </script>
 </body>
 </html>
