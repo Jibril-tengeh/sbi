@@ -17,7 +17,6 @@
   --muted:#6b7280;
   --border:#e5e7eb;
   --card:#ffffff;
-  --card-contrast:#1f2937;
   --radius:14px;
   --shadow:0 8px 24px rgba(0,0,0,.08);
   --font-arabic-size: 22px;
@@ -25,20 +24,14 @@
   --font-transliteration-size: 16px;
   --arabic-font: "Amiri", serif;
 }
-@font-face{font-family:"Amiri-BoldSlanted";src:local("Amiri Bold Slanted"),local("Amiri-BoldSlanted")}
-@font-face{font-family:"albayan";src:local("Al Bayan"),local("albayan")}
-@font-face{font-family:"471btehran";src:local("B Tehran"),local("471btehran")}
-@font-face{font-family:"AmiriQuranColored";src:local("Amiri Quran Colored"),local("AmiriQuranColored")}
-@font-face{font-family:"amiri-bold";src:local("Amiri Bold"),local("amiri-bold")}
-
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";transition:background .25s,color .25s}
 .theme-fade{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .35s ease;z-index:9999}
 .theme-fade.show{opacity:1}
 
-/* ============ HEADER ============ */
+/* ============ HEADER (TOP) ============ */
 header{
-  position:sticky;top:0;z-index:20;
+  position:sticky;top:0;z-index:30;
   background:linear-gradient(135deg,var(--primary),var(--secondary));
   color:#fff;padding:12px 14px;box-shadow:0 4px 16px rgba(0,0,0,.12);
   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
@@ -62,12 +55,13 @@ header{
 }
 
 /* ============ MAIN ============ */
-.container{max-width:1000px;margin:16px auto 110px;padding:0 14px}
+.container{max-width:1000px;margin:16px auto 84px;padding:0 14px}
 .section-title-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .section-title{margin:6px 0 6px;color:var(--primary);font-size:1.5rem}
-.section-actions{display:flex;gap:8px;align-items:center}
-.pill-btn{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text);box-shadow:var(--shadow);font-size:.9rem;cursor:pointer}
-.pill-btn.active{border-color:var(--primary);color:var(--primary)}
+
+main {
+  padding-bottom: 70px; /* same height as bottom header */
+}
 
 /* ============ LISTS ============ */
 .categories-list{list-style:none;max-width:860px;margin:0 auto}
@@ -90,7 +84,7 @@ header{
 .back-btn:hover{transform:translateY(-1px)}
 .dua-list{max-width:860px;margin:0 auto 20px}
 .dua-item{
-  background:var(--card);border-left:5px solid var(--primary);border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:var(--shadow);position:relative
+  background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:var(--shadow);position:relative
 }
 .dua-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;color:var(--muted);font-size:.9rem}
 .dua-arabic{
@@ -108,32 +102,21 @@ header{
   background:var(--card);color:var(--text);cursor:pointer;transition:transform .12s,border-color .12s,background .12s;
 }
 .icon-btn:hover{transform:translateY(-1px);border-color:var(--primary)}
-.icon-btn .fa{font-size:1rem}
 .icon-btn.fav.active{color:#b91c1c;border-color:#b91c1c}
 
 /* ============ STATES ============ */
 .loading,.error,.no-results{text-align:center;color:var(--muted);padding:18px}
 
-/* ============ FLOATING SETTINGS BUTTON ============ */
-#settingsFab{
-  position:fixed;right:15px;bottom:15px;width:56px;height:56px;border-radius:50%;
-  background:rgba(255,255,255,.25);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.4);
-  display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:40;
-  box-shadow:0 8px 24px rgba(0,0,0,.2);color:#111
-}
-#settingsFab:hover{transform:translateY(-1px)}
-#settingsFab i{font-size:1.2rem}
-
-/* ============ SETTINGS PANEL (SHEET) ============ */
+/* ============ SETTINGS SHEET (from bottom) ============ */
 .sheet{
-  position:fixed;inset:auto 0 0 0;height:78vh;background:var(--card);border-top-left-radius:18px;border-top-right-radius:18px;
-  box-shadow:0 -10px 30px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .28s ease;z-index:50;border:1px solid var(--border)
+  position:fixed;inset:auto 0 0 0;height:75vh;background:var(--card);border-top-left-radius:18px;border-top-right-radius:18px;
+  box-shadow:0 -10px 30px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .28s ease;z-index:60;border:1px solid var(--border)
 }
 .sheet.show{transform:translateY(0)}
 .sheet-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
 .sheet-title{font-weight:700}
 .sheet-close{border:none;background:transparent;font-size:1.2rem;cursor:pointer}
-.sheet-content{padding:10px 16px 18px;overflow:auto;height:calc(78vh - 54px)}
+.sheet-content{padding:10px 16px 18px;overflow:auto;height:calc(75vh - 54px)}
 
 .section{border:1px solid var(--border);border-radius:12px;background:var(--card);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
 .section summary{
@@ -144,64 +127,42 @@ header{
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
 .row label{font-size:.95rem}
 .row .controls{display:flex;align-items:center;gap:8px}
-.switch{
-  position:relative;width:48px;height:26px;border-radius:999px;background:#e5e7eb;cursor:pointer;flex-shrink:0;border:1px solid var(--border)
-}
+.switch{position:relative;width:48px;height:26px;border-radius:999px;background:#e5e7eb;cursor:pointer;flex-shrink:0;border:1px solid var(--border)}
 .switch input{display:none}
 .switch.on{background:#22c55e}
 .thumb{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:white;box-shadow:var(--shadow);transition:left .18s}
 .switch.on .thumb{left:24px}
-
-/* range + selects */
 input[type="range"]{width:160px}
-select, input[type="text"], input[type="color"]{
-  padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)
-}
+select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)}
 
-/* Theme grid */
-.theme-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:8px}
-.theme-card{
-  height:42px;border-radius:10px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem
+/* ============ BOTTOM HEADER (persistent) ============ */
+.bottom-header{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:var(--card);border-top:1px solid var(--border);box-shadow:0 -4px 18px rgba(0,0,0,.06);
 }
-.theme-card .swatch{width:100%;height:100%;border-radius:9px}
-
-/* Modal (About) */
-.modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.28);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:60
+.bottom-header .bar{
+  max-width:1000px;margin:0 auto;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;
 }
-.modal.show{display:flex}
-.modal-card{max-width:520px;width:92%;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
-.modal-head{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.modal-body{padding:14px}
+.bh-left,.bh-right{display:flex;gap:8px;align-items:center}
+.pill-btn{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text);box-shadow:var(--shadow);font-size:.92rem;cursor:pointer}
+.pill-btn.active{border-color:var(--primary);color:var(--primary)}
 
 /* Toasts */
 .toast{
-  position:fixed;left:50%;transform:translateX(-50%);
-  bottom:90px;background:var(--card);color:var(--text);
-  border:1px solid var(--border);box-shadow:var(--shadow);
-  padding:10px 14px;border-radius:12px;z-index:80;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s
+  position:fixed;left:50%;transform:translateX(-50%);bottom:86px;background:var(--card);color:var(--text);
+  border:1px solid var(--border);box-shadow:var(--shadow);padding:10px 14px;border-radius:12px;z-index:80;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s
 }
 .toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(-6px)}
 .toast.success{border-color:#16a34a}
 .toast.info{border-color:#2563eb}
 .toast.warn{border-color:#f59e0b}
 .toast.error{border-color:#ef4444}
-
-/* Footer actions (sticky) */
-.footer-actions{
-  position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;padding:8px 12px;z-index:30
-}
-
-/* Small touches for dark palettes */
-body.dark .logo i,
-body.dark .category-arrow{color:#fbbf24}
 </style>
 </head>
 <body>
 <div class="theme-fade" id="themeFade"></div>
 
-<!-- ======= HEADER ======= -->
+<!-- ======= HEADER (TOP) ======= -->
 <header>
   <div class="logo"><i class="fas fa-star-and-crescent"></i><span>Adhkar</span></div>
   <div class="header-icons">
@@ -225,10 +186,6 @@ body.dark .category-arrow{color:#fbbf24}
 <div class="container">
   <div class="section-title-wrap">
     <h1 class="section-title">Categories</h1>
-    <div class="section-actions">
-      <button class="pill-btn" id="favoritesViewBtn" title="View favorites"><i class="fa fa-heart"></i> <span class="fav-count">0</span></button>
-      <button class="pill-btn" id="aboutBtn"><i class="fa fa-circle-info"></i> About</button>
-    </div>
   </div>
 
   <ul id="categoriesList" class="categories-list">
@@ -241,9 +198,6 @@ body.dark .category-arrow{color:#fbbf24}
   </div>
 </div>
 
-<!-- ======= FLOATING SETTINGS BUTTON ======= -->
-<button id="settingsFab" aria-label="Settings"><i class="fa fa-sliders"></i></button>
-
 <!-- ======= SETTINGS SHEET ======= -->
 <div class="sheet" id="settingsSheet" aria-hidden="true">
   <div class="sheet-header">
@@ -251,7 +205,7 @@ body.dark .category-arrow{color:#fbbf24}
     <button class="sheet-close" id="closeSettings"><i class="fa fa-xmark"></i></button>
   </div>
   <div class="sheet-content">
-    <!-- Display (Collapsible default OPEN) -->
+    <!-- Display (OPEN by default) -->
     <details class="section" id="displaySection" open>
       <summary>
         <span id="displayTitle">Display</span>
@@ -268,7 +222,7 @@ body.dark .category-arrow{color:#fbbf24}
           </div>
         </div>
         <div class="row">
-          <label for="toggleTransliterations">Show Transliterations</label>
+          <label for="toggleTransliterations">Show Transliteration</label>
           <div class="controls">
             <div class="switch" id="toggleTransliterationsSwitch">
               <input type="checkbox" id="toggleTransliterations">
@@ -322,35 +276,9 @@ body.dark .category-arrow{color:#fbbf24}
         <i class="fa fa-chevron-down"></i>
       </summary>
       <div class="section-body">
-        <button class="pill-btn" id="openThemeGridBtn"><i class="fa fa-palette"></i> Choose Theme</button>
-        <div id="themeGrid" class="theme-grid" style="display:none;"></div>
-
-        <div class="row" style="margin-top:10px">
-          <label>Create your theme</label>
+        <div class="row" style="justify-content:flex-start">
+          <button class="pill-btn" id="toggleDarkQuick"><i class="fa fa-circle-half-stroke"></i> Quick Dark/Light</button>
         </div>
-        <div class="row">
-          <label>Primary</label>
-          <input type="color" id="cPrimary" value="#16a34a">
-          <label>Secondary</label>
-          <input type="color" id="cSecondary" value="#0e9f6e">
-        </div>
-        <div class="row">
-          <label>Accent</label>
-          <input type="color" id="cAccent" value="#f05252">
-          <label>BG</label>
-          <input type="color" id="cBg" value="#f9fafb">
-        </div>
-        <div class="row">
-          <label>Text</label>
-          <input type="color" id="cText" value="#111827">
-          <label>Card</label>
-          <input type="color" id="cCard" value="#ffffff">
-        </div>
-        <div class="row">
-          <label>Border</label>
-          <input type="color" id="cBorder" value="#e5e7eb">
-        </div>
-        <button class="pill-btn" id="applyCustomTheme"><i class="fa fa-check"></i> Apply Custom Theme</button>
       </div>
     </details>
 
@@ -386,47 +314,39 @@ body.dark .category-arrow{color:#fbbf24}
   </div>
 </div>
 
-<!-- ======= ABOUT MODAL (optional quick access) ======= -->
-<div class="modal" id="aboutModal" aria-hidden="true">
-  <div class="modal-card">
-    <div class="modal-head">
-      <strong>About</strong>
-      <button class="sheet-close" id="closeAbout"><i class="fa fa-xmark"></i></button>
+<!-- ======= BOTTOM HEADER ======= -->
+<nav class="bottom-header">
+  <div class="bar">
+    <div class="bh-left">
+      <button class="pill-btn" id="homeBtn"><i class="fa fa-house"></i> Home</button>
+      <button class="pill-btn" id="favoritesBtn"><i class="fa fa-heart"></i> Favorites</button>
     </div>
-    <div class="modal-body">
-      <p>This app presents categories and duas from JSON files, with offline caching, favorites, sharing, and rich settings.</p>
-      <p style="margin-top:8px;color:var(--muted)">Developed by <strong>Jibril SBI TENGEH</strong>.</p>
+    <div class="bh-right">
+      <button class="pill-btn" id="settingsBtn"><i class="fa fa-sliders"></i> Settings</button>
+      <button class="pill-btn" id="aboutBtn"><i class="fa fa-circle-info"></i> About</button>
     </div>
   </div>
-</div>
+</nav>
 
 <!-- ======= TOAST ======= -->
 <div class="toast" id="toast"></div>
 
-<!-- ======= FOOTER (sticky actions bar; not “developed by”) ======= -->
-<div class="footer-actions" id="footerBar">
-  <div style="display:flex;gap:8px;align-items:center;">
-    <button class="pill-btn" id="homeBtn"><i class="fa fa-house"></i> Home</button>
-    <button class="pill-btn" id="favOnlyBtn"><i class="fa fa-heart"></i> Favorites</button>
-  </div>
-  <div style="display:flex;gap:8px;align-items:center;">
-    <span style="color:var(--muted);font-size:.9rem" id="statusText">Ready</span>
-  </div>
-</div>
-
 <script>
-/* ================== CONFIG (GitHub raw) ================== */
+/* ================== CONFIG ================== */
 const GITHUB_USER  = "jibril-tengeh";
 const GITHUB_REPO  = "sbi";
-const GITHUB_BRANCH= "main"; // change if your default branch is different
+const GITHUB_BRANCH= "main";
 const GITHUB_BASE  = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`;
 
 /* ================== STATE ================== */
 let currentLanguage = localStorage.getItem('lang') || 'en';
-let categoriesData = [];   // [{ id, title, folder? }, ...]
+let categoriesData = [];   // [{ id, title, folder }, ...]
 let duasData = [];         // current category duas
 let currentCategoryFolder = null;
-let favorites = JSON.parse(localStorage.getItem('favorites')||'{}'); // {duaId:boolean}
+
+let favorites = JSON.parse(localStorage.getItem('favorites')||'{}'); // {duaKey:true}
+let viewingFavorites = false;
+
 let showTransliterations = JSON.parse(localStorage.getItem('showTransliterations')||'true');
 let showTranslations = JSON.parse(localStorage.getItem('showTranslations')||'true');
 
@@ -434,10 +354,6 @@ let fontArabic = localStorage.getItem('fontArabic') || 'Amiri';
 let fontSizeArabic = parseInt(localStorage.getItem('fontSizeArabic')||'22',10);
 let fontSizeTranslation = parseInt(localStorage.getItem('fontSizeTranslation')||'16',10);
 let fontSizeTransliteration = parseInt(localStorage.getItem('fontSizeTransliteration')||'16',10);
-
-let themeIndex = parseInt(localStorage.getItem('themeIndex')||'0',10); // 0..24
-let customTheme = JSON.parse(localStorage.getItem('customTheme')||'null');
-let viewingFavorites = false;
 
 /* ================== UI ELEMENTS ================== */
 const els = {
@@ -451,20 +367,22 @@ const els = {
   searchBarContainer: document.getElementById('searchBarContainer'),
   searchBar: document.getElementById('searchBar'),
   sectionTitle: document.querySelector('.section-title'),
-  favoritesViewBtn: document.getElementById('favoritesViewBtn'),
-  favOnlyBtn: document.getElementById('favOnlyBtn'),
+  toast: document.getElementById('toast'),
+
+  // bottom header
   homeBtn: document.getElementById('homeBtn'),
+  favoritesBtn: document.getElementById('favoritesBtn'),
+  settingsBtn: document.getElementById('settingsBtn'),
   aboutBtn: document.getElementById('aboutBtn'),
-  aboutModal: document.getElementById('aboutModal'),
-  closeAbout: document.getElementById('closeAbout'),
-  settingsFab: document.getElementById('settingsFab'),
+
+  // settings sheet
   settingsSheet: document.getElementById('settingsSheet'),
   closeSettings: document.getElementById('closeSettings'),
   currentLangLabel: document.getElementById('currentLangLabel'),
   cycleLangBtn: document.getElementById('cycleLangBtn'),
-  toast: document.getElementById('toast'),
-  statusText: document.getElementById('statusText'),
+  toggleDarkQuick: document.getElementById('toggleDarkQuick'),
 
+  // display controls
   toggleTranslations: document.getElementById('toggleTranslations'),
   toggleTranslationsSwitch: document.getElementById('toggleTranslationsSwitch'),
   toggleTransliterations: document.getElementById('toggleTransliterations'),
@@ -476,75 +394,13 @@ const els = {
   transliterationSize: document.getElementById('transliterationSize'),
   transliterationSizeVal: document.getElementById('transliterationSizeVal'),
   arabicFont: document.getElementById('arabicFont'),
-  openThemeGridBtn: document.getElementById('openThemeGridBtn'),
-  themeGrid: document.getElementById('themeGrid'),
-  applyCustomTheme: document.getElementById('applyCustomTheme'),
-
-  cPrimary: document.getElementById('cPrimary'),
-  cSecondary: document.getElementById('cSecondary'),
-  cAccent: document.getElementById('cAccent'),
-  cBg: document.getElementById('cBg'),
-  cText: document.getElementById('cText'),
-  cCard: document.getElementById('cCard'),
-  cBorder: document.getElementById('cBorder'),
 };
 
-/* ================== THEMES (25 presets) ================== */
-const THEMES = [
-  {name:"Emerald", primary:"#16a34a",secondary:"#0e9f6e",accent:"#f05252",bg:"#f9fafb",text:"#111827",border:"#e5e7eb",card:"#ffffff"},
-  {name:"Ocean", primary:"#0284c7",secondary:"#0ea5e9",accent:"#f97316",bg:"#f1f5f9",text:"#0f172a",border:"#e2e8f0",card:"#ffffff"},
-  {name:"Rose", primary:"#e11d48",secondary:"#fb7185",accent:"#22c55e",bg:"#fff1f2",text:"#111827",border:"#fecdd3",card:"#ffffff"},
-  {name:"Grape", primary:"#7c3aed",secondary:"#a78bfa",accent:"#06b6d4",bg:"#f5f3ff",text:"#111827",border:"#ddd6fe",card:"#ffffff"},
-  {name:"Sunset", primary:"#f59e0b",secondary:"#f97316",accent:"#10b981",bg:"#fff7ed",text:"#111827",border:"#fed7aa",card:"#ffffff"},
-  {name:"Forest", primary:"#166534",secondary:"#16a34a",accent:"#f59e0b",bg:"#ecfdf5",text:"#052e16",border:"#bbf7d0",card:"#ffffff"},
-  {name:"Slate", primary:"#334155",secondary:"#64748b",accent:"#ef4444",bg:"#f1f5f9",text:"#0f172a",border:"#e2e8f0",card:"#ffffff"},
-  {name:"Sky", primary:"#0ea5e9",secondary:"#38bdf8",accent:"#6366f1",bg:"#e0f2fe",text:"#0c4a6e",border:"#bae6fd",card:"#ffffff"},
-  {name:"Mint", primary:"#10b981",secondary:"#34d399",accent:"#f43f5e",bg:"#ecfeff",text:"#052e16",border:"#a7f3d0",card:"#ffffff"},
-  {name:"Cocoa", primary:"#7c3f00",secondary:"#a16207",accent:"#ef4444",bg:"#fff7ed",text:"#3f2d1c",border:"#f4d6b0",card:"#ffffff"},
-  {name:"Royal", primary:"#1d4ed8",secondary:"#6366f1",accent:"#22c55e",bg:"#eff6ff",text:"#0b1a51",border:"#bfdbfe",card:"#ffffff"},
-  {name:"Crimson", primary:"#dc2626",secondary:"#ef4444",accent:"#06b6d4",bg:"#fef2f2",text:"#111827",border:"#fecaca",card:"#ffffff"},
-  {name:"Lime", primary:"#84cc16",secondary:"#65a30d",accent:"#0ea5e9",bg:"#f7fee7",text:"#1a2e05",border:"#d9f99d",card:"#ffffff"},
-  {name:"Aubergine", primary:"#581c87",secondary:"#7e22ce",accent:"#22c55e",bg:"#faf5ff",text:"#2e1065",border:"#e9d5ff",card:"#ffffff"},
-  {name:"Gold", primary:"#d97706",secondary:"#f59e0b",accent:"#10b981",bg:"#fffbeb",text:"#111827",border:"#fde68a",card:"#ffffff"},
-  {name:"Teal", primary:"#0f766e",secondary:"#14b8a6",accent:"#f59e0b",bg:"#ecfeff",text:"#0f172a",border:"#99f6e4",card:"#ffffff"},
-  {name:"Lagoon", primary:"#0891b2",secondary:"#06b6d4",accent:"#a78bfa",bg:"#ecfeff",text:"#0e7490",border:"#67e8f9",card:"#ffffff"},
-  {name:"Steel", primary:"#1f2937",secondary:"#4b5563",accent:"#f59e0b",bg:"#f3f4f6",text:"#111827",border:"#e5e7eb",card:"#ffffff"},
-  {name:"WarmGrey", primary:"#6b7280",secondary:"#9ca3af",accent:"#f97316",bg:"#f9fafb",text:"#111827",border:"#e5e7eb",card:"#ffffff"},
-  {name:"CyanPop", primary:"#06b6d4",secondary:"#22d3ee",accent:"#ef4444",bg:"#ecfeff",text:"#0e7490",border:"#a5f3fc",card:"#ffffff"},
-  {name:"Dark", primary:"#14b8a6",secondary:"#0ea5e9",accent:"#ef4444",bg:"#0b1020",text:"#f4f4f5",border:"#1f2937",card:"#0f172a"},
-  {name:"Midnight", primary:"#6366f1",secondary:"#7c3aed",accent:"#22c55e",bg:"#0f172a",text:"#e5e7eb",border:"#1f2937",card:"#111827"},
-  {name:"Charcoal", primary:"#94a3b8",secondary:"#64748b",accent:"#22c55e",bg:"#0b1220",text:"#e2e8f0",border:"#1e293b",card:"#111827"},
-  {name:"Olive", primary:"#84cc16",secondary:"#65a30d",accent:"#22c55e",bg:"#111827",text:"#e5e7eb",border:"#334155",card:"#0b1220"},
-  {name:"Ink", primary:"#22c55e",secondary:"#0ea5e9",accent:"#f97316",bg:"#0b0f19",text:"#e5e7eb",border:"#1f2937",card:"#111827"},
-];
-
 /* ================== HELPERS ================== */
-const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
 function toast(msg,type="info",ms=2000){
   els.toast.textContent = msg;
   els.toast.className = `toast ${type} show`;
   setTimeout(()=>{els.toast.classList.remove('show')}, ms);
-}
-function setStatus(msg){ els.statusText.textContent = msg; }
-function tinyColor(hex){
-  const c = hex.replace('#','');
-  const r = parseInt(c.substring(0,2),16);
-  const g = parseInt(c.substring(2,4),16);
-  const b = parseInt(c.substring(4,6),16);
-  const luma = (0.2126*r + 0.7152*g + 0.0722*b)/255;
-  return { isDark: ()=> luma < 0.5 }
-}
-function applyTheme(theme){
-  const r = document.documentElement;
-  r.style.setProperty('--primary', theme.primary);
-  r.style.setProperty('--secondary', theme.secondary);
-  r.style.setProperty('--accent', theme.accent);
-  r.style.setProperty('--bg', theme.bg);
-  r.style.setProperty('--text', theme.text);
-  r.style.setProperty('--border', theme.border);
-  r.style.setProperty('--card', theme.card);
-  const darkBg = tinyColor(theme.bg).isDark();
-  document.body.classList.toggle('dark', darkBg);
 }
 function savePrefs(){
   localStorage.setItem('lang', currentLanguage);
@@ -554,14 +410,16 @@ function savePrefs(){
   localStorage.setItem('fontSizeArabic', fontSizeArabic);
   localStorage.setItem('fontSizeTranslation', fontSizeTranslation);
   localStorage.setItem('fontSizeTransliteration', fontSizeTransliteration);
-  localStorage.setItem('themeIndex', themeIndex);
-  if(customTheme) localStorage.setItem('customTheme', JSON.stringify(customTheme));
 }
 function updateFontVars(){
   document.documentElement.style.setProperty('--font-arabic-size', fontSizeArabic + 'px');
   document.documentElement.style.setProperty('--font-translation-size', fontSizeTranslation + 'px');
   document.documentElement.style.setProperty('--font-transliteration-size', fontSizeTransliteration + 'px');
   document.documentElement.style.setProperty('--arabic-font', `"${fontArabic}", serif`);
+}
+function darkModeOn(isOn){
+  document.body.style.background = isOn ? '#0b1020' : 'var(--bg)';
+  document.body.style.color = isOn ? '#e5e7eb' : 'var(--text)';
 }
 
 /* ================== FETCHERS (with cache fallback) ================== */
@@ -574,10 +432,7 @@ async function fetchJSONWithCache(url, cacheKey){
     return data;
   }catch(err){
     const cached = localStorage.getItem(cacheKey);
-    if(cached){
-      setStatus('Offline – using cached data');
-      return JSON.parse(cached).data;
-    }
+    if(cached){ return JSON.parse(cached).data; }
     throw err;
   }
 }
@@ -587,14 +442,12 @@ async function loadCategories(){
     els.categoriesList.innerHTML = '<li class="loading">Loading categories...</li>';
     const url = `${GITHUB_BASE}categories/${currentLanguage}.json`;
     const cacheKey = `categories_${currentLanguage}`;
-    // Expected format: [{ "id": 1, "title": "Morning Adhkar", "folder": "categories_1" }, ...]
+    // expected: [{ "id": 1, "title": "...", "folder": "categories_1" }, ...]
     categoriesData = await fetchJSONWithCache(url, cacheKey);
     renderCategories();
-    setStatus('Categories loaded');
   }catch(err){
     console.error('Categories error:', err);
     els.categoriesList.innerHTML = '<li class="error">Failed to load categories.</li>';
-    setStatus('Failed to load categories');
   }
 }
 
@@ -605,19 +458,18 @@ async function loadCategoryDuas(categoryFolder, categoryName){
     els.categoriesList.style.display = 'none';
     els.sectionTitle.textContent = categoryName;
     els.duaContainer.innerHTML = '<div class="loading">Loading duas...</div>';
-    const url = `${GITHUB_BASE}duas/${categoryFolder}/${currentLanguage}.json`;
-    const cacheKey = `duas_${categoryFolder}_${currentLanguage}`;
+    // NOTE: uses "douas" per your repo
+    const url = `${GITHUB_BASE}douas/${categoryFolder}/${currentLanguage}.json`;
+    const cacheKey = `douas_${categoryFolder}_${currentLanguage}`;
     duasData = await fetchJSONWithCache(url, cacheKey);
     renderDuas();
-    setStatus('Duas loaded');
   }catch(err){
     console.error('Duas error:', err);
     els.duaContainer.innerHTML = `
       <div class="error">
         Failed to load duas.<br/>
-        <small>Checked: <code>duas/${categoryFolder}/${currentLanguage}.json</code></small>
+        <small>Checked: <code>douas/${categoryFolder}/${currentLanguage}.json</code></small>
       </div>`;
-    setStatus('Failed to load duas');
   }
 }
 
@@ -629,7 +481,6 @@ function renderCategories(filter=''){
   if(!filtered.length){ ul.innerHTML = '<li class="no-results">No categories available</li>'; return; }
 
   filtered.forEach((cat, idx)=>{
-    // Use provided folder if present; fallback to categories_#{id or index+1}
     const folder = cat.folder || (cat.id ? `categories_${cat.id}` : `categories_${idx+1}`);
     const li = document.createElement('li'); li.className = 'category-item';
     li.innerHTML = `
@@ -642,42 +493,58 @@ function renderCategories(filter=''){
   });
 }
 
+function duaKey(dua){
+  // unique key across categories + language
+  const cat = currentCategoryFolder || 'cat';
+  const lang = currentLanguage || 'en';
+  return `${cat}:${lang}:${dua.id ?? Math.random().toString(36).slice(2)}`;
+}
+
 function renderDuas(filter=''){
   const container = els.duaContainer; container.innerHTML = '';
-  let list = duasData;
-
-  if(viewingFavorites){
-    const favKeys = Object.keys(favorites).filter(k=>favorites[k]);
-    list = duasData.filter(d=> favKeys.includes(String(d.id)));
-  }
+  let list = duasData.slice();
 
   if(filter){
     const f = filter.toLowerCase();
-    list = list.filter(dua => 
+    list = list.filter(dua =>
       (dua.translation && dua.translation.toLowerCase().includes(f)) ||
       (dua.transliteration && dua.transliteration.toLowerCase().includes(f)) ||
       (dua.arabic && dua.arabic.includes(filter))
     );
   }
 
-  if(!list.length){ container.innerHTML = '<div class="no-results">No duas available</div>'; updateFavCount(); return; }
+  // Favorites view toggle
+  if(viewingFavorites){
+    const favKeys = new Set(Object.keys(favorites).filter(k=>favorites[k]));
+    list = list.filter(d => favKeys.has(duaKey(d)));
+  }
+
+  if(!list.length){ container.innerHTML = '<div class="no-results">No duas available</div>'; return; }
 
   list.forEach(dua=>{
-    const isFav = !!favorites[dua.id];
-    const d = document.createElement('div'); d.className = 'dua-item';
+    const key = duaKey(dua);
+    const isFav = !!favorites[key];
 
-    const translitHtml = showTransliterations && dua.transliteration ? `<div class="dua-transliteration">${dua.transliteration}</div>` : '';
-    const transHtml = showTranslations && dua.translation ? `<div class="dua-translation">${dua.translation}</div>` : '';
+    const d = document.createElement('div'); d.className = 'dua-item';
 
     d.innerHTML = `
       <div class="dua-header">
         <div class="ref-left">${dua.reference ? dua.reference : ''}</div>
         <div class="ref-right"></div>
       </div>
+
       ${dua.arabic ? `<div class="dua-arabic">${dua.arabic}</div>` : ''}
-      ${translitHtml}
-      ${transHtml}
+
+      <div class="dua-transliteration" style="display:${showTransliterations && dua.transliteration ? 'block':'none'}">
+        ${dua.transliteration ? dua.transliteration : ''}
+      </div>
+
+      <div class="dua-translation" style="display:${showTranslations && dua.translation ? 'block':'none'}">
+        ${dua.translation ? dua.translation : ''}
+      </div>
+
       ${dua.source ? `<div class="dua-reference">${dua.source}</div>` : ''}
+
       <div class="dua-actions">
         <button class="icon-btn fav ${isFav?'active':''}" title="Favorite"><i class="fa fa-heart"></i></button>
         <button class="icon-btn share" title="Share"><i class="fa fa-share-nodes"></i></button>
@@ -686,24 +553,28 @@ function renderDuas(filter=''){
       </div>
     `;
 
+    // Favorite
     d.querySelector('.fav').addEventListener('click', ()=>{
-      favorites[dua.id] = !favorites[dua.id];
+      const nowFav = !favorites[key];
+      favorites[key] = nowFav;
       localStorage.setItem('favorites', JSON.stringify(favorites));
-      d.querySelector('.fav').classList.toggle('active', !!favorites[dua.id]);
-      updateFavCount();
-      toast(favorites[dua.id] ? 'Added to favorites' : 'Removed from favorites','success',2000);
+      d.querySelector('.fav').classList.toggle('active', nowFav);
+      toast(nowFav ? 'Added to favorites' : 'Removed from favorites','success',1500);
+      if(viewingFavorites && !nowFav){ d.remove(); if(!els.duaContainer.children.length) container.innerHTML = '<div class="no-results">No duas available</div>'; }
     });
 
+    // Share
     d.querySelector('.share').addEventListener('click', async ()=>{
       const text = buildDuaPlainText(dua);
       if(navigator.share){
-        try{ await navigator.share({title:'Dua', text}); toast('Shared','success',2000);}catch(e){}
+        try{ await navigator.share({title:'Dua', text}); toast('Shared','success',1500);}catch(e){}
       }else{
         await copyToClipboard(text);
-        toast('Copied for sharing','info',2000);
+        toast('Copied for sharing','info',1500);
       }
     });
 
+    // Save
     d.querySelector('.save').addEventListener('click', ()=>{
       const text = buildDuaPlainText(dua);
       const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
@@ -711,18 +582,17 @@ function renderDuas(filter=''){
       const a = document.createElement('a');
       a.href = url; a.download = `dua_${dua.id||'item'}.txt`;
       document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-      toast('Saved as file','success',2000);
+      toast('Saved as file','success',1500);
     });
 
+    // Copy
     d.querySelector('.copy').addEventListener('click', async ()=>{
       await copyToClipboard(buildDuaPlainText(dua));
-      toast('Copied','success',2000);
+      toast('Copied','success',1500);
     });
 
     container.appendChild(d);
   });
-
-  updateFavCount();
 }
 
 function buildDuaPlainText(dua){
@@ -744,23 +614,20 @@ async function copyToClipboard(text){
     document.body.removeChild(ta);
   }
 }
-function updateFavCount(){
-  const count = Object.values(favorites).filter(Boolean).length;
-  document.querySelector('.fav-count').textContent = count;
-}
 
 /* ================== EVENTS ================== */
-// Language cycle (header icon)
+// Language cycle (top header icon)
 document.getElementById('languageToggle').addEventListener('click', ()=>{
   const langs = ['en','fr','ru','zh','ha'];
   const i = langs.indexOf(currentLanguage);
   currentLanguage = langs[(i+1)%langs.length];
   els.languageText.textContent = currentLanguage.toUpperCase();
   els.currentLangLabel.textContent = currentLanguage.toUpperCase();
+  savePrefs();
+  // reset view
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
   els.sectionTitle.textContent = 'Categories';
-  savePrefs();
   loadCategories();
 });
 
@@ -770,80 +637,58 @@ els.backBtn.addEventListener('click', ()=>{
   els.categoriesList.style.display = 'block';
   els.sectionTitle.textContent = 'Categories';
   viewingFavorites = false;
-  setStatus('Back to categories');
+  els.favoritesBtn.classList.remove('active');
 });
 
-// Theme toggle (quick dark/light swap via preset indices)
+// Theme toggle (top header quick)
 els.themeToggle.addEventListener('click', ()=>{
-  // if currently dark preset (index 20), toggle back to 0; else go to dark
-  const DARK_INDEX = 20; // "Dark" in THEMES list (0-based)
-  if(themeIndex === DARK_INDEX){ themeIndex = 0; }
-  else themeIndex = DARK_INDEX;
-  applyTheme(THEMES[themeIndex]);
-  savePrefs();
   const icon = els.themeToggle.querySelector('i');
-  icon.className = (themeIndex === DARK_INDEX) ? 'fas fa-sun' : 'fas fa-moon';
+  const isMoon = icon.classList.contains('fa-moon');
+  icon.className = isMoon ? 'fas fa-sun' : 'fas fa-moon';
+  darkModeOn(isMoon);
 });
 
-// Search toggle
+// Search UI
 els.searchToggle.addEventListener('click', ()=>{
   els.searchBarContainer.style.display = els.searchBarContainer.style.display === 'none' ? 'block' : 'none';
   els.searchBar.focus();
 });
-
-// Search input filter
 els.searchBar.addEventListener('input', ()=>{
-  if(els.categoryDetails.style.display === 'block'){
-    renderDuas(els.searchBar.value);
-  } else {
-    renderCategories(els.searchBar.value);
-  }
+  if(els.categoryDetails.style.display === 'block'){ renderDuas(els.searchBar.value); }
+  else{ renderCategories(els.searchBar.value); }
 });
 
-// Favorites quick filter in footer bar
-els.favOnlyBtn.addEventListener('click', ()=>{
-  if(els.categoryDetails.style.display !== 'block'){
-    toast('Open a category first','warn',2000);
-    return;
-  }
-  viewingFavorites = !viewingFavorites;
-  els.favOnlyBtn.classList.toggle('active', viewingFavorites);
-  renderDuas(els.searchBar.value);
-});
-
-// Favorites view badge at header
-els.favoritesViewBtn.addEventListener('click', ()=>{
-  if(els.categoryDetails.style.display !== 'block'){
-    toast('Open a category first','warn',2000);
-    return;
-  }
-  viewingFavorites = !viewingFavorites;
-  els.favoritesViewBtn.classList.toggle('active', viewingFavorites);
-  renderDuas(els.searchBar.value);
-});
-
-// Home
+// Bottom header buttons
 els.homeBtn.addEventListener('click', ()=>{
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
   els.sectionTitle.textContent = 'Categories';
   viewingFavorites = false;
+  els.favoritesBtn.classList.remove('active');
+});
+els.favoritesBtn.addEventListener('click', ()=>{
+  if(els.categoryDetails.style.display !== 'block'){
+    toast('Open a category first','warn',1600);
+    return;
+  }
+  viewingFavorites = !viewingFavorites;
+  els.favoritesBtn.classList.toggle('active', viewingFavorites);
+  renderDuas(els.searchBar.value);
+});
+els.settingsBtn.addEventListener('click', ()=> els.settingsSheet.classList.add('show'));
+els.aboutBtn.addEventListener('click', ()=>{
+  // just open About section within settings for simplicity
+  els.settingsSheet.classList.add('show');
+  document.getElementById('aboutSection').setAttribute('open','open');
 });
 
-// About modal
-els.aboutBtn.addEventListener('click', ()=> els.aboutModal.classList.add('show'));
-els.closeAbout.addEventListener('click', ()=> els.aboutModal.classList.remove('show'));
-els.aboutModal.addEventListener('click', (e)=>{ if(e.target===els.aboutModal) els.aboutModal.classList.remove('show'); });
-
-// Settings sheet open/close
-els.settingsFab.addEventListener('click', ()=> els.settingsSheet.classList.add('show'));
+// Settings sheet close
 els.closeSettings.addEventListener('click', ()=> els.settingsSheet.classList.remove('show'));
 
-// Settings: Display toggles
+// Settings: Display toggles — WORKING instantly
 function syncDisplayControls(){
   els.toggleTranslations.checked = !!showTranslations;
   els.toggleTransliterations.checked = !!showTransliterations;
-
   els.toggleTranslationsSwitch.classList.toggle('on', !!showTranslations);
   els.toggleTransliterationsSwitch.classList.toggle('on', !!showTransliterations);
 
@@ -853,19 +698,23 @@ function syncDisplayControls(){
 
   els.arabicFont.value = fontArabic;
 }
-
 els.toggleTranslations.addEventListener('change', ()=>{
   showTranslations = els.toggleTranslations.checked;
   els.toggleTranslationsSwitch.classList.toggle('on', showTranslations);
   savePrefs();
-  if(els.categoryDetails.style.display==='block') renderDuas(els.searchBar.value);
+  // live update: show/hide translation nodes without re-render
+  document.querySelectorAll('.dua-translation').forEach(n=>{
+    n.style.display = showTranslations ? 'block':'none';
+  });
 });
-
 els.toggleTransliterations.addEventListener('change', ()=>{
   showTransliterations = els.toggleTransliterations.checked;
   els.toggleTransliterationsSwitch.classList.toggle('on', showTransliterations);
   savePrefs();
-  if(els.categoryDetails.style.display==='block') renderDuas(els.searchBar.value);
+  // live update
+  document.querySelectorAll('.dua-transliteration').forEach(n=>{
+    n.style.display = showTransliterations ? 'block':'none';
+  });
 });
 
 els.arabicSize.addEventListener('input', ()=>{
@@ -888,74 +737,19 @@ els.arabicFont.addEventListener('change', ()=>{
   updateFontVars(); savePrefs();
 });
 
-// Theme grid
-function buildThemeGrid(){
-  els.themeGrid.innerHTML = '';
-  THEMES.forEach((t,idx)=>{
-    const card = document.createElement('div');
-    card.className = 'theme-card';
-    card.title = t.name;
-    card.innerHTML = `<div class="swatch" style="background:linear-gradient(135deg, ${t.primary}, ${t.secondary}); border:2px solid ${t.border}"></div>`;
-    card.addEventListener('click', ()=>{
-      themeIndex = idx;
-      applyTheme(t);
-      savePrefs();
-      toast(`Theme: ${t.name}`,'success',1200);
-    });
-    els.themeGrid.appendChild(card);
-  });
-}
-els.openThemeGridBtn.addEventListener('click', ()=>{
-  els.themeGrid.style.display = els.themeGrid.style.display==='none' ? 'grid' : 'none';
+// Settings: theme quick toggle (inside sheet)
+els.toggleDarkQuick.addEventListener('click', ()=>{
+  const isDark = document.body.style.background !== '' && document.body.style.background !== 'var(--bg)';
+  darkModeOn(!isDark);
 });
 
-// Custom theme apply
-els.applyCustomTheme.addEventListener('click', ()=>{
-  customTheme = {
-    primary: els.cPrimary.value,
-    secondary: els.cSecondary.value,
-    accent: els.cAccent.value,
-    bg: els.cBg.value,
-    text: els.cText.value,
-    border: els.cBorder.value,
-    card: els.cCard.value,
-  };
-  applyTheme(customTheme);
-  savePrefs();
-  toast('Custom theme applied','success',1600);
-});
-
-// Language section
-els.currentLangLabel.textContent = currentLanguage.toUpperCase();
-els.cycleLangBtn.addEventListener('click', ()=>{
-  const langs = ['en','fr','ru','zh','ha'];
-  const i = langs.indexOf(currentLanguage);
-  currentLanguage = langs[(i+1)%langs.length];
-  els.languageText.textContent = currentLanguage.toUpperCase();
-  els.currentLangLabel.textContent = currentLanguage.toUpperCase();
-  savePrefs();
-  els.categoryDetails.style.display = 'none';
-  els.categoriesList.style.display = 'block';
-  els.sectionTitle.textContent = 'Categories';
-  loadCategories();
-});
-
-/* ================== INIT ================== */
-function initTheme(){
-  if(customTheme){ applyTheme(customTheme); }
-  else applyTheme(THEMES[themeIndex] || THEMES[0]);
-  const DARK_INDEX = 20;
-  const icon = els.themeToggle.querySelector('i');
-  icon.className = (themeIndex === DARK_INDEX) ? 'fas fa-sun' : 'fas fa-moon';
-}
+// INIT
 function init(){
   els.languageText.textContent = currentLanguage.toUpperCase();
+  els.currentLangLabel.textContent = currentLanguage.toUpperCase();
   updateFontVars();
-  initTheme();
-  buildThemeGrid();
   syncDisplayControls();
   loadCategories();
-  setStatus('Ready');
 }
 init();
 </script>
