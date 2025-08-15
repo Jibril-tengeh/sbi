@@ -20,10 +20,9 @@
   --card-contrast:#1f2937;
   --radius:14px;
   --shadow:0 8px 24px rgba(0,0,0,.08);
-  --font-arabic-size: 1.35rem;
-  --font-translation-size: 1rem;
-  --font-transliteration-size: 1rem;
-
+  --font-arabic-size: 22px;
+  --font-translation-size: 16px;
+  --font-transliteration-size: 16px;
   --arabic-font: "Amiri", serif;
 }
 @font-face{font-family:"Amiri-BoldSlanted";src:local("Amiri Bold Slanted"),local("Amiri-BoldSlanted")}
@@ -149,12 +148,9 @@ header{
   position:relative;width:48px;height:26px;border-radius:999px;background:#e5e7eb;cursor:pointer;flex-shrink:0;border:1px solid var(--border)
 }
 .switch input{display:none}
-.switch::after{
-  content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:white;box-shadow:var(--shadow);transition:left .18s
-}
-.switch input:checked + .thumb{left:24px}
 .switch.on{background:#22c55e}
 .thumb{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:white;box-shadow:var(--shadow);transition:left .18s}
+.switch.on .thumb{left:24px}
 
 /* range + selects */
 input[type="range"]{width:160px}
@@ -197,7 +193,7 @@ select, input[type="text"], input[type="color"]{
   display:flex;align-items:center;justify-content:space-between;padding:8px 12px;z-index:30
 }
 
-/* Dark theme helper when user toggles “moon/sun” only switches palette index */
+/* Small touches for dark palettes */
 body.dark .logo i,
 body.dark .category-arrow{color:#fbbf24}
 </style>
@@ -367,15 +363,11 @@ body.dark .category-arrow{color:#fbbf24}
       <div class="section-body">
         <div class="row">
           <label>Current</label>
-          <div class="controls">
-            <span id="currentLangLabel">EN</span>
-          </div>
+          <div class="controls"><span id="currentLangLabel">EN</span></div>
         </div>
         <div class="row">
           <label>Switch</label>
-          <div class="controls">
-            <button class="pill-btn" id="cycleLangBtn"><i class="fa fa-language"></i> Cycle</button>
-          </div>
+          <div class="controls"><button class="pill-btn" id="cycleLangBtn"><i class="fa fa-language"></i> Cycle</button></div>
         </div>
       </div>
     </details>
@@ -431,8 +423,9 @@ const GITHUB_BASE  = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_
 
 /* ================== STATE ================== */
 let currentLanguage = localStorage.getItem('lang') || 'en';
-let categoriesData = [];
-let duasData = [];      // current category
+let categoriesData = [];   // [{ id, title, folder? }, ...]
+let duasData = [];         // current category duas
+let currentCategoryFolder = null;
 let favorites = JSON.parse(localStorage.getItem('favorites')||'{}'); // {duaId:boolean}
 let showTransliterations = JSON.parse(localStorage.getItem('showTransliterations')||'true');
 let showTranslations = JSON.parse(localStorage.getItem('showTranslations')||'true');
@@ -444,7 +437,6 @@ let fontSizeTransliteration = parseInt(localStorage.getItem('fontSizeTranslitera
 
 let themeIndex = parseInt(localStorage.getItem('themeIndex')||'0',10); // 0..24
 let customTheme = JSON.parse(localStorage.getItem('customTheme')||'null');
-
 let viewingFavorites = false;
 
 /* ================== UI ELEMENTS ================== */
@@ -473,7 +465,6 @@ const els = {
   toast: document.getElementById('toast'),
   statusText: document.getElementById('statusText'),
 
-  // Settings controls
   toggleTranslations: document.getElementById('toggleTranslations'),
   toggleTranslationsSwitch: document.getElementById('toggleTranslationsSwitch'),
   toggleTransliterations: document.getElementById('toggleTransliterations'),
@@ -529,15 +520,20 @@ const THEMES = [
 
 /* ================== HELPERS ================== */
 const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
-
 function toast(msg,type="info",ms=2000){
   els.toast.textContent = msg;
   els.toast.className = `toast ${type} show`;
   setTimeout(()=>{els.toast.classList.remove('show')}, ms);
 }
-
 function setStatus(msg){ els.statusText.textContent = msg; }
-
+function tinyColor(hex){
+  const c = hex.replace('#','');
+  const r = parseInt(c.substring(0,2),16);
+  const g = parseInt(c.substring(2,4),16);
+  const b = parseInt(c.substring(4,6),16);
+  const luma = (0.2126*r + 0.7152*g + 0.0722*b)/255;
+  return { isDark: ()=> luma < 0.5 }
+}
 function applyTheme(theme){
   const r = document.documentElement;
   r.style.setProperty('--primary', theme.primary);
@@ -547,24 +543,9 @@ function applyTheme(theme){
   r.style.setProperty('--text', theme.text);
   r.style.setProperty('--border', theme.border);
   r.style.setProperty('--card', theme.card);
-
-  // toggle dark class hint (used for small styling touches)
   const darkBg = tinyColor(theme.bg).isDark();
   document.body.classList.toggle('dark', darkBg);
 }
-
-function tinyColor(hex){
-  // mini color helper to detect luminance
-  const c = hex.replace('#','');
-  const r = parseInt(c.substring(0,2),16);
-  const g = parseInt(c.substring(2,4),16);
-  const b = parseInt(c.substring(4,6),16);
-  const luma = (0.2126*r + 0.7152*g + 0.0722*b)/255;
-  return {
-    isDark: ()=> luma < 0.5
-  }
-}
-
 function savePrefs(){
   localStorage.setItem('lang', currentLanguage);
   localStorage.setItem('showTranslations', JSON.stringify(showTranslations));
@@ -576,7 +557,6 @@ function savePrefs(){
   localStorage.setItem('themeIndex', themeIndex);
   if(customTheme) localStorage.setItem('customTheme', JSON.stringify(customTheme));
 }
-
 function updateFontVars(){
   document.documentElement.style.setProperty('--font-arabic-size', fontSizeArabic + 'px');
   document.documentElement.style.setProperty('--font-translation-size', fontSizeTranslation + 'px');
@@ -607,6 +587,7 @@ async function loadCategories(){
     els.categoriesList.innerHTML = '<li class="loading">Loading categories...</li>';
     const url = `${GITHUB_BASE}categories/${currentLanguage}.json`;
     const cacheKey = `categories_${currentLanguage}`;
+    // Expected format: [{ "id": 1, "title": "Morning Adhkar", "folder": "categories_1" }, ...]
     categoriesData = await fetchJSONWithCache(url, cacheKey);
     renderCategories();
     setStatus('Categories loaded');
@@ -617,20 +598,25 @@ async function loadCategories(){
   }
 }
 
-async function loadCategoryDuas(categoryId, categoryName){
+async function loadCategoryDuas(categoryFolder, categoryName){
   try{
+    currentCategoryFolder = categoryFolder;
     els.categoryDetails.style.display = 'block';
     els.categoriesList.style.display = 'none';
     els.sectionTitle.textContent = categoryName;
     els.duaContainer.innerHTML = '<div class="loading">Loading duas...</div>';
-    const url = `${GITHUB_BASE}duas/categories_${categoryId}/${currentLanguage}.json`;
-    const cacheKey = `duas_${categoryId}_${currentLanguage}`;
+    const url = `${GITHUB_BASE}duas/${categoryFolder}/${currentLanguage}.json`;
+    const cacheKey = `duas_${categoryFolder}_${currentLanguage}`;
     duasData = await fetchJSONWithCache(url, cacheKey);
     renderDuas();
     setStatus('Duas loaded');
   }catch(err){
     console.error('Duas error:', err);
-    els.duaContainer.innerHTML = '<div class="error">Failed to load duas.</div>';
+    els.duaContainer.innerHTML = `
+      <div class="error">
+        Failed to load duas.<br/>
+        <small>Checked: <code>duas/${categoryFolder}/${currentLanguage}.json</code></small>
+      </div>`;
     setStatus('Failed to load duas');
   }
 }
@@ -639,19 +625,19 @@ async function loadCategoryDuas(categoryId, categoryName){
 function renderCategories(filter=''){
   const ul = els.categoriesList; ul.innerHTML = '';
   let filtered = categoriesData;
-  if(filter){
-    filtered = categoriesData.filter(cat=>cat.title.toLowerCase().includes(filter.toLowerCase()));
-  }
+  if(filter) filtered = categoriesData.filter(cat=> (cat.title||'').toLowerCase().includes(filter.toLowerCase()));
   if(!filtered.length){ ul.innerHTML = '<li class="no-results">No categories available</li>'; return; }
+
   filtered.forEach((cat, idx)=>{
-    // Note: we assume category id is (idx+1) matching your folder names categories_1, categories_2, ...
+    // Use provided folder if present; fallback to categories_#{id or index+1}
+    const folder = cat.folder || (cat.id ? `categories_${cat.id}` : `categories_${idx+1}`);
     const li = document.createElement('li'); li.className = 'category-item';
     li.innerHTML = `
       <div class="category-arrow"><i class="fas fa-chevron-right"></i></div>
-      <div class="category-title">${cat.title}</div>
-      <div class="category-count">${idx+1}</div>
+      <div class="category-title">${cat.title || ('Category ' + (idx+1))}</div>
+      <div class="category-count">${cat.id || (idx+1)}</div>
     `;
-    li.addEventListener('click', ()=>loadCategoryDuas(idx+1, cat.title));
+    li.addEventListener('click', ()=>loadCategoryDuas(folder, cat.title || ('Category ' + (idx+1))));
     ul.appendChild(li);
   });
 }
@@ -700,7 +686,6 @@ function renderDuas(filter=''){
       </div>
     `;
 
-    // actions
     d.querySelector('.fav').addEventListener('click', ()=>{
       favorites[dua.id] = !favorites[dua.id];
       localStorage.setItem('favorites', JSON.stringify(favorites));
@@ -751,15 +736,14 @@ function buildDuaPlainText(dua){
 }
 
 async function copyToClipboard(text){
-  try{
-    await navigator.clipboard.writeText(text);
-  }catch(e){
+  try{ await navigator.clipboard.writeText(text); }
+  catch(e){
     const ta = document.createElement('textarea');
     ta.value = text; document.body.appendChild(ta); ta.select();
-    try{ document.execCommand('copy'); }catch(_){}; document.body.removeChild(ta);
+    try{ document.execCommand('copy'); }catch(_){}
+    document.body.removeChild(ta);
   }
 }
-
 function updateFavCount(){
   const count = Object.values(favorites).filter(Boolean).length;
   document.querySelector('.fav-count').textContent = count;
@@ -789,19 +773,16 @@ els.backBtn.addEventListener('click', ()=>{
   setStatus('Back to categories');
 });
 
-// Theme toggle (icon only toggles between a light preset and a dark preset)
+// Theme toggle (quick dark/light swap via preset indices)
 els.themeToggle.addEventListener('click', ()=>{
-  // toggle between current and Dark theme quickly
-  if(themeIndex === 21){ // Dark preset index in list is 21 (0-based? we added 25; check index)
-    themeIndex = 0;
-  }else{
-    themeIndex = 21; // Dark
-  }
+  // if currently dark preset (index 20), toggle back to 0; else go to dark
+  const DARK_INDEX = 20; // "Dark" in THEMES list (0-based)
+  if(themeIndex === DARK_INDEX){ themeIndex = 0; }
+  else themeIndex = DARK_INDEX;
   applyTheme(THEMES[themeIndex]);
   savePrefs();
-  // icon swap
   const icon = els.themeToggle.querySelector('i');
-  icon.className = (themeIndex === 21) ? 'fas fa-sun' : 'fas fa-moon';
+  icon.className = (themeIndex === DARK_INDEX) ? 'fas fa-sun' : 'fas fa-moon';
 });
 
 // Search toggle
@@ -854,25 +835,22 @@ els.aboutBtn.addEventListener('click', ()=> els.aboutModal.classList.add('show')
 els.closeAbout.addEventListener('click', ()=> els.aboutModal.classList.remove('show'));
 els.aboutModal.addEventListener('click', (e)=>{ if(e.target===els.aboutModal) els.aboutModal.classList.remove('show'); });
 
-// Settings sheet
+// Settings sheet open/close
 els.settingsFab.addEventListener('click', ()=> els.settingsSheet.classList.add('show'));
 els.closeSettings.addEventListener('click', ()=> els.settingsSheet.classList.remove('show'));
 
 // Settings: Display toggles
 function syncDisplayControls(){
-  // toggles
   els.toggleTranslations.checked = !!showTranslations;
   els.toggleTransliterations.checked = !!showTransliterations;
-  // switches background color hint
+
   els.toggleTranslationsSwitch.classList.toggle('on', !!showTranslations);
   els.toggleTransliterationsSwitch.classList.toggle('on', !!showTransliterations);
 
-  // ranges
   els.arabicSize.value = fontSizeArabic; els.arabicSizeVal.textContent = fontSizeArabic+'px';
   els.translationSize.value = fontSizeTranslation; els.translationSizeVal.textContent = fontSizeTranslation+'px';
   els.transliterationSize.value = fontSizeTransliteration; els.transliterationSizeVal.textContent = fontSizeTransliteration+'px';
 
-  // font select
   els.arabicFont.value = fontArabic;
 }
 
@@ -947,7 +925,7 @@ els.applyCustomTheme.addEventListener('click', ()=>{
   toast('Custom theme applied','success',1600);
 });
 
-// Settings: language section
+// Language section
 els.currentLangLabel.textContent = currentLanguage.toUpperCase();
 els.cycleLangBtn.addEventListener('click', ()=>{
   const langs = ['en','fr','ru','zh','ha'];
@@ -956,7 +934,6 @@ els.cycleLangBtn.addEventListener('click', ()=>{
   els.languageText.textContent = currentLanguage.toUpperCase();
   els.currentLangLabel.textContent = currentLanguage.toUpperCase();
   savePrefs();
-  // back to categories on switch
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
   els.sectionTitle.textContent = 'Categories';
@@ -967,9 +944,9 @@ els.cycleLangBtn.addEventListener('click', ()=>{
 function initTheme(){
   if(customTheme){ applyTheme(customTheme); }
   else applyTheme(THEMES[themeIndex] || THEMES[0]);
-  // set icon according to theme darkness
+  const DARK_INDEX = 20;
   const icon = els.themeToggle.querySelector('i');
-  icon.className = (themeIndex === 21) ? 'fas fa-sun' : 'fas fa-moon';
+  icon.className = (themeIndex === DARK_INDEX) ? 'fas fa-sun' : 'fas fa-moon';
 }
 function init(){
   els.languageText.textContent = currentLanguage.toUpperCase();
