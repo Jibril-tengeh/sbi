@@ -4,7 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Adhkar Application</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
 <style>
 /* ============ RESET & THEME VARS ============ */
 *{margin:0;padding:0;box-sizing:border-box}
@@ -17,27 +18,36 @@
   --muted:#6b7280;
   --border:#e5e7eb;
   --card:#ffffff;
+  --card-contrast:#1f2937;
   --radius:14px;
   --shadow:0 8px 24px rgba(0,0,0,.08);
-  --font-arabic-size: 22px;
-  --font-translation-size: 16px;
-  --font-transliteration-size: 16px;
-  --arabic-font: "Amiri", serif;
-  --bottom-header-h: 56px;
+  --font-arabic-size: 1.35rem;
+  --font-translation-size: 1rem;
+  --font-transliteration-size: 1rem;
+  --arabic-font: "Amiri-BoldSlanted", serif; /* default */
 }
+
+/* Dark mode baseline — keeps primary/secondary from theme, adjusts surfaces */
+body.dark{
+  --bg:#111827;
+  --text:#f3f4f6;
+  --card:#1f2937;
+  --border:#374151;
+  --muted:#9ca3af;
+}
+
 html,body{height:100%}
 body{
-  background:var(--bg);
-  color:var(--text);
+  background:var(--bg);color:var(--text);
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
   transition:background .25s,color .25s
 }
 .theme-fade{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .35s ease;z-index:9999}
 .theme-fade.show{opacity:1}
 
-/* ============ HEADER (TOP) ============ */
+/* ============ HEADER ============ */
 header{
-  position:sticky;top:0;z-index:30;
+  position:sticky;top:0;z-index:20;
   background:linear-gradient(135deg,var(--primary),var(--secondary));
   color:#fff;padding:12px 14px;box-shadow:0 4px 16px rgba(0,0,0,.12);
   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
@@ -54,16 +64,15 @@ header{
 /* Search bar */
 #searchBarContainer{
   width:100%;padding:8px;background:rgba(255,255,255,0.2);
-  display:none;
+  display:none; /* hidden until toggled */
 }
 #searchBar{
   width:100%;padding:8px 12px;border:none;border-radius:8px;font-size:1rem;
 }
 
-/* ============ MAIN ============ */
-.container{max-width:1000px;margin:16px auto calc(var(--bottom-header-h) + 18px);padding:0 14px}
-.section-title-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.section-title{margin:6px 0 6px;color:var(--primary);font-size:1.5rem}
+/* ============ LAYOUT ============ */
+.container{max-width:1000px;margin:16px auto 90px;padding:0 14px}
+.section-title{text-align:center;margin:6px 0 16px;color:var(--primary);font-size:1.5rem}
 
 /* ============ LISTS ============ */
 .categories-list{list-style:none;max-width:860px;margin:0 auto}
@@ -86,130 +95,134 @@ header{
 .back-btn:hover{transform:translateY(-1px)}
 .dua-list{max-width:860px;margin:0 auto 20px}
 .dua-item{
-  background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:var(--shadow);position:relative
+  background:var(--card);border-left:5px solid var(--primary);border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:var(--shadow)
 }
-.dua-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;color:var(--muted);font-size:.9rem}
 .dua-arabic{
   font-size:var(--font-arabic-size);line-height:2;direction:rtl;text-align:right;margin-bottom:6px;
-  font-family:var(--arabic-font);
+  font-family:var(--arabic-font, "Amiri-BoldSlanted"), serif;
 }
 .dua-transliteration{font-size:var(--font-transliteration-size);font-style:italic;margin-top:4px;color:#374151}
 .dua-translation{font-size:var(--font-translation-size);margin-top:6px}
 .dua-reference{margin-top:6px;color:var(--muted);font-size:.92rem}
-.dua-actions{
-  display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:10px;padding-top:8px;border-top:1px dashed var(--border)
-}
-.icon-btn{
-  display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);
-  background:var(--card);color:var(--text);cursor:pointer;transition:transform .12s,border-color .12s,background .12s;
-}
-.icon-btn:hover{transform:translateY(-1px);border-color:var(--primary)}
-.icon-btn.fav.active{color:#b91c1c;border-color:#b91c1c}
 
 /* ============ STATES ============ */
 .loading,.error,.no-results{text-align:center;color:var(--muted);padding:18px}
 
-/* ============ SETTINGS FAB (bottom-right transparent) ============ */
-.fab{
-  position:fixed;right:15px;bottom:calc(var(--bottom-header-h) - 49px);z-index:60;
-  height:46px;border-radius:999px;border:1px solid rgba(255,255,255,.25);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  background:rgba(0,0,0,0.15);color:#fff;padding:0 12px;
-  backdrop-filter: blur(4px) saturate(120%);
+/* ============ SETTINGS ============ */
+#settingsIcon{
+  position:fixed;right:15px;bottom:15px;z-index:40;
+  width:48px;height:48px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.22);backdrop-filter: blur(8px);
+  color:#fff;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.25);
+  transition:transform .15s,opacity .15s;
 }
-.fab span{font-size:.92rem}
-.fab i{font-size:18px}
-.fab:hover{transform:translateY(-1px)}
+#settingsIcon:hover{transform:translateY(-2px)}
 
-/* ============ MODAL (centered) ============ */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:saturate(110%) blur(2px);
-  display:none;align-items:center;justify-content:center;z-index:70;
+.settings-panel{
+  position:fixed;top:0;right:-360px;height:100%;width:360px;max-width:92vw;z-index:50;
+  background:var(--card);color:var(--text);border-left:1px solid var(--border);
+  box-shadow:-8px 0 24px rgba(0,0,0,.18);transition:right .25s ease;
+  display:flex;flex-direction:column;
 }
-.modal-overlay.show{display:flex;animation:fadeIn .18s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal{
-  width:min(92vw,820px);max-height:80vh;overflow:auto;background:var(--card);color:var(--text);
-  border-radius:16px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.25);
+.settings-panel.open{right:0}
+.settings-header{
+  padding:14px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;font-weight:700;color:var(--primary)
 }
-.modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
-.modal-title{font-weight:800;font-size:1.05rem}
-.modal-body{padding:12px 14px}
-
-/* collapsible sections */
-.section{border:1px solid var(--border);border-radius:12px;background:var(--card);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
-.section summary{
-  list-style:none;cursor:pointer;padding:12px 14px;font-weight:700;display:flex;align-items:center;justify-content:space-between
+.settings-body{padding:14px 16px;overflow:auto;flex:1}
+.settings-group{margin-bottom:14px;padding-bottom:12px;border-bottom:1px dashed var(--border)}
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0}
+.settings-row label{font-weight:600}
+.switch{
+  position:relative;width:48px;height:26px;background:#d1d5db;border-radius:999px;cursor:pointer;flex:none
 }
-.section summary::-webkit-details-marker{display:none}
-.section .section-body{padding:10px 14px 14px;border-top:1px dashed var(--border)}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
-.row label{font-size:.95rem}
-.row .controls{display:flex;align-items:center;gap:8px}
-.switch{position:relative;width:50px;height:28px;border-radius:999px;background:#e5e7eb;cursor:pointer;flex-shrink:0;border:1px solid var(--border)}
 .switch input{display:none}
-.switch.on{background:#22c55e}
-.thumb{position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:white;box-shadow:var(--shadow);transition:left .18s}
-.switch.on .thumb{left:24px}
-input[type="range"]{width:180px}
-select, input[type="color"]{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)}
+.switch::after{
+  content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:999px;background:#fff;transition:left .2s
+}
+.switch input:checked + .knob{left:25px}
+.knob{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:999px;background:#fff;transition:left .2s}
 
-/* ============ THEME GRID ============ */
+.button{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;border:1px solid var(--border);
+  background:var(--card);box-shadow:var(--shadow);cursor:pointer
+}
+.button:hover{transform:translateY(-1px)}
+
+.font-size-controls{display:flex;gap:8px}
+.font-btn{
+  width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--card);cursor:pointer;box-shadow:var(--shadow)
+}
+.select, select{
+  width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)
+}
+
 .theme-grid{
-  display:grid;
-  grid-template-columns:repeat(3, minmax(0,1fr));
-  gap:10px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px
 }
-@media (min-width:560px){ .theme-grid{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
-@media (min-width:820px){ .theme-grid{ grid-template-columns:repeat(5, minmax(0,1fr)); } }
-
-.theme-card{
+.theme-tile{
   border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow);
-  background:var(--card);display:flex;flex-direction:column;align-items:center;transition:transform .12s,border-color .12s
 }
-.theme-card:hover{transform:translateY(-2px);border-color:var(--primary)}
-.swatch{
-  width:100%;height:56px;display:grid;grid-template-columns:1fr 1fr 1fr;
+.theme-sample{
+  height:48px;display:flex;
 }
-.swatch > div{height:56px}
-.theme-name{font-size:.85rem;padding:8px 8px 10px;color:var(--text);text-align:center}
+.theme-swatch{flex:1}
+.theme-name{padding:6px 8px;font-size:.9rem;text-align:center}
 
-/* ============ BOTTOM HEADER (persistent) ============ */
-.bottom-header{
-  position:fixed;left:0;right:0;bottom:0;z-index:50;
-  height:var(--bottom-header-h);
-  background:var(--card);border-top:1px solid var(--border);box-shadow:0 -4px 18px rgba(0,0,0,.06);
-}
-.bottom-header .bar{
-  max-width:1000px;height:100%;margin:0 auto;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;
-}
-.bh-left,.bh-right{display:flex;gap:8px;align-items:center}
-.pill-btn{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text);box-shadow:var(--shadow);font-size:.92rem;cursor:pointer}
-.pill-btn.active{border-color:var(--primary);color:var(--primary)}
+.theme-actions{display:flex;gap:8px;margin-top:10px}
+.color-input{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.color-input input{width:100%;height:38px;padding:0;border:1px solid var(--border);border-radius:10px}
 
-/* Toasts (copy/share etc.) */
-.toast{
-  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bottom-header-h) + 18px);
-  background:var(--card);color:var(--text);
-  border:1px solid var(--border);box-shadow:var(--shadow);padding:10px 14px;border-radius:12px;z-index:80;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s
+/* Settings footer (INSIDE panel) */
+.settings-footer{
+  padding:12px 16px;border-top:1px solid var(--border);font-size:.92rem;color:var(--muted);
 }
-.toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(-6px)}
-.toast.success{border-color:#16a34a}
-.toast.info{border-color:#2563eb}
-.toast.warn{border-color:#f59e0b}
-.toast.error{border-color:#ef4444}
+
+/* ============ FONTS (example @font-face; replace URLs with your actual files) ============ */
+@font-face{
+  font-family:"Amiri-BoldSlanted";
+  src:url("fonts/Amiri-BoldSlanted.ttf") format("truetype");
+  font-display:swap;
+}
+@font-face{
+  font-family:"albayan";
+  src:url("fonts/albayan.ttf") format("truetype");
+  font-display:swap;
+}
+@font-face{
+  font-family:"471btehran";
+  src:url("fonts/471btehran.ttf") format("truetype");
+  font-display:swap;
+}
+@font-face{
+  font-family:"AmiriQuranColored";
+  src:url("fonts/AmiriQuranColored.ttf") format("truetype");
+  font-display:swap;
+}
+@font-face{
+  font-family:"amiri-bold";
+  src:url("fonts/amiri-bold.ttf") format("truetype");
+  font-display:swap;
+}
 </style>
 </head>
 <body>
 <div class="theme-fade" id="themeFade"></div>
 
-<!-- ======= HEADER (TOP) ======= -->
+<!-- ======= HEADER ======= -->
 <header>
   <div class="logo"><i class="fas fa-star-and-crescent"></i><span>Adhkar</span></div>
   <div class="header-icons">
-    <!-- Order: search — dark mode — languages -->
-    <div class="header-icon" id="searchToggle" title="Search"><i class="fas fa-search"></i></div>
-    <div class="header-icon" id="themeToggle" title="Dark / Light"><i class="fas fa-moon"></i></div>
+    <!-- Search Icon -->
+    <div class="header-icon" id="searchToggle" title="Search">
+      <i class="fas fa-search"></i>
+    </div>
+    <!-- Dark Mode -->
+    <div class="header-icon" id="themeToggle" title="Toggle Sun/Moon">
+      <i class="fas fa-moon"></i>
+    </div>
+    <!-- Language -->
     <div class="header-icon" id="languageToggle" title="Language">
       <i class="fas fa-language"></i>
       <div class="language-text" id="languageText">EN</div>
@@ -223,252 +236,122 @@ select, input[type="color"]{padding:8px 10px;border-radius:10px;border:1px solid
 
 <!-- ======= MAIN ======= -->
 <div class="container">
-  <div class="section-title-wrap">
-    <h1 class="section-title"></h1>
-  </div>
-
+  <h1 class="section-title">Categories</h1>
   <ul id="categoriesList" class="categories-list">
     <li class="loading">Loading categories...</li>
   </ul>
-
   <div id="categoryDetails" style="display:none;">
-    <button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
+    <button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i> <span id="labelBack">Back</span></button>
     <div id="duaContainer" class="dua-list"></div>
   </div>
 </div>
 
-<!-- ======= FLOATING SETTINGS (transparent with text) ======= -->
-<button class="fab" id="fabSettings" title="Settings" aria-label="Settings">
-  <i class="fa fa-sliders"></i><span></span>
-</button>
+<!-- ======= SETTINGS ICON ======= -->
+<div id="settingsIcon" title="Settings" aria-label="Settings"><i class="fas fa-cog"></i></div>
 
-<!-- ======= SETTINGS MODAL ======= -->
-<div class="modal-overlay" id="settingsOverlay" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-    <div class="modal-head">
-      <div class="modal-title" id="settingsTitle">Settings</div>
-      <button class="header-icon" id="closeSettings" style="width:36px;height:36px;background:rgba(0,0,0,0.05);color:inherit"><i class="fa fa-xmark"></i></button>
+<!-- ======= SETTINGS PANEL ======= -->
+<aside id="settingsPanel" class="settings-panel" aria-hidden="true">
+  <div class="settings-header">
+    <span id="labelSettings">Settings</span>
+    <button class="button" id="closeSettings"><i class="fas fa-times"></i></button>
+  </div>
+
+  <div class="settings-body" id="settingsMain">
+    <div class="settings-group">
+      <div class="settings-row">
+        <label for="toggleTranslations" id="labelShowTranslations">Show translations</label>
+        <div class="switch">
+          <input type="checkbox" id="toggleTranslations" />
+          <div class="knob"></div>
+        </div>
+      </div>
+      <div class="settings-row">
+        <label for="toggleTransliterations" id="labelShowTransliterations">Show transliterations</label>
+        <div class="switch">
+          <input type="checkbox" id="toggleTransliterations" />
+          <div class="knob"></div>
+        </div>
+      </div>
     </div>
-    <div class="modal-body">
-      <!-- Display (OPEN by default) -->
-      <details class="section" id="displaySection" open>
-        <summary>
-          <span id="displayTitle">Display</span>
-          <i class="fa fa-chevron-down"></i>
-        </summary>
-        <div class="section-body">
-          <div class="row">
-            <label for="toggleTranslations">Show Translations</label>
-            <div class="controls">
-              <label class="switch" id="toggleTranslationsSwitch">
-                <input type="checkbox" id="toggleTranslations">
-                <span class="thumb"></span>
-              </label>
-            </div>
-          </div>
-          <div class="row">
-            <label for="toggleTransliterations">Show Transliteration</label>
-            <div class="controls">
-              <label class="switch" id="toggleTransliterationsSwitch">
-                <input type="checkbox" id="toggleTransliterations">
-                <span class="thumb"></span>
-              </label>
-            </div>
-          </div>
 
-          <div class="row">
-            <label>Arabic size</label>
-            <div class="controls">
-              <input type="range" id="arabicSize" min="18" max="44" value="22">
-              <span id="arabicSizeVal">22px</span>
-            </div>
-          </div>
-          <div class="row">
-            <label>Translation size</label>
-            <div class="controls">
-              <input type="range" id="translationSize" min="12" max="28" value="16">
-              <span id="translationSizeVal">16px</span>
-            </div>
-          </div>
-          <div class="row">
-            <label>Transliteration size</label>
-            <div class="controls">
-              <input type="range" id="transliterationSize" min="12" max="28" value="16">
-              <span id="transliterationSizeVal">16px</span>
-            </div>
-          </div>
-
-          <div class="row">
-            <label>Arabic Font</label>
-            <div class="controls">
-              <select id="arabicFont">
-                <option value="Amiri-BoldSlanted">Amiri-BoldSlanted</option>
-                <option value="albayan">albayan</option>
-                <option value="471btehran">471btehran</option>
-                <option value="AmiriQuranColored">AmiriQuranColored</option>
-                <option value="amiri-bold">amiri-bold</option>
-                <option value="Amiri">Amiri (system)</option>
-              </select>
-            </div>
-          </div>
+    <div class="settings-group">
+      <div class="settings-row">
+        <label id="labelArabicFont">Arabic font</label>
+        <select id="arabicFontSelect" class="select">
+          <option value="Amiri-BoldSlanted">Amiri-BoldSlanted</option>
+          <option value="albayan">albayan</option>
+          <option value="471btehran">471btehran</option>
+          <option value="AmiriQuranColored">AmiriQuranColored</option>
+          <option value="amiri-bold">amiri-bold</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <label id="labelFontSize">Arabic font size</label>
+        <div class="font-size-controls">
+          <button class="font-btn" id="fontSmaller" title="A−">A−</button>
+          <button class="font-btn" id="fontLarger" title="A+">A+</button>
         </div>
-      </details>
+      </div>
+    </div>
 
-      <!-- Theme -->
-      <details class="section" id="themeSection">
-        <summary>
-          <span id="themeTitle">Theme</span>
-          <i class="fa fa-chevron-down"></i>
-        </summary>
-        <div class="section-body">
-          <div class="row" style="justify-content:flex-start;margin-top:0">
-            <button class="pill-btn" id="toggleDarkQuick"><i class="fa fa-circle-half-stroke"></i> Dark / Light</button>
-          </div>
-
-          <div class="row" style="justify-content:flex-start">
-            <label style="min-width:120px">Choose Theme</label>
-          </div>
-          <div class="theme-grid" id="themeGrid"></div>
-
-          <div class="row" style="margin-top:14px"><label><strong>Create Your Own Theme</strong></label></div>
-          <div class="row">
-            <label>Background</label>
-            <div class="controls"><input type="color" id="customBg" value="#161a23"></div>
-          </div>
-          <div class="row">
-            <label>Text</label>
-            <div class="controls"><input type="color" id="customText" value="#e5e7eb"></div>
-          </div>
-          <div class="row">
-            <label>Card</label>
-            <div class="controls"><input type="color" id="customCard" value="#0f172a"></div>
-          </div>
-          <div class="row">
-            <label>Primary</label>
-            <div class="controls"><input type="color" id="customPrimary" value="#16a34a"></div>
-          </div>
-          <div class="row">
-            <label>Secondary</label>
-            <div class="controls"><input type="color" id="customSecondary" value="#0e9f6e"></div>
-          </div>
-          <div class="row">
-            <label>Accent</label>
-            <div class="controls"><input type="color" id="customAccent" value="#f05252"></div>
-          </div>
-          <div class="row">
-            <label>Border</label>
-            <div class="controls"><input type="color" id="customBorder" value="#334155"></div>
-          </div>
-          <div class="row" style="justify-content:flex-start">
-            <button class="pill-btn" id="applyCustomTheme"><i class="fa fa-palette"></i> Apply Custom Theme</button>
-          </div>
-        </div>
-      </details>
-
-      <!-- Language -->
-      <details class="section" id="languageSection">
-        <summary>
-          <span id="languageTitle">Language</span>
-          <i class="fa fa-chevron-down"></i>
-        </summary>
-        <div class="section-body">
-          <div class="row">
-            <label>Current</label>
-            <div class="controls"><span id="currentLangLabel">EN</span></div>
-          </div>
-          <div class="row">
-            <label>Switch</label>
-            <div class="controls"><button class="pill-btn" id="cycleLangBtn"><i class="fa fa-language"></i> Cycle</button></div>
-          </div>
-        </div>
-      </details>
-
-      <!-- About (ONLY here) -->
-      <details class="section" id="aboutSection">
-        <summary>
-          <span id="aboutTitle">About</span>
-          <i class="fa fa-chevron-down"></i>
-        </summary>
-        <div class="section-body">
-          <p style="margin-bottom:6px">Adhkar & Dua Application</p>
-          <p style="color:var(--muted);font-size:.95rem">Developed by <strong>Jibril SBI TENGEH</strong>.</p>
-        </div>
-      </details>
+    <div class="settings-group">
+      <div class="settings-row" style="justify-content:flex-start;">
+        <button class="button" id="openThemes"><i class="fas fa-palette"></i><span id="labelOpenThemes">Themes</span></button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- ======= BOTTOM HEADER ======= -->
-<nav class="bottom-header" aria-label="Bottom header">
-  <div class="bar">
-    <div class="bh-left">
-      <button class="pill-btn" id="homeBtn"><i class="fa fa-house"></i> Home</button>
-      <button class="pill-btn" id="favoritesBtn"><i class="fa fa-heart"></i> Favorites</button>
+  <!-- Theme Selection View -->
+  <div class="settings-body" id="settingsThemes" style="display:none;">
+    <div class="settings-row" style="justify-content:space-between;">
+      <button class="button" id="backToMain"><i class="fas fa-arrow-left"></i><span id="labelBackToMain">Back</span></button>
+      <strong id="labelChooseTheme">Choose a theme</strong>
     </div>
-    <div class="bh-right"></div>
-  </div>
-</nav>
 
-<!-- ======= TOAST ======= -->
-<div class="toast" id="toast">Done</div>
+    <div id="themeGrid" class="theme-grid"></div>
+
+    <div class="settings-group">
+      <div class="settings-row" style="justify-content:flex-start;">
+        <strong id="labelCustomTheme">Custom theme</strong>
+      </div>
+      <div class="theme-actions">
+        <div class="color-input">
+          <label for="colorPrimary" id="labelPrimary">Primary</label>
+          <input type="color" id="colorPrimary" value="#16a34a">
+        </div>
+        <div class="color-input">
+          <label for="colorSecondary" id="labelSecondary">Secondary</label>
+          <input type="color" id="colorSecondary" value="#0e9f6e">
+        </div>
+        <div class="color-input">
+          <label for="colorBg" id="labelBg">Background</label>
+          <input type="color" id="colorBg" value="#f9fafb">
+        </div>
+        <div class="color-input">
+          <label for="colorText" id="labelText">Text</label>
+          <input type="color" id="colorText" value="#111827">
+        </div>
+      </div>
+      <div class="settings-row" style="justify-content:flex-start;margin-top:8px;">
+        <button class="button" id="applyCustom"><i class="fas fa-check"></i><span id="labelApply">Apply</span></button>
+        <button class="button" id="saveCustom"><i class="fas fa-save"></i><span id="labelSave">Save as My Theme</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-footer">
+    <span id="labelDevelopedBy">Developed by Jibril SBI TENGEH</span>
+  </div>
+</aside>
 
 <script>
-/* ================== CONFIG ================== */
-/* Absolute base path so it works instantly with your GitHub Pages */
-const BASE = "https://jibril-tengeh.github.io/sbi/";
-
-/* ================== THEMES (25 presets) ================== */
-const PRESET_THEMES = [
-  {name:"Leaf", vars:{bg:"#f9fafb",text:"#111827",card:"#ffffff",border:"#e5e7eb",primary:"#16a34a",secondary:"#0e9f6e",accent:"#f05252"}},
-  {name:"Emerald", vars:{bg:"#ecfdf5",text:"#064e3b",card:"#ffffff",border:"#d1fae5",primary:"#10b981",secondary:"#059669",accent:"#ef4444"}},
-  {name:"Forest", vars:{bg:"#0b1411",text:"#e7f8f0",card:"#10201b",border:"#1f2f2a",primary:"#22c55e",secondary:"#16a34a",accent:"#f59e0b"}},
-  {name:"Mint", vars:{bg:"#f0fdfa",text:"#064e3b",card:"#ffffff",border:"#ccfbf1",primary:"#14b8a6",secondary:"#0ea5e9",accent:"#fb7185"}},
-  {name:"Ocean", vars:{bg:"#0b1220",text:"#e5e7eb",card:"#0f172a",border:"#334155",primary:"#3b82f6",secondary:"#06b6d4",accent:"#f59e0b"}},
-  {name:"Sky", vars:{bg:"#f0f9ff",text:"#0c4a6e",card:"#ffffff",border:"#e0f2fe",primary:"#0ea5e9",secondary:"#38bdf8",accent:"#ef4444"}},
-  {name:"Royal", vars:{bg:"#0b1020",text:"#e5e7eb",card:"#111827",border:"#374151",primary:"#6366f1",secondary:"#8b5cf6",accent:"#22c55e"}},
-  {name:"Grape", vars:{bg:"#faf5ff",text:"#4c1d95",card:"#ffffff",border:"#ede9fe",primary:"#8b5cf6",secondary:"#a78bfa",accent:"#ef4444"}},
-  {name:"Lavender", vars:{bg:"#f5f3ff",text:"#3730a3",card:"#ffffff",border:"#e9d5ff",primary:"#7c3aed",secondary:"#6d28d9",accent:"#f59e0b"}},
-  {name:"Cherry", vars:{bg:"#fff1f2",text:"#7f1d1d",card:"#ffffff",border:"#ffe4e6",primary:"#ef4444",secondary:"#fb7185",accent:"#22c55e"}},
-  {name:"Rose", vars:{bg:"#fff1f2",text:"#7a1a38",card:"#ffffff",border:"#ffe4e6",primary:"#f43f5e",secondary:"#e11d48",accent:"#0ea5e9"}},
-  {name:"Sunset", vars:{bg:"#fff7ed",text:"#7c2d12",card:"#ffffff",border:"#ffedd5",primary:"#f97316",secondary:"#f59e0b",accent:"#10b981"}},
-  {name:"Sand", vars:{bg:"#fafaf9",text:"#1f2937",card:"#ffffff",border:"#e7e5e4",primary:"#ca8a04",secondary:"#d97706",accent:"#16a34a"}},
-  {name:"Cocoa", vars:{bg:"#1c1917",text:"#e7e5e4",card:"#292524",border:"#44403c",primary:"#a16207",secondary:"#854d0e",accent:"#22c55e"}},
-  {name:"Slate", vars:{bg:"#0b1220",text:"#e5e7eb",card:"#111827",border:"#374151",primary:"#64748b",secondary:"#94a3b8",accent:"#22c55e"}},
-  {name:"Carbon", vars:{bg:"#0a0a0a",text:"#f3f4f6",card:"#171717",border:"#262626",primary:"#22c55e",secondary:"#3b82f6",accent:"#f59e0b"}},
-  {name:"Nord", vars:{bg:"#2e3440",text:"#e5e9f0",card:"#3b4252",border:"#4c566a",primary:"#88c0d0",secondary:"#81a1c1",accent:"#a3be8c"}},
-  {name:"Dracula", vars:{bg:"#282a36",text:"#f8f8f2",card:"#303241",border:"#3c3f51",primary:"#bd93f9",secondary:"#50fa7b",accent:"#ff79c6"}},
-  {name:"Solar", vars:{bg:"#fdf6e3",text:"#073642",card:"#fffdf5",border:"#eee8d5",primary:"#b58900",secondary:"#268bd2",accent:"#cb4b16"}},
-  {name:"Aqua", vars:{bg:"#ecfeff",text:"#083344",card:"#ffffff",border:"#cffafe",primary:"#06b6d4",secondary:"#0ea5e9",accent:"#10b981"}},
-  {name:"Lime", vars:{bg:"#f7fee7",text:"#1a2e05",card:"#ffffff",border:"#ecfccb",primary:"#84cc16",secondary:"#22c55e",accent:"#f97316"}},
-  {name:"Peach", vars:{bg:"#fff7ed",text:"#7c2d12",card:"#ffffff",border:"#fed7aa",primary:"#fb923c",secondary:"#f97316",accent:"#22c55e"}},
-  {name:"Berry", vars:{bg:"#fdf2f8",text:"#4a044e",card:"#ffffff",border:"#f5d0fe",primary:"#d946ef",secondary:"#a855f7",accent:"#22c55e"}},
-  {name:"Steel", vars:{bg:"#f8fafc",text:"#0f172a",card:"#ffffff",border:"#e2e8f0",primary:"#334155",secondary:"#475569",accent:"#ef4444"}},
-  {name:"Mono", vars:{bg:"#ffffff",text:"#111827",card:"#ffffff",border:"#e5e7eb",primary:"#111827",secondary:"#6b7280",accent:"#ef4444"}},
-];
-
-/* ================== STATE ================== */
-let currentLanguage = localStorage.getItem('lang') || 'en';
+/* ========= ORIGINAL STATE (unchanged) ========= */
+let currentLanguage = 'en';
 let categoriesData = [];
 let duasData = [];
-let currentCategoryFolder = null;
+let showTransliterations = true;
+let showTranslations = true;
 
-let favorites = JSON.parse(localStorage.getItem('favorites')||'{}'); // {duaKey: duaObject}
-let viewingFavorites = false;
-
-let showTransliterations = JSON.parse(localStorage.getItem('showTransliterations')||'true');
-let showTranslations = JSON.parse(localStorage.getItem('showTranslations')||'true');
-
-let fontArabic = localStorage.getItem('fontArabic') || 'Amiri';
-let fontSizeArabic = parseInt(localStorage.getItem('fontSizeArabic')||'22',10);
-let fontSizeTranslation = parseInt(localStorage.getItem('fontSizeTranslation')||'16',10);
-let fontSizeTransliteration = parseInt(localStorage.getItem('fontSizeTransliteration')||'16',10);
-
-let themeIndex = parseInt(localStorage.getItem('themeIndex') ?? '0',10);
-if(Number.isNaN(themeIndex)) themeIndex = 0;
-let customTheme = JSON.parse(localStorage.getItem('customTheme') || 'null');
-let darkMode = JSON.parse(localStorage.getItem('darkMode')||'false');
-
-/* ================== UI ELEMENTS ================== */
 const els = {
   categoriesList: document.getElementById('categoriesList'),
   categoryDetails: document.getElementById('categoryDetails'),
@@ -479,128 +362,36 @@ const els = {
   searchToggle: document.getElementById('searchToggle'),
   searchBarContainer: document.getElementById('searchBarContainer'),
   searchBar: document.getElementById('searchBar'),
-  sectionTitle: document.querySelector('.section-title'),
-  toast: document.getElementById('toast'),
 
-  // bottom header
-  homeBtn: document.getElementById('homeBtn'),
-  favoritesBtn: document.getElementById('favoritesBtn'),
-
-  // settings modal & FAB
-  fabSettings: document.getElementById('fabSettings'),
-  settingsOverlay: document.getElementById('settingsOverlay'),
+  // Settings
+  settingsIcon: document.getElementById('settingsIcon'),
+  settingsPanel: document.getElementById('settingsPanel'),
   closeSettings: document.getElementById('closeSettings'),
-
-  // settings content
-  currentLangLabel: document.getElementById('currentLangLabel'),
-  cycleLangBtn: document.getElementById('cycleLangBtn'),
-  toggleDarkQuick: document.getElementById('toggleDarkQuick'),
-
-  // display controls
+  settingsMain: document.getElementById('settingsMain'),
+  settingsThemes: document.getElementById('settingsThemes'),
+  openThemes: document.getElementById('openThemes'),
+  backToMain: document.getElementById('backToMain'),
   toggleTranslations: document.getElementById('toggleTranslations'),
-  toggleTranslationsSwitch: document.getElementById('toggleTranslationsSwitch'),
   toggleTransliterations: document.getElementById('toggleTransliterations'),
-  toggleTransliterationsSwitch: document.getElementById('toggleTransliterationsSwitch'),
-  arabicSize: document.getElementById('arabicSize'),
-  arabicSizeVal: document.getElementById('arabicSizeVal'),
-  translationSize: document.getElementById('translationSize'),
-  translationSizeVal: document.getElementById('translationSizeVal'),
-  transliterationSize: document.getElementById('transliterationSize'),
-  transliterationSizeVal: document.getElementById('transliterationSizeVal'),
-  arabicFont: document.getElementById('arabicFont'),
-
-  // themes
+  arabicFontSelect: document.getElementById('arabicFontSelect'),
+  fontSmaller: document.getElementById('fontSmaller'),
+  fontLarger: document.getElementById('fontLarger'),
   themeGrid: document.getElementById('themeGrid'),
-  customBg: document.getElementById('customBg'),
-  customText: document.getElementById('customText'),
-  customCard: document.getElementById('customCard'),
-  customPrimary: document.getElementById('customPrimary'),
-  customSecondary: document.getElementById('customSecondary'),
-  customAccent: document.getElementById('customAccent'),
-  customBorder: document.getElementById('customBorder'),
-  applyCustomTheme: document.getElementById('applyCustomTheme'),
+  colorPrimary: document.getElementById('colorPrimary'),
+  colorSecondary: document.getElementById('colorSecondary'),
+  colorBg: document.getElementById('colorBg'),
+  colorText: document.getElementById('colorText'),
+  applyCustom: document.getElementById('applyCustom'),
+  saveCustom: document.getElementById('saveCustom'),
 };
 
-/* ================== HELPERS ================== */
-function toast(msg,type="info",ms=2000){
-  els.toast.textContent = msg;
-  els.toast.className = `toast ${type} show`;
-  setTimeout(()=>{els.toast.classList.remove('show')}, ms);
-}
-function savePrefs(){
-  localStorage.setItem('lang', currentLanguage);
-  localStorage.setItem('showTranslations', JSON.stringify(showTranslations));
-  localStorage.setItem('showTransliterations', JSON.stringify(showTransliterations));
-  localStorage.setItem('fontArabic', fontArabic);
-  localStorage.setItem('fontSizeArabic', fontSizeArabic);
-  localStorage.setItem('fontSizeTranslation', fontSizeTranslation);
-  localStorage.setItem('fontSizeTransliteration', fontSizeTransliteration);
-  localStorage.setItem('themeIndex', themeIndex);
-  localStorage.setItem('darkMode', JSON.stringify(darkMode));
-  if(customTheme) localStorage.setItem('customTheme', JSON.stringify(customTheme));
-}
-function updateFontVars(){
-  document.documentElement.style.setProperty('--font-arabic-size', fontSizeArabic + 'px');
-  document.documentElement.style.setProperty('--font-translation-size', fontSizeTranslation + 'px');
-  document.documentElement.style.setProperty('--font-transliteration-size', fontSizeTransliteration + 'px');
-  document.documentElement.style.setProperty('--arabic-font', `"${fontArabic}", serif`);
-}
-
-/* THEME ENGINE */
-function applyVars(vars){
-  for(const [k,v] of Object.entries(vars)){
-    document.documentElement.style.setProperty(`--${k}`, v);
-  }
-}
-function buildDarkOverlay(base){
-  // Ensure readable dark variant regardless of chosen theme
-  return {
-    bg:         "#0b1220",
-    text:       "#e5e7eb",
-    card:       "#0f172a",
-    border:     "#334155",
-    primary:    base.primary || "#3b82f6",
-    secondary:  base.secondary || "#06b6d4",
-    accent:     base.accent || "#f59e0b",
-  };
-}
-function applyTheme(index, useDark = darkMode){
-  const preset = PRESET_THEMES[index] ? PRESET_THEMES[index].vars : PRESET_THEMES[0].vars;
-  const vars = useDark ? {...preset, ...buildDarkOverlay(preset)} : {...preset};
-  applyVars(vars);
-  const icon = els.themeToggle.querySelector('i');
-  icon.className = useDark ? 'fas fa-sun' : 'fas fa-moon';
-}
-function applyCustomTheme(theme, useDark = darkMode){
-  const base = theme || PRESET_THEMES[0].vars;
-  const vars = useDark ? {...base, ...buildDarkOverlay(base)} : {...base};
-  applyVars(vars);
-  const icon = els.themeToggle.querySelector('i');
-  icon.className = useDark ? 'fas fa-sun' : 'fas fa-moon';
-}
-
-/* ================== FETCHERS (with cache fallback) ================== */
-async function fetchJSONWithCache(url, cacheKey){
-  try{
-    const res = await fetch(url, {cache:'no-store'});
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    localStorage.setItem(cacheKey, JSON.stringify({ts:Date.now(), data}));
-    return data;
-  }catch(err){
-    const cached = localStorage.getItem(cacheKey);
-    if(cached){ return JSON.parse(cached).data; }
-    throw err;
-  }
-}
-
+/* ================== FETCHING (unchanged) ================== */
 async function loadCategories(){
   try{
     els.categoriesList.innerHTML = '<li class="loading">Loading categories...</li>';
-    const url = `${BASE}categories/${currentLanguage}.json`;
-    const cacheKey = `categories_${currentLanguage}`;
-    // expected: [{ "id": 1, "title": "...", "folder": "categories_1" }, ...]
-    categoriesData = await fetchJSONWithCache(url, cacheKey);
+    const res = await fetch(`categories/${currentLanguage}.json`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    categoriesData = await res.json();
     renderCategories();
   }catch(err){
     console.error('Categories error:', err);
@@ -608,382 +399,420 @@ async function loadCategories(){
   }
 }
 
-async function loadCategoryDuas(categoryFolder, categoryName){
-  try{
-    currentCategoryFolder = categoryFolder;
-    els.categoryDetails.style.display = 'block';
-    els.categoriesList.style.display = 'none';
-    els.sectionTitle.textContent = categoryName;
-    els.duaContainer.innerHTML = '<div class="loading">Loading duas...</div>';
-    // NOTE: uses "duas" as requested
-    const url = `${BASE}duas/${categoryFolder}/${currentLanguage}.json`;
-    const cacheKey = `duas_${categoryFolder}_${currentLanguage}`;
-    duasData = await fetchJSONWithCache(url, cacheKey);
-    // mark items with folder/lang for favorites keys
-    duasData = duasData.map(d => ({...d, _catFolder: categoryFolder, _lang: currentLanguage}));
-    renderDuas();
-  }catch(err){
-    console.error('Duas error:', err);
-    els.duaContainer.innerHTML = `
-      <div class="error">
-        Failed to load duas.<br/>
-        <small>Checked: <code>duas/${categoryFolder}/${currentLanguage}.json</code></small>
-      </div>`;
-  }
-}
-
-/* ================== RENDERERS ================== */
 function renderCategories(filter=''){
   const ul = els.categoriesList; ul.innerHTML = '';
   let filtered = categoriesData;
-  if(filter) filtered = categoriesData.filter(cat=> (cat.title||'').toLowerCase().includes(filter.toLowerCase()));
+  if(filter){
+    filtered = categoriesData.filter(cat=>cat.title.toLowerCase().includes(filter.toLowerCase()));
+  }
   if(!filtered.length){ ul.innerHTML = '<li class="no-results">No categories available</li>'; return; }
-
   filtered.forEach((cat, idx)=>{
-    const folder = cat.folder || (cat.id ? `categories_${cat.id}` : `categories_${idx+1}`);
     const li = document.createElement('li'); li.className = 'category-item';
     li.innerHTML = `
       <div class="category-arrow"><i class="fas fa-chevron-right"></i></div>
-      <div class="category-title">${cat.title || ('Category ' + (idx+1))}</div>
+      <div class="category-title">${cat.title}</div>
+      <div class="category-count">${idx+1}</div>
     `;
-    li.addEventListener('click', ()=>loadCategoryDuas(folder, cat.title || ('Category ' + (idx+1))));
+    li.addEventListener('click', ()=>loadCategoryDuas(idx+1, cat.title));
     ul.appendChild(li);
   });
 }
 
-function makeDuaKey(dua, catFolder = currentCategoryFolder, lang = currentLanguage){
-  const idPart = dua.id != null ? dua.id : (dua.arabic ? dua.arabic.slice(0,30) : Math.random().toString(36).slice(2));
-  return `${catFolder}:${lang}:${idPart}`;
+async function loadCategoryDuas(categoryId, categoryName){
+  try{
+    els.categoryDetails.style.display = 'block';
+    els.categoriesList.style.display = 'none';
+    document.querySelector('.section-title').textContent = categoryName;
+    els.duaContainer.innerHTML = '<div class="loading">Loading duas...</div>';
+    const res = await fetch(`duas/categories_${categoryId}/${currentLanguage}.json`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    duasData = await res.json();
+    renderDuas();
+  }catch(err){
+    console.error('Duas error:', err);
+    els.duaContainer.innerHTML = '<div class="error">Failed to load duas.</div>';
+  }
 }
 
 function renderDuas(filter=''){
   const container = els.duaContainer; container.innerHTML = '';
-  let list;
-
-  if(viewingFavorites){
-    list = Object.values(favorites || {});
-    if(filter){
-      const f = filter.toLowerCase();
-      list = list.filter(dua =>
-        (dua.translation && dua.translation.toLowerCase().includes(f)) ||
-        (dua.transliteration && dua.transliteration.toLowerCase().includes(f)) ||
-        (dua.arabic && dua.arabic.includes(filter))
-      );
-    }
-  } else {
-    list = duasData.slice();
-    if(filter){
-      const f = filter.toLowerCase();
-      list = list.filter(dua =>
-        (dua.translation && dua.translation.toLowerCase().includes(f)) ||
-        (dua.transliteration && dua.transliteration.toLowerCase().includes(f)) ||
-        (dua.arabic && dua.arabic.includes(filter))
-      );
-    }
+  let filtered = duasData;
+  if(filter){
+    filtered = duasData.filter(dua=>
+      (dua.translation && dua.translation.toLowerCase().includes(filter.toLowerCase())) ||
+      (dua.arabic && dua.arabic.includes(filter)) ||
+      (dua.transliteration && dua.transliteration.toLowerCase().includes(filter.toLowerCase()))
+    );
   }
-
-  if(!list.length){ container.innerHTML = '<div class="no-results">No duas available</div>'; return; }
-
-  list.forEach(dua=>{
-    const key = makeDuaKey(dua, dua._catFolder || currentCategoryFolder, dua._lang || currentLanguage);
-    const isFav = !!favorites[key];
-
+  if(!filtered.length){ container.innerHTML = '<div class="no-results">No duas available</div>'; return; }
+  filtered.forEach(dua=>{
     const d = document.createElement('div'); d.className = 'dua-item';
-
     d.innerHTML = `
-      <div class="dua-header">
-        <div class="ref-left">${dua.reference ? dua.reference : ''}</div>
-        <div class="ref-right"></div>
-      </div>
-
       ${dua.arabic ? `<div class="dua-arabic">${dua.arabic}</div>` : ''}
-
-      <div class="dua-transliteration" style="display:${showTransliterations && dua.transliteration ? 'block':'none'}">
-        ${dua.transliteration ? dua.transliteration : ''}
-      </div>
-
-      <div class="dua-translation" style="display:${showTranslations && dua.translation ? 'block':'none'}">
-        ${dua.translation ? dua.translation : ''}
-      </div>
-
-      ${dua.source ? `<div class="dua-reference">${dua.source}</div>` : ''}
-
-      <div class="dua-actions">
-        <button class="icon-btn fav ${isFav?'active':''}" title="Favorite"><i class="fa fa-heart"></i></button>
-        <button class="icon-btn share" title="Share"><i class="fa fa-share-nodes"></i></button>
-        <button class="icon-btn save" title="Save"><i class="fa fa-download"></i></button>
-        <button class="icon-btn copy" title="Copy"><i class="fa fa-copy"></i></button>
-      </div>
+      ${showTransliterations && dua.transliteration ? `<div class="dua-transliteration">${dua.transliteration}</div>` : ''}
+      ${showTranslations && dua.translation ? `<div class="dua-translation">${dua.translation}</div>` : ''}
+      ${dua.reference ? `<div class="dua-reference">${dua.reference}</div>` : ''}
     `;
-
-    // Favorite
-    d.querySelector('.fav').addEventListener('click', ()=>{
-      const nowFav = !favorites[key];
-      if(nowFav){
-        const stored = {...dua, _catFolder: dua._catFolder || currentCategoryFolder, _lang: dua._lang || currentLanguage};
-        favorites[key] = stored;
-      }else{
-        delete favorites[key];
-      }
-      localStorage.setItem('favorites', JSON.stringify(favorites));
-      d.querySelector('.fav').classList.toggle('active', nowFav);
-      toast(nowFav ? 'Added to favorites' : 'Removed from favorites','success',1500);
-      if(viewingFavorites && !nowFav){ d.remove(); if(!els.duaContainer.children.length) container.innerHTML = '<div class="no-results">No duas available</div>'; }
-    });
-
-    // Share
-    d.querySelector('.share').addEventListener('click', async ()=>{
-      const text = buildDuaPlainText(dua);
-      if(navigator.share){
-        try{ await navigator.share({title:'Dua', text}); toast('Shared','success',2000);}catch(e){}
-      }else{
-        await copyToClipboard(text);
-        toast('Copied for sharing','info',2000);
-      }
-    });
-
-    // Save
-    d.querySelector('.save').addEventListener('click', ()=>{
-      const text = buildDuaPlainText(dua);
-      const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `dua_${dua.id||'item'}.txt`;
-      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-      toast('Saved as file','success',2000);
-    });
-
-    // Copy
-    d.querySelector('.copy').addEventListener('click', async ()=>{
-      await copyToClipboard(buildDuaPlainText(dua));
-      toast('Copied','success',2000);
-    });
-
     container.appendChild(d);
   });
 }
 
-function buildDuaPlainText(dua){
-  let t = '';
-  if(dua.arabic) t += dua.arabic + '\n\n';
-  if(showTransliterations && dua.transliteration) t += dua.transliteration + '\n\n';
-  if(showTranslations && dua.translation) t += dua.translation + '\n\n';
-  if(dua.reference) t += '('+dua.reference+')\n';
-  if(dua.source) t += 'Source: '+dua.source+'\n';
-  return t.trim();
+/* ================== THEMES ================== */
+const predefinedThemes = [
+  {name:"Emerald",primary:"#16a34a",secondary:"#0e9f6e",bg:"#f9fafb",text:"#111827"},
+  {name:"Ocean",primary:"#2563eb",secondary:"#1e3a8a",bg:"#eff6ff",text:"#0f172a"},
+  {name:"Royal Purple",primary:"#7c3aed",secondary:"#4c1d95",bg:"#f5f3ff",text:"#111827"},
+  {name:"Sunset",primary:"#f59e0b",secondary:"#b45309",bg:"#fffbeb",text:"#111827"},
+  {name:"Ruby",primary:"#ef4444",secondary:"#b91c1c",bg:"#fef2f2",text:"#111827"},
+  {name:"Teal",primary:"#14b8a6",secondary:"#0f766e",bg:"#ecfeff",text:"#0b1620"},
+  {name:"Rose",primary:"#e11d48",secondary:"#881337",bg:"#fff1f2",text:"#111827"},
+  {name:"Slate",primary:"#0ea5e9",secondary:"#0369a1",bg:"#f1f5f9",text:"#0f172a"},
+  {name:"Indigo",primary:"#4f46e5",secondary:"#1e40af",bg:"#eef2ff",text:"#0f172a"},
+  {name:"Lime",primary:"#84cc16",secondary:"#3f6212",bg:"#f7fee7",text:"#111827"},
+  {name:"Amber",primary:"#f59e0b",secondary:"#92400e",bg:"#fff7ed",text:"#111827"},
+  {name:"Cobalt",primary:"#1d4ed8",secondary:"#1e3a8a",bg:"#e0e7ff",text:"#0f172a"},
+  {name:"Forest",primary:"#22c55e",secondary:"#065f46",bg:"#ecfdf5",text:"#0f172a"},
+  {name:"Copper",primary:"#ea580c",secondary:"#9a3412",bg:"#fff7ed",text:"#111827"},
+  {name:"Grape",primary:"#a855f7",secondary:"#6d28d9",bg:"#faf5ff",text:"#111827"},
+  {name:"Pink",primary:"#ec4899",secondary:"#9d174d",bg:"#fdf2f8",text:"#111827"},
+  {name:"Sky",primary:"#38bdf8",secondary:"#0284c7",bg:"#e0f2fe",text:"#0f172a"},
+  {name:"Steel",primary:"#64748b",secondary:"#334155",bg:"#f8fafc",text:"#0f172a"},
+  {name:"Mint",primary:"#2dd4bf",secondary:"#0f766e",bg:"#f0fdfa",text:"#0f172a"},
+  {name:"Moss",primary:"#65a30d",secondary:"#365314",bg:"#f7fee7",text:"#111827"},
+  {name:"Cranberry",primary:"#be123c",secondary:"#7f1d1d",bg:"#fff1f2",text:"#111827"},
+  {name:"Denim",primary:"#1e40af",secondary:"#1e3a8a",bg:"#e2e8f0",text:"#0f172a"},
+  {name:"Plum",primary:"#7e22ce",secondary:"#581c87",bg:"#faf5ff",text:"#111827"},
+  {name:"Aqua",primary:"#06b6d4",secondary:"#0e7490",bg:"#e0f2fe",text:"#0f172a"},
+  {name:"Charcoal",primary:"#0ea5e9",secondary:"#111827",bg:"#111827",text:"#f3f4f6"},
+];
+
+function applyTheme(t){
+  document.documentElement.style.setProperty('--primary', t.primary);
+  document.documentElement.style.setProperty('--secondary', t.secondary);
+  document.documentElement.style.setProperty('--bg', t.bg);
+  document.documentElement.style.setProperty('--text', t.text);
+  // Derive neutral surfaces from bg/text for light mode; dark mode will override with body.dark
+  // Border & card adjusted to bg
+  const border = '#e5e7eb';
+  const card = '#ffffff';
+  const muted = '#6b7280';
+  document.documentElement.style.setProperty('--border', border);
+  document.documentElement.style.setProperty('--card', card);
+  document.documentElement.style.setProperty('--muted', muted);
 }
 
-async function copyToClipboard(text){
-  try{ await navigator.clipboard.writeText(text); }
-  catch(e){
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    try{ document.execCommand('copy'); }catch(_){}
-    document.body.removeChild(ta);
-  }
-}
-
-/* ================== THEMES UI ================== */
-function renderThemeGrid(){
+function buildThemeGrid(){
   els.themeGrid.innerHTML = '';
-  PRESET_THEMES.forEach((t, idx)=>{
-    const card = document.createElement('div');
-    card.className = 'theme-card';
-    card.innerHTML = `
-      <div class="swatch">
-        <div style="background:${t.vars.bg}"></div>
-        <div style="background:${t.vars.card}"></div>
-        <div style="background:${t.vars.primary}"></div>
+  predefinedThemes.forEach((t, idx)=>{
+    const tile = document.createElement('div');
+    tile.className = 'theme-tile';
+    tile.title = t.name;
+    tile.innerHTML = `
+      <div class="theme-sample">
+        <div class="theme-swatch" style="background:${t.primary}"></div>
+        <div class="theme-swatch" style="background:${t.secondary}"></div>
+        <div class="theme-swatch" style="background:${t.bg};border-left:1px solid rgba(0,0,0,.06)"></div>
       </div>
       <div class="theme-name">${t.name}</div>
     `;
-    card.addEventListener('click', ()=>{
-      themeIndex = idx;
-      customTheme = null; // switching to preset
-      applyTheme(themeIndex, darkMode);
-      savePrefs();
-      toast(`Theme: ${t.name}`, 'info', 1200);
+    tile.addEventListener('click', ()=>{
+      applyTheme(t);
+      localStorage.setItem('selectedThemeIndex', String(idx));
+      localStorage.removeItem('customTheme'); // clear custom if choosing predefined
     });
-    els.themeGrid.appendChild(card);
+    els.themeGrid.appendChild(tile);
   });
 }
-els.applyCustomTheme.addEventListener('click', ()=>{
-  customTheme = {
-    bg: els.customBg.value,
-    text: els.customText.value,
-    card: els.customCard.value,
-    border: els.customBorder.value,
-    primary: els.customPrimary.value,
-    secondary: els.customSecondary.value,
-    accent: els.customAccent.value
-  };
-  applyCustomTheme(customTheme, darkMode);
-  savePrefs();
-  toast('Custom theme applied','success',1500);
-});
+
+/* ================== SETTINGS + PERSISTENCE ================== */
+const STORAGE_KEYS = {
+  translations: 'showTranslations',
+  transliterations: 'showTransliterations',
+  themeIndex: 'selectedThemeIndex',
+  customTheme: 'customTheme',
+  dark: 'darkMode',
+  arabicFont: 'arabicFont',
+  arabicFontSize: 'arabicFontSize',
+  uiLang: 'uiLanguage'
+};
+
+// Load persisted settings
+function loadPrefs(){
+  // language
+  const savedLang = localStorage.getItem(STORAGE_KEYS.uiLang);
+  if(savedLang) currentLanguage = savedLang;
+
+  // theme
+  const custom = localStorage.getItem(STORAGE_KEYS.customTheme);
+  const idxStr = localStorage.getItem(STORAGE_KEYS.themeIndex);
+  if(custom){
+    try{
+      const t = JSON.parse(custom);
+      applyTheme(t);
+    }catch(e){}
+  }else if(idxStr){
+    const idx = parseInt(idxStr,10);
+    if(predefinedThemes[idx]) applyTheme(predefinedThemes[idx]);
+  }else{
+    applyTheme(predefinedThemes[0]);
+  }
+
+  // dark
+  const dark = localStorage.getItem(STORAGE_KEYS.dark);
+  if(dark === '1') document.body.classList.add('dark');
+
+  // toggles
+  const tr = localStorage.getItem(STORAGE_KEYS.translations);
+  const tl = localStorage.getItem(STORAGE_KEYS.transliterations);
+  showTranslations = tr === null ? true : tr === '1';
+  showTransliterations = tl === null ? true : tl === '1';
+  els.toggleTranslations.checked = showTranslations;
+  els.toggleTransliterations.checked = showTransliterations;
+
+  // font
+  const font = localStorage.getItem(STORAGE_KEYS.arabicFont);
+  if(font) document.documentElement.style.setProperty('--arabic-font', `"${font}"`);
+  els.arabicFontSelect.value = font || 'Amiri-BoldSlanted';
+
+  const size = parseFloat(localStorage.getItem(STORAGE_KEYS.arabicFontSize) || '1.35');
+  document.documentElement.style.setProperty('--font-arabic-size', size+'rem');
+}
+
+// Save simple helpers
+function setPref(key, val){ localStorage.setItem(key, val); }
+
+/* ================== I18N FOR SETTINGS ================== */
+const i18n = {
+  en:{
+    settings:"Settings", back:"Back",
+    showTranslations:"Show translations",
+    showTransliterations:"Show transliterations",
+    arabicFont:"Arabic font",
+    arabicFontSize:"Arabic font size",
+    themes:"Themes", chooseTheme:"Choose a theme",
+    customTheme:"Custom theme",
+    primary:"Primary", secondary:"Secondary", background:"Background", text:"Text",
+    apply:"Apply", save:"Save as My Theme",
+    developedBy:"Developed by Jibril SBI TENGEH",
+    backBtn:"Back"
+  },
+  fr:{
+    settings:"Paramètres", back:"Retour",
+    showTranslations:"Afficher les traductions",
+    showTransliterations:"Afficher les translittérations",
+    arabicFont:"Police arabe",
+    arabicFontSize:"Taille de police arabe",
+    themes:"Thèmes", chooseTheme:"Choisir un thème",
+    customTheme:"Thème personnalisé",
+    primary:"Couleur primaire", secondary:"Secondaire", background:"Arrière-plan", text:"Texte",
+    apply:"Appliquer", save:"Enregistrer comme Mon Thème",
+    developedBy:"Développé par Jibril SBI TENGEH",
+    backBtn:"Retour"
+  },
+  ru:{
+    settings:"Настройки", back:"Назад",
+    showTranslations:"Показывать переводы",
+    showTransliterations:"Показывать транслитерации",
+    arabicFont:"Арабский шрифт",
+    arabicFontSize:"Размер арабского шрифта",
+    themes:"Темы", chooseTheme:"Выберите тему",
+    customTheme:"Пользовательская тема",
+    primary:"Основной", secondary:"Второй", background:"Фон", text:"Текст",
+    apply:"Применить", save:"Сохранить как Моя тема",
+    developedBy:"Разработано Jibril SBI TENGEH",
+    backBtn:"Назад"
+  },
+  zh:{
+    settings:"设置", back:"返回",
+    showTranslations:"显示翻译",
+    showTransliterations:"显示音译",
+    arabicFont:"阿拉伯字体",
+    arabicFontSize:"阿拉伯字体大小",
+    themes:"主题", chooseTheme:"选择主题",
+    customTheme:"自定义主题",
+    primary:"主色", secondary:"次色", background:"背景", text:"文字",
+    apply:"应用", save:"保存为我的主题",
+    developedBy:"由 Jibril SBI TENGEH 开发",
+    backBtn:"返回"
+  },
+  ha:{
+    settings:"Saituna", back:"Koma baya",
+    showTranslations:"Nuna fassara",
+    showTransliterations:"Nuna rubutun karin magana",
+    arabicFont:"Nau'in rubutun Larabci",
+    arabicFontSize:"Girman rubutun Larabci",
+    themes:"Jigo", chooseTheme:"Zaɓi jigo",
+    customTheme:"Jigon al'ada",
+    primary:"Asali", secondary:"Na biyu", background:"Baya", text:"Rubutu",
+    apply:"Aiwatar", save:"Ajiye a matsayin Jigona",
+    developedBy:"An haɓaka ta Jibril SBI TENGEH",
+    backBtn:"Koma baya"
+  }
+};
+
+function t(key){
+  const dict = i18n[currentLanguage] || i18n.en;
+  return dict[key] || key;
+}
+
+function updateSettingsLabels(){
+  document.getElementById('labelSettings').textContent = t('settings');
+  document.getElementById('labelShowTranslations').textContent = t('showTranslations');
+  document.getElementById('labelShowTransliterations').textContent = t('showTransliterations');
+  document.getElementById('labelArabicFont').textContent = t('arabicFont');
+  document.getElementById('labelFontSize').textContent = t('arabicFontSize');
+  document.getElementById('labelOpenThemes').textContent = t('themes');
+  document.getElementById('labelBackToMain').textContent = t('back');
+  document.getElementById('labelChooseTheme').textContent = t('chooseTheme');
+  document.getElementById('labelCustomTheme').textContent = t('customTheme');
+  document.getElementById('labelPrimary').textContent = t('primary');
+  document.getElementById('labelSecondary').textContent = t('secondary');
+  document.getElementById('labelBg').textContent = t('background');
+  document.getElementById('labelText').textContent = t('text');
+  document.getElementById('labelApply').textContent = t('apply');
+  document.getElementById('labelSave').textContent = t('save');
+  document.getElementById('labelDevelopedBy').textContent = t('developedBy');
+  document.getElementById('labelBack').textContent = t('backBtn');
+}
 
 /* ================== EVENTS ================== */
-// Language cycle (top header icon)
 document.getElementById('languageToggle').addEventListener('click', ()=>{
   const langs = ['en','fr','ru','zh','ha'];
   const i = langs.indexOf(currentLanguage);
   currentLanguage = langs[(i+1)%langs.length];
   els.languageText.textContent = currentLanguage.toUpperCase();
-  els.currentLangLabel.textContent = currentLanguage.toUpperCase();
-  savePrefs();
-  // reset view
+  localStorage.setItem(STORAGE_KEYS.uiLang, currentLanguage);
+
+  // keep main view intact
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
-  els.sectionTitle.textContent = 'Categories';
-  viewingFavorites = false;
-  els.favoritesBtn.classList.remove('active');
+  document.querySelector('.section-title').textContent = 'Categories';
+
+  updateSettingsLabels(); // ensure settings takes chosen language
   loadCategories();
 });
 
-// Back button
+// Back
 els.backBtn.addEventListener('click', ()=>{
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
-  els.sectionTitle.textContent = 'Categories';
-  viewingFavorites = false;
-  els.favoritesBtn.classList.remove('active');
+  document.querySelector('.section-title').textContent = 'Categories';
 });
 
-// Dark / Light toggles
-function toggleDark(){
-  darkMode = !darkMode;
-  if(customTheme) applyCustomTheme(customTheme, darkMode);
-  else applyTheme(themeIndex, darkMode);
-  savePrefs();
-}
-els.themeToggle.addEventListener('click', toggleDark);
-els.toggleDarkQuick.addEventListener('click', toggleDark);
+// Theme toggle (now toggles body.dark and icon)
+els.themeToggle.addEventListener('click', ()=>{
+  document.body.classList.toggle('dark');
+  const icon = els.themeToggle.querySelector('i');
+  const isDark = document.body.classList.contains('dark');
+  icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+  setPref(STORAGE_KEYS.dark, isDark ? '1':'0');
+});
 
-// Search UI
+// Search toggle
 els.searchToggle.addEventListener('click', ()=>{
   els.searchBarContainer.style.display = els.searchBarContainer.style.display === 'none' ? 'block' : 'none';
   els.searchBar.focus();
 });
+
+// Search bar input filter
 els.searchBar.addEventListener('input', ()=>{
-  if(els.categoryDetails.style.display === 'block'){ renderDuas(els.searchBar.value); }
-  else{ renderCategories(els.searchBar.value); }
+  if(els.categoryDetails.style.display === 'block'){
+    renderDuas(els.searchBar.value);
+  } else {
+    renderCategories(els.searchBar.value);
+  }
 });
 
-// Bottom header buttons
-els.homeBtn.addEventListener('click', ()=>{
-  els.categoryDetails.style.display = 'none';
-  els.categoriesList.style.display = 'block';
-  els.sectionTitle.textContent = 'Categories';
-  viewingFavorites = false;
-  els.favoritesBtn.classList.remove('active');
+/* ===== Settings open/close ===== */
+els.settingsIcon.addEventListener('click', ()=>{
+  els.settingsPanel.classList.add('open');
+  els.settingsPanel.setAttribute('aria-hidden','false');
 });
-els.favoritesBtn.addEventListener('click', ()=>{
-  viewingFavorites = true;
-  els.favoritesBtn.classList.add('active');
-  els.categoriesList.style.display = 'none';
-  els.categoryDetails.style.display = 'block';
-  els.sectionTitle.textContent = 'Favorites';
-  renderDuas(els.searchBar.value);
+els.closeSettings.addEventListener('click', ()=>{
+  els.settingsPanel.classList.remove('open');
+  els.settingsPanel.setAttribute('aria-hidden','true');
 });
 
-// Settings FAB + Modal
-els.fabSettings.addEventListener('click', ()=> els.settingsOverlay.classList.add('show'));
-els.closeSettings.addEventListener('click', ()=> els.settingsOverlay.classList.remove('show'));
-els.settingsOverlay.addEventListener('click', (e)=>{ if(e.target===els.settingsOverlay) els.settingsOverlay.classList.remove('show') });
+/* ===== Main <-> Themes view ===== */
+els.openThemes.addEventListener('click', ()=>{
+  els.settingsMain.style.display = 'none';
+  els.settingsThemes.style.display = 'block';
+});
+els.backToMain.addEventListener('click', ()=>{
+  els.settingsThemes.style.display = 'none';
+  els.settingsMain.style.display = 'block';
+});
 
-// Settings: Display toggles — WORKING instantly
-function syncDisplayControls(){
-  els.toggleTranslations.checked = !!showTranslations;
-  els.toggleTransliterations.checked = !!showTransliterations;
-  els.toggleTranslationsSwitch.classList.toggle('on', !!showTranslations);
-  els.toggleTransliterationsSwitch.classList.toggle('on', !!showTransliterations);
+/* ===== Toggles ===== */
+els.toggleTranslations.addEventListener('change', (e)=>{
+  showTranslations = e.target.checked; setPref(STORAGE_KEYS.translations, showTranslations ? '1':'0'); renderDuas(els.searchBar.value || '');
+});
+els.toggleTransliterations.addEventListener('change', (e)=>{
+  showTransliterations = e.target.checked; setPref(STORAGE_KEYS.transliterations, showTransliterations ? '1':'0'); renderDuas(els.searchBar.value || '');
+});
 
-  els.arabicSize.value = fontSizeArabic; els.arabicSizeVal.textContent = fontSizeArabic+'px';
-  els.translationSize.value = fontSizeTranslation; els.translationSizeVal.textContent = fontSizeTranslation+'px';
-  els.transliterationSize.value = fontSizeTransliteration; els.transliterationSizeVal.textContent = fontSizeTransliteration+'px';
+/* ===== Arabic font select ===== */
+els.arabicFontSelect.addEventListener('change', ()=>{
+  const ff = els.arabicFontSelect.value;
+  document.documentElement.style.setProperty('--arabic-font', `"${ff}"`);
+  setPref(STORAGE_KEYS.arabicFont, ff);
+});
 
-  els.arabicFont.value = fontArabic;
+/* ===== Font size controls ===== */
+function getArabicSize(){
+  const v = getComputedStyle(document.documentElement).getPropertyValue('--font-arabic-size').trim();
+  return parseFloat(v);
 }
-els.toggleTranslations.addEventListener('change', ()=>{
-  showTranslations = els.toggleTranslations.checked;
-  els.toggleTranslationsSwitch.classList.toggle('on', showTranslations);
-  savePrefs();
-  document.querySelectorAll('.dua-translation').forEach(n=>{
-    n.style.display = showTranslations ? 'block':'none';
-  });
-  toast(showTranslations?'Translations ON':'Translations OFF','info',1200);
-});
-els.toggleTransliterations.addEventListener('change', ()=>{
-  showTransliterations = els.toggleTransliterations.checked;
-  els.toggleTransliterationsSwitch.classList.toggle('on', showTransliterations);
-  savePrefs();
-  document.querySelectorAll('.dua-transliteration').forEach(n=>{
-    n.style.display = showTransliterations ? 'block':'none';
-  });
-  toast(showTransliterations?'Transliteration ON':'Transliteration OFF','info',1200);
+function setArabicSize(val){
+  const clamped = Math.max(1.0, Math.min(3.0, val)); // 1rem .. 3rem
+  document.documentElement.style.setProperty('--font-arabic-size', clamped+'rem');
+  setPref(STORAGE_KEYS.arabicFontSize, String(clamped));
+}
+els.fontSmaller.addEventListener('click', ()=> setArabicSize(getArabicSize() - 0.1));
+els.fontLarger.addEventListener('click', ()=> setArabicSize(getArabicSize() + 0.1));
+
+/* ===== Theme grid & custom theme ===== */
+buildThemeGrid();
+
+els.applyCustom.addEventListener('click', ()=>{
+  const t = {
+    name: 'Custom',
+    primary: els.colorPrimary.value,
+    secondary: els.colorSecondary.value,
+    bg: els.colorBg.value,
+    text: els.colorText.value
+  };
+  applyTheme(t);
+  localStorage.setItem(STORAGE_KEYS.customTheme, JSON.stringify(t));
+  localStorage.removeItem(STORAGE_KEYS.themeIndex);
 });
 
-els.arabicSize.addEventListener('input', ()=>{
-  fontSizeArabic = parseInt(els.arabicSize.value,10);
-  els.arabicSizeVal.textContent = fontSizeArabic+'px';
-  updateFontVars(); savePrefs();
-});
-els.translationSize.addEventListener('input', ()=>{
-  fontSizeTranslation = parseInt(els.translationSize.value,10);
-  els.translationSizeVal.textContent = fontSizeTranslation+'px';
-  updateFontVars(); savePrefs();
-});
-els.transliterationSize.addEventListener('input', ()=>{
-  fontSizeTransliteration = parseInt(els.transliterationSize.value,10);
-  els.transliterationSizeVal.textContent = fontSizeTransliteration+'px';
-  updateFontVars(); savePrefs();
-});
-els.arabicFont.addEventListener('change', ()=>{
-  fontArabic = els.arabicFont.value;
-  updateFontVars(); savePrefs();
-});
-
-// Language cycle inside settings
-els.cycleLangBtn.addEventListener('click', ()=>{
-  const langs = ['en','fr','ru','zh','ha'];
-  const i = langs.indexOf(currentLanguage);
-  currentLanguage = langs[(i+1)%langs.length];
-  els.languageText.textContent = currentLanguage.toUpperCase();
-  els.currentLangLabel.textContent = currentLanguage.toUpperCase();
-  savePrefs();
-  // Reset to categories and reload
-  els.categoryDetails.style.display = 'none';
-  els.categoriesList.style.display = 'block';
-  els.sectionTitle.textContent = 'Categories';
-  viewingFavorites = false;
-  els.favoritesBtn.classList.remove('active');
-  loadCategories();
+els.saveCustom.addEventListener('click', ()=>{
+  const t = {
+    name: 'My Theme',
+    primary: els.colorPrimary.value,
+    secondary: els.colorSecondary.value,
+    bg: els.colorBg.value,
+    text: els.colorText.value
+  };
+  applyTheme(t);
+  localStorage.setItem(STORAGE_KEYS.customTheme, JSON.stringify(t));
+  localStorage.removeItem(STORAGE_KEYS.themeIndex);
+  alert('Custom theme saved!');
 });
 
 /* ================== INIT ================== */
-function renderThemeGridOnce(){ renderThemeGrid(); }
-function initTheme(){
-  renderThemeGridOnce();
-  if(customTheme){
-    // set pickers from saved
-    els.customBg.value        = customTheme.bg;
-    els.customText.value      = customTheme.text;
-    els.customCard.value      = customTheme.card;
-    els.customBorder.value    = customTheme.border;
-    els.customPrimary.value   = customTheme.primary;
-    els.customSecondary.value = customTheme.secondary;
-    els.customAccent.value    = customTheme.accent;
-    applyCustomTheme(customTheme, darkMode);
-  } else {
-    applyTheme(themeIndex, darkMode);
-  }
-}
 function init(){
-  els.languageText.textContent = currentLanguage.toUpperCase();
-  els.currentLangLabel.textContent = currentLanguage.toUpperCase();
-  updateFontVars();
-  syncDisplayControls();
-  initTheme();
+  loadPrefs();
+  updateSettingsLabels();
+
+  // sync header icon with dark state
+  const icon = els.themeToggle.querySelector('i');
+  icon.className = document.body.classList.contains('dark') ? 'fas fa-sun' : 'fas fa-moon';
+
+  // init toggles checked states reflect showTranslations/showTransliterations (done in loadPrefs)
+
+  // initial data
   loadCategories();
 }
 init();
