@@ -112,11 +112,13 @@ header{
 /* ============ SETTINGS FAB (bottom-right transparent) ============ */
 .fab{
   position:fixed;right:15px;bottom:calc(var(--bottom-header-h) + 15px);z-index:60;
-  width:52px;height:52px;border-radius:999px;border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  background:transparent;color:var(--text);
+  height:46px;border-radius:999px;border:1px solid rgba(255,255,255,.25);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:rgba(0,0,0,0.15);color:#fff;padding:0 12px;
+  backdrop-filter: blur(4px) saturate(120%);
 }
-.fab i{font-size:22px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
+.fab span{font-size:.92rem}
+.fab i{font-size:18px}
 .fab:hover{transform:translateY(-1px)}
 
 /* ============ MODAL (centered) ============ */
@@ -235,9 +237,9 @@ select, input[type="color"]{padding:8px 10px;border-radius:10px;border:1px solid
   </div>
 </div>
 
-<!-- ======= FLOATING SETTINGS (transparent) ======= -->
+<!-- ======= FLOATING SETTINGS (transparent with text) ======= -->
 <button class="fab" id="fabSettings" title="Settings" aria-label="Settings">
-  <i class="fa fa-sliders"></i>
+  <i class="fa fa-sliders"></i><span>Settings</span>
 </button>
 
 <!-- ======= SETTINGS MODAL ======= -->
@@ -412,38 +414,36 @@ select, input[type="color"]{padding:8px 10px;border-radius:10px;border:1px solid
 
 <script>
 /* ================== CONFIG ================== */
-const GITHUB_USER  = "jibril-tengeh";
-const GITHUB_REPO  = "sbi";
-const GITHUB_BRANCH= "main";
-const GITHUB_BASE  = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`;
+/* Absolute base path so it works instantly with your GitHub Pages */
+const BASE = "https://jibril-tengeh.github.io/sbi/";
 
 /* ================== THEMES (25 presets) ================== */
 const PRESET_THEMES = [
-  {name:"Leaf",        vars:{bg:"#f9fafb",text:"#111827",card:"#ffffff",border:"#e5e7eb",primary:"#16a34a",secondary:"#0e9f6e",accent:"#f05252"}},
-  {name:"Emerald",     vars:{bg:"#ecfdf5",text:"#064e3b",card:"#ffffff",border:"#d1fae5",primary:"#10b981",secondary:"#059669",accent:"#ef4444"}},
-  {name:"Forest",      vars:{bg:"#0b1411",text:"#e7f8f0",card:"#10201b",border:"#1f2f2a",primary:"#22c55e",secondary:"#16a34a",accent:"#f59e0b"}},
-  {name:"Mint",        vars:{bg:"#f0fdfa",text:"#064e3b",card:"#ffffff",border:"#ccfbf1",primary:"#14b8a6",secondary:"#0ea5e9",accent:"#fb7185"}},
-  {name:"Ocean",       vars:{bg:"#0b1220",text:"#e5e7eb",card:"#0f172a",border:"#334155",primary:"#3b82f6",secondary:"#06b6d4",accent:"#f59e0b"}},
-  {name:"Sky",         vars:{bg:"#f0f9ff",text:"#0c4a6e",card:"#ffffff",border:"#e0f2fe",primary:"#0ea5e9",secondary:"#38bdf8",accent:"#ef4444"}},
-  {name:"Royal",       vars:{bg:"#0b1020",text:"#e5e7eb",card:"#111827",border:"#374151",primary:"#6366f1",secondary:"#8b5cf6",accent:"#22c55e"}},
-  {name:"Grape",       vars:{bg:"#faf5ff",text:"#4c1d95",card:"#ffffff",border:"#ede9fe",primary:"#8b5cf6",secondary:"#a78bfa",accent:"#ef4444"}},
-  {name:"Lavender",    vars:{bg:"#f5f3ff",text:"#3730a3",card:"#ffffff",border:"#e9d5ff",primary:"#7c3aed",secondary:"#6d28d9",accent:"#f59e0b"}},
-  {name:"Cherry",      vars:{bg:"#fff1f2",text:"#7f1d1d",card:"#ffffff",border:"#ffe4e6",primary:"#ef4444",secondary:"#fb7185",accent:"#22c55e"}},
-  {name:"Rose",        vars:{bg:"#fff1f2",text:"#7a1a38",card:"#ffffff",border:"#ffe4e6",primary:"#f43f5e",secondary:"#e11d48",accent:"#0ea5e9"}},
-  {name:"Sunset",      vars:{bg:"#fff7ed",text:"#7c2d12",card:"#ffffff",border:"#ffedd5",primary:"#f97316",secondary:"#f59e0b",accent:"#10b981"}},
-  {name:"Sand",        vars:{bg:"#fafaf9",text:"#1f2937",card:"#ffffff",border:"#e7e5e4",primary:"#ca8a04",secondary:"#d97706",accent:"#16a34a"}},
-  {name:"Cocoa",       vars:{bg:"#1c1917",text:"#e7e5e4",card:"#292524",border:"#44403c",primary:"#a16207",secondary:"#854d0e",accent:"#22c55e"}},
-  {name:"Slate",       vars:{bg:"#0b1220",text:"#e5e7eb",card:"#111827",border:"#374151",primary:"#64748b",secondary:"#94a3b8",accent:"#22c55e"}},
-  {name:"Carbon",      vars:{bg:"#0a0a0a",text:"#f3f4f6",card:"#171717",border:"#262626",primary:"#22c55e",secondary:"#3b82f6",accent:"#f59e0b"}},
-  {name:"Nord",        vars:{bg:"#2e3440",text:"#e5e9f0",card:"#3b4252",border:"#4c566a",primary:"#88c0d0",secondary:"#81a1c1",accent:"#a3be8c"}},
-  {name:"Dracula",     vars:{bg:"#282a36",text:"#f8f8f2",card:"#303241",border:"#3c3f51",primary:"#bd93f9",secondary:"#50fa7b",accent:"#ff79c6"}},
-  {name:"Solar",       vars:{bg:"#fdf6e3",text:"#073642",card:"#fffdf5",border:"#eee8d5",primary:"#b58900",secondary:"#268bd2",accent:"#cb4b16"}},
-  {name:"Aqua",        vars:{bg:"#ecfeff",text:"#083344",card:"#ffffff",border:"#cffafe",primary:"#06b6d4",secondary:"#0ea5e9",accent:"#10b981"}},
-  {name:"Lime",        vars:{bg:"#f7fee7",text:"#1a2e05",card:"#ffffff",border:"#ecfccb",primary:"#84cc16",secondary:"#22c55e",accent:"#f97316"}},
-  {name:"Peach",       vars:{bg:"#fff7ed",text:"#7c2d12",card:"#ffffff",border:"#fed7aa",primary:"#fb923c",secondary:"#f97316",accent:"#22c55e"}},
-  {name:"Berry",       vars:{bg:"#fdf2f8",text:"#4a044e",card:"#ffffff",border:"#f5d0fe",primary:"#d946ef",secondary:"#a855f7",accent:"#22c55e"}},
-  {name:"Steel",       vars:{bg:"#f8fafc",text:"#0f172a",card:"#ffffff",border:"#e2e8f0",primary:"#334155",secondary:"#475569",accent:"#ef4444"}},
-  {name:"Mono",        vars:{bg:"#ffffff",text:"#111827",card:"#ffffff",border:"#e5e7eb",primary:"#111827",secondary:"#6b7280",accent:"#ef4444"}},
+  {name:"Leaf", vars:{bg:"#f9fafb",text:"#111827",card:"#ffffff",border:"#e5e7eb",primary:"#16a34a",secondary:"#0e9f6e",accent:"#f05252"}},
+  {name:"Emerald", vars:{bg:"#ecfdf5",text:"#064e3b",card:"#ffffff",border:"#d1fae5",primary:"#10b981",secondary:"#059669",accent:"#ef4444"}},
+  {name:"Forest", vars:{bg:"#0b1411",text:"#e7f8f0",card:"#10201b",border:"#1f2f2a",primary:"#22c55e",secondary:"#16a34a",accent:"#f59e0b"}},
+  {name:"Mint", vars:{bg:"#f0fdfa",text:"#064e3b",card:"#ffffff",border:"#ccfbf1",primary:"#14b8a6",secondary:"#0ea5e9",accent:"#fb7185"}},
+  {name:"Ocean", vars:{bg:"#0b1220",text:"#e5e7eb",card:"#0f172a",border:"#334155",primary:"#3b82f6",secondary:"#06b6d4",accent:"#f59e0b"}},
+  {name:"Sky", vars:{bg:"#f0f9ff",text:"#0c4a6e",card:"#ffffff",border:"#e0f2fe",primary:"#0ea5e9",secondary:"#38bdf8",accent:"#ef4444"}},
+  {name:"Royal", vars:{bg:"#0b1020",text:"#e5e7eb",card:"#111827",border:"#374151",primary:"#6366f1",secondary:"#8b5cf6",accent:"#22c55e"}},
+  {name:"Grape", vars:{bg:"#faf5ff",text:"#4c1d95",card:"#ffffff",border:"#ede9fe",primary:"#8b5cf6",secondary:"#a78bfa",accent:"#ef4444"}},
+  {name:"Lavender", vars:{bg:"#f5f3ff",text:"#3730a3",card:"#ffffff",border:"#e9d5ff",primary:"#7c3aed",secondary:"#6d28d9",accent:"#f59e0b"}},
+  {name:"Cherry", vars:{bg:"#fff1f2",text:"#7f1d1d",card:"#ffffff",border:"#ffe4e6",primary:"#ef4444",secondary:"#fb7185",accent:"#22c55e"}},
+  {name:"Rose", vars:{bg:"#fff1f2",text:"#7a1a38",card:"#ffffff",border:"#ffe4e6",primary:"#f43f5e",secondary:"#e11d48",accent:"#0ea5e9"}},
+  {name:"Sunset", vars:{bg:"#fff7ed",text:"#7c2d12",card:"#ffffff",border:"#ffedd5",primary:"#f97316",secondary:"#f59e0b",accent:"#10b981"}},
+  {name:"Sand", vars:{bg:"#fafaf9",text:"#1f2937",card:"#ffffff",border:"#e7e5e4",primary:"#ca8a04",secondary:"#d97706",accent:"#16a34a"}},
+  {name:"Cocoa", vars:{bg:"#1c1917",text:"#e7e5e4",card:"#292524",border:"#44403c",primary:"#a16207",secondary:"#854d0e",accent:"#22c55e"}},
+  {name:"Slate", vars:{bg:"#0b1220",text:"#e5e7eb",card:"#111827",border:"#374151",primary:"#64748b",secondary:"#94a3b8",accent:"#22c55e"}},
+  {name:"Carbon", vars:{bg:"#0a0a0a",text:"#f3f4f6",card:"#171717",border:"#262626",primary:"#22c55e",secondary:"#3b82f6",accent:"#f59e0b"}},
+  {name:"Nord", vars:{bg:"#2e3440",text:"#e5e9f0",card:"#3b4252",border:"#4c566a",primary:"#88c0d0",secondary:"#81a1c1",accent:"#a3be8c"}},
+  {name:"Dracula", vars:{bg:"#282a36",text:"#f8f8f2",card:"#303241",border:"#3c3f51",primary:"#bd93f9",secondary:"#50fa7b",accent:"#ff79c6"}},
+  {name:"Solar", vars:{bg:"#fdf6e3",text:"#073642",card:"#fffdf5",border:"#eee8d5",primary:"#b58900",secondary:"#268bd2",accent:"#cb4b16"}},
+  {name:"Aqua", vars:{bg:"#ecfeff",text:"#083344",card:"#ffffff",border:"#cffafe",primary:"#06b6d4",secondary:"#0ea5e9",accent:"#10b981"}},
+  {name:"Lime", vars:{bg:"#f7fee7",text:"#1a2e05",card:"#ffffff",border:"#ecfccb",primary:"#84cc16",secondary:"#22c55e",accent:"#f97316"}},
+  {name:"Peach", vars:{bg:"#fff7ed",text:"#7c2d12",card:"#ffffff",border:"#fed7aa",primary:"#fb923c",secondary:"#f97316",accent:"#22c55e"}},
+  {name:"Berry", vars:{bg:"#fdf2f8",text:"#4a044e",card:"#ffffff",border:"#f5d0fe",primary:"#d946ef",secondary:"#a855f7",accent:"#22c55e"}},
+  {name:"Steel", vars:{bg:"#f8fafc",text:"#0f172a",card:"#ffffff",border:"#e2e8f0",primary:"#334155",secondary:"#475569",accent:"#ef4444"}},
+  {name:"Mono", vars:{bg:"#ffffff",text:"#111827",card:"#ffffff",border:"#e5e7eb",primary:"#111827",secondary:"#6b7280",accent:"#ef4444"}},
 ];
 
 /* ================== STATE ================== */
@@ -568,7 +568,6 @@ function applyTheme(index, useDark = darkMode){
   const preset = PRESET_THEMES[index] ? PRESET_THEMES[index].vars : PRESET_THEMES[0].vars;
   const vars = useDark ? {...preset, ...buildDarkOverlay(preset)} : {...preset};
   applyVars(vars);
-  // update icon for header dark mode
   const icon = els.themeToggle.querySelector('i');
   icon.className = useDark ? 'fas fa-sun' : 'fas fa-moon';
 }
@@ -598,7 +597,7 @@ async function fetchJSONWithCache(url, cacheKey){
 async function loadCategories(){
   try{
     els.categoriesList.innerHTML = '<li class="loading">Loading categories...</li>';
-    const url = `${GITHUB_BASE}categories/${currentLanguage}.json`;
+    const url = `${BASE}categories/${currentLanguage}.json`;
     const cacheKey = `categories_${currentLanguage}`;
     // expected: [{ "id": 1, "title": "...", "folder": "categories_1" }, ...]
     categoriesData = await fetchJSONWithCache(url, cacheKey);
@@ -616,17 +615,19 @@ async function loadCategoryDuas(categoryFolder, categoryName){
     els.categoriesList.style.display = 'none';
     els.sectionTitle.textContent = categoryName;
     els.duaContainer.innerHTML = '<div class="loading">Loading duas...</div>';
-    // NOTE: uses "douas" per your repo structure
-    const url = `${GITHUB_BASE}douas/${categoryFolder}/${currentLanguage}.json`;
-    const cacheKey = `douas_${categoryFolder}_${currentLanguage}`;
+    // NOTE: uses "duas" as requested
+    const url = `${BASE}duas/${categoryFolder}/${currentLanguage}.json`;
+    const cacheKey = `duas_${categoryFolder}_${currentLanguage}`;
     duasData = await fetchJSONWithCache(url, cacheKey);
+    // mark items with folder/lang for favorites keys
+    duasData = duasData.map(d => ({...d, _catFolder: categoryFolder, _lang: currentLanguage}));
     renderDuas();
   }catch(err){
     console.error('Duas error:', err);
     els.duaContainer.innerHTML = `
       <div class="error">
         Failed to load duas.<br/>
-        <small>Checked: <code>douas/${categoryFolder}/${currentLanguage}.json</code></small>
+        <small>Checked: <code>duas/${categoryFolder}/${currentLanguage}.json</code></small>
       </div>`;
   }
 }
@@ -644,7 +645,6 @@ function renderCategories(filter=''){
     li.innerHTML = `
       <div class="category-arrow"><i class="fas fa-chevron-right"></i></div>
       <div class="category-title">${cat.title || ('Category ' + (idx+1))}</div>
-      <div class="category-count">${cat.id || (idx+1)}</div>
     `;
     li.addEventListener('click', ()=>loadCategoryDuas(folder, cat.title || ('Category ' + (idx+1))));
     ul.appendChild(li);
@@ -961,8 +961,9 @@ els.cycleLangBtn.addEventListener('click', ()=>{
 });
 
 /* ================== INIT ================== */
+function renderThemeGridOnce(){ renderThemeGrid(); }
 function initTheme(){
-  renderThemeGrid();
+  renderThemeGridOnce();
   if(customTheme){
     // set pickers from saved
     els.customBg.value        = customTheme.bg;
@@ -989,3 +990,4 @@ init();
 </script>
 </body>
 </html>
+```0
