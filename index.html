@@ -23,9 +23,15 @@
   --font-translation-size: 16px;
   --font-transliteration-size: 16px;
   --arabic-font: "Amiri", serif;
+  --bottom-header-h: 56px;
 }
 html,body{height:100%}
-body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";transition:background .25s,color .25s}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+  transition:background .25s,color .25s
+}
 .theme-fade{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .35s ease;z-index:9999}
 .theme-fade.show{opacity:1}
 
@@ -48,20 +54,16 @@ header{
 /* Search bar */
 #searchBarContainer{
   width:100%;padding:8px;background:rgba(255,255,255,0.2);
-  display:none; /* hidden until toggled */
+  display:none;
 }
 #searchBar{
   width:100%;padding:8px 12px;border:none;border-radius:8px;font-size:1rem;
 }
 
 /* ============ MAIN ============ */
-.container{max-width:1000px;margin:16px auto 84px;padding:0 14px}
+.container{max-width:1000px;margin:16px auto calc(var(--bottom-header-h) + 18px);padding:0 14px}
 .section-title-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .section-title{margin:6px 0 6px;color:var(--primary);font-size:1.5rem}
-
-main {
-  padding-bottom: 70px; /* same height as bottom header */
-}
 
 /* ============ LISTS ============ */
 .categories-list{list-style:none;max-width:860px;margin:0 auto}
@@ -107,17 +109,32 @@ main {
 /* ============ STATES ============ */
 .loading,.error,.no-results{text-align:center;color:var(--muted);padding:18px}
 
-/* ============ SETTINGS SHEET (from bottom) ============ */
-.sheet{
-  position:fixed;inset:auto 0 0 0;height:75vh;background:var(--card);border-top-left-radius:18px;border-top-right-radius:18px;
-  box-shadow:0 -10px 30px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .28s ease;z-index:60;border:1px solid var(--border)
+/* ============ SETTINGS FAB (bottom-right transparent) ============ */
+.fab{
+  position:fixed;right:15px;bottom:calc(var(--bottom-header-h) + 15px);z-index:60;
+  width:52px;height:52px;border-radius:999px;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent;color:#111827;
 }
-.sheet.show{transform:translateY(0)}
-.sheet-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
-.sheet-title{font-weight:700}
-.sheet-close{border:none;background:transparent;font-size:1.2rem;cursor:pointer}
-.sheet-content{padding:10px 16px 18px;overflow:auto;height:calc(75vh - 54px)}
+.fab i{font-size:22px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
+.fab:hover{transform:translateY(-1px)}
 
+/* ============ MODAL (centered) ============ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:saturate(110%) blur(2px);
+  display:none;align-items:center;justify-content:center;z-index:70;
+}
+.modal-overlay.show{display:flex;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{
+  width:min(92vw,720px);max-height:80vh;overflow:auto;background:var(--card);color:var(--text);
+  border-radius:16px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
+.modal-title{font-weight:800;font-size:1.05rem}
+.modal-body{padding:12px 14px}
+
+/* collapsible sections */
 .section{border:1px solid var(--border);border-radius:12px;background:var(--card);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
 .section summary{
   list-style:none;cursor:pointer;padding:12px 14px;font-weight:700;display:flex;align-items:center;justify-content:space-between
@@ -138,18 +155,20 @@ select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);backgr
 /* ============ BOTTOM HEADER (persistent) ============ */
 .bottom-header{
   position:fixed;left:0;right:0;bottom:0;z-index:50;
+  height:var(--bottom-header-h);
   background:var(--card);border-top:1px solid var(--border);box-shadow:0 -4px 18px rgba(0,0,0,.06);
 }
 .bottom-header .bar{
-  max-width:1000px;margin:0 auto;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;
+  max-width:1000px;height:100%;margin:0 auto;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;
 }
 .bh-left,.bh-right{display:flex;gap:8px;align-items:center}
 .pill-btn{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text);box-shadow:var(--shadow);font-size:.92rem;cursor:pointer}
 .pill-btn.active{border-color:var(--primary);color:var(--primary)}
 
-/* Toasts */
+/* Toasts (copy/share etc.) */
 .toast{
-  position:fixed;left:50%;transform:translateX(-50%);bottom:86px;background:var(--card);color:var(--text);
+  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bottom-header-h) + 18px);
+  background:var(--card);color:var(--text);
   border:1px solid var(--border);box-shadow:var(--shadow);padding:10px 14px;border-radius:12px;z-index:80;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s
 }
 .toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(-6px)}
@@ -157,6 +176,9 @@ select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);backgr
 .toast.info{border-color:#2563eb}
 .toast.warn{border-color:#f59e0b}
 .toast.error{border-color:#ef4444}
+
+/* Dark mode helper (quick) */
+.dark body{background:#0b1020;color:#e5e7eb}
 </style>
 </head>
 <body>
@@ -167,9 +189,7 @@ select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);backgr
   <div class="logo"><i class="fas fa-star-and-crescent"></i><span>Adhkar</span></div>
   <div class="header-icons">
     <!-- Order: search — dark mode — languages -->
-    <div class="header-icon" id="searchToggle" title="Search">
-      <i class="fas fa-search"></i>
-    </div>
+    <div class="header-icon" id="searchToggle" title="Search"><i class="fas fa-search"></i></div>
     <div class="header-icon" id="themeToggle" title="Toggle Sun/Moon"><i class="fas fa-moon"></i></div>
     <div class="header-icon" id="languageToggle" title="Language">
       <i class="fas fa-language"></i>
@@ -198,138 +218,142 @@ select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);backgr
   </div>
 </div>
 
-<!-- ======= SETTINGS SHEET ======= -->
-<div class="sheet" id="settingsSheet" aria-hidden="true">
-  <div class="sheet-header">
-    <div class="sheet-title" id="settingsTitle">Settings</div>
-    <button class="sheet-close" id="closeSettings"><i class="fa fa-xmark"></i></button>
-  </div>
-  <div class="sheet-content">
-    <!-- Display (OPEN by default) -->
-    <details class="section" id="displaySection" open>
-      <summary>
-        <span id="displayTitle">Display</span>
-        <i class="fa fa-chevron-down"></i>
-      </summary>
-      <div class="section-body">
-        <div class="row">
-          <label for="toggleTranslations">Show Translations</label>
-          <div class="controls">
-            <div class="switch" id="toggleTranslationsSwitch">
-              <input type="checkbox" id="toggleTranslations">
-              <span class="thumb"></span>
+<!-- ======= FLOATING SETTINGS (transparent) ======= -->
+<button class="fab" id="fabSettings" title="Settings" aria-label="Settings">
+  <i class="fa fa-sliders"></i>
+</button>
+
+<!-- ======= SETTINGS MODAL ======= -->
+<div class="modal-overlay" id="settingsOverlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-head">
+      <div class="modal-title" id="settingsTitle">Settings</div>
+      <button class="header-icon" id="closeSettings" style="width:36px;height:36px;background:rgba(0,0,0,0.05);color:inherit"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <!-- Display (OPEN by default) -->
+      <details class="section" id="displaySection" open>
+        <summary>
+          <span id="displayTitle">Display</span>
+          <i class="fa fa-chevron-down"></i>
+        </summary>
+        <div class="section-body">
+          <div class="row">
+            <label for="toggleTranslations">Show Translations</label>
+            <div class="controls">
+              <div class="switch" id="toggleTranslationsSwitch">
+                <input type="checkbox" id="toggleTranslations">
+                <span class="thumb"></span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <label for="toggleTransliterations">Show Transliteration</label>
+            <div class="controls">
+              <div class="switch" id="toggleTransliterationsSwitch">
+                <input type="checkbox" id="toggleTransliterations">
+                <span class="thumb"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <label>Arabic size</label>
+            <div class="controls">
+              <input type="range" id="arabicSize" min="18" max="44" value="22">
+              <span id="arabicSizeVal">22px</span>
+            </div>
+          </div>
+          <div class="row">
+            <label>Translation size</label>
+            <div class="controls">
+              <input type="range" id="translationSize" min="12" max="28" value="16">
+              <span id="translationSizeVal">16px</span>
+            </div>
+          </div>
+          <div class="row">
+            <label>Transliteration size</label>
+            <div class="controls">
+              <input type="range" id="transliterationSize" min="12" max="28" value="16">
+              <span id="transliterationSizeVal">16px</span>
+            </div>
+          </div>
+
+          <div class="row">
+            <label>Arabic Font</label>
+            <div class="controls">
+              <select id="arabicFont">
+                <option value="Amiri-BoldSlanted">Amiri-BoldSlanted</option>
+                <option value="albayan">albayan</option>
+                <option value="471btehran">471btehran</option>
+                <option value="AmiriQuranColored">AmiriQuranColored</option>
+                <option value="amiri-bold">amiri-bold</option>
+                <option value="Amiri">Amiri (system)</option>
+              </select>
             </div>
           </div>
         </div>
-        <div class="row">
-          <label for="toggleTransliterations">Show Transliteration</label>
-          <div class="controls">
-            <div class="switch" id="toggleTransliterationsSwitch">
-              <input type="checkbox" id="toggleTransliterations">
-              <span class="thumb"></span>
-            </div>
+      </details>
+
+      <!-- Theme -->
+      <details class="section" id="themeSection">
+        <summary>
+          <span id="themeTitle">Theme</span>
+          <i class="fa fa-chevron-down"></i>
+        </summary>
+        <div class="section-body">
+          <div class="row" style="justify-content:flex-start">
+            <button class="pill-btn" id="toggleDarkQuick"><i class="fa fa-circle-half-stroke"></i> Quick Dark/Light</button>
           </div>
         </div>
+      </details>
 
-        <div class="row">
-          <label>Arabic size</label>
-          <div class="controls">
-            <input type="range" id="arabicSize" min="18" max="44" value="22">
-            <span id="arabicSizeVal">22px</span>
+      <!-- Language -->
+      <details class="section" id="languageSection">
+        <summary>
+          <span id="languageTitle">Language</span>
+          <i class="fa fa-chevron-down"></i>
+        </summary>
+        <div class="section-body">
+          <div class="row">
+            <label>Current</label>
+            <div class="controls"><span id="currentLangLabel">EN</span></div>
+          </div>
+          <div class="row">
+            <label>Switch</label>
+            <div class="controls"><button class="pill-btn" id="cycleLangBtn"><i class="fa fa-language"></i> Cycle</button></div>
           </div>
         </div>
-        <div class="row">
-          <label>Translation size</label>
-          <div class="controls">
-            <input type="range" id="translationSize" min="12" max="28" value="16">
-            <span id="translationSizeVal">16px</span>
-          </div>
-        </div>
-        <div class="row">
-          <label>Transliteration size</label>
-          <div class="controls">
-            <input type="range" id="transliterationSize" min="12" max="28" value="16">
-            <span id="transliterationSizeVal">16px</span>
-          </div>
-        </div>
+      </details>
 
-        <div class="row">
-          <label>Arabic Font</label>
-          <div class="controls">
-            <select id="arabicFont">
-              <option value="Amiri-BoldSlanted">Amiri-BoldSlanted</option>
-              <option value="albayan">albayan</option>
-              <option value="471btehran">471btehran</option>
-              <option value="AmiriQuranColored">AmiriQuranColored</option>
-              <option value="amiri-bold">amiri-bold</option>
-              <option value="Amiri">Amiri (system)</option>
-            </select>
-          </div>
+      <!-- About (ONLY here) -->
+      <details class="section" id="aboutSection">
+        <summary>
+          <span id="aboutTitle">About</span>
+          <i class="fa fa-chevron-down"></i>
+        </summary>
+        <div class="section-body">
+          <p style="margin-bottom:6px">Adhkar & Dua Application</p>
+          <p style="color:var(--muted);font-size:.95rem">Developed by <strong>Jibril SBI TENGEH</strong>.</p>
         </div>
-      </div>
-    </details>
-
-    <!-- Theme -->
-    <details class="section" id="themeSection">
-      <summary>
-        <span id="themeTitle">Theme</span>
-        <i class="fa fa-chevron-down"></i>
-      </summary>
-      <div class="section-body">
-        <div class="row" style="justify-content:flex-start">
-          <button class="pill-btn" id="toggleDarkQuick"><i class="fa fa-circle-half-stroke"></i> Quick Dark/Light</button>
-        </div>
-      </div>
-    </details>
-
-    <!-- Language -->
-    <details class="section" id="languageSection">
-      <summary>
-        <span id="languageTitle">Language</span>
-        <i class="fa fa-chevron-down"></i>
-      </summary>
-      <div class="section-body">
-        <div class="row">
-          <label>Current</label>
-          <div class="controls"><span id="currentLangLabel">EN</span></div>
-        </div>
-        <div class="row">
-          <label>Switch</label>
-          <div class="controls"><button class="pill-btn" id="cycleLangBtn"><i class="fa fa-language"></i> Cycle</button></div>
-        </div>
-      </div>
-    </details>
-
-    <!-- About -->
-    <details class="section" id="aboutSection">
-      <summary>
-        <span id="aboutTitle">About</span>
-        <i class="fa fa-chevron-down"></i>
-      </summary>
-      <div class="section-body">
-        <p style="margin-bottom:6px">Adhkar & Dua Application</p>
-        <p style="color:var(--muted);font-size:.95rem">Developed by <strong>Jibril SBI TENGEH</strong>.</p>
-      </div>
-    </details>
+      </details>
+    </div>
   </div>
 </div>
 
 <!-- ======= BOTTOM HEADER ======= -->
-<nav class="bottom-header">
+<nav class="bottom-header" aria-label="Bottom header">
   <div class="bar">
     <div class="bh-left">
       <button class="pill-btn" id="homeBtn"><i class="fa fa-house"></i> Home</button>
       <button class="pill-btn" id="favoritesBtn"><i class="fa fa-heart"></i> Favorites</button>
     </div>
-    <div class="bh-right">
-      <button class="pill-btn" id="settingsBtn"><i class="fa fa-sliders"></i> Settings</button>
-      <button class="pill-btn" id="aboutBtn"><i class="fa fa-circle-info"></i> About</button>
-    </div>
+    <div class="bh-right"><!-- intentionally empty --></div>
   </div>
 </nav>
 
 <!-- ======= TOAST ======= -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast">Done</div>
 
 <script>
 /* ================== CONFIG ================== */
@@ -344,7 +368,7 @@ let categoriesData = [];   // [{ id, title, folder }, ...]
 let duasData = [];         // current category duas
 let currentCategoryFolder = null;
 
-let favorites = JSON.parse(localStorage.getItem('favorites')||'{}'); // {duaKey:true}
+let favorites = JSON.parse(localStorage.getItem('favorites')||'{}'); // {duaKey: duaObject}
 let viewingFavorites = false;
 
 let showTransliterations = JSON.parse(localStorage.getItem('showTransliterations')||'true');
@@ -372,12 +396,13 @@ const els = {
   // bottom header
   homeBtn: document.getElementById('homeBtn'),
   favoritesBtn: document.getElementById('favoritesBtn'),
-  settingsBtn: document.getElementById('settingsBtn'),
-  aboutBtn: document.getElementById('aboutBtn'),
 
-  // settings sheet
-  settingsSheet: document.getElementById('settingsSheet'),
+  // settings modal & FAB
+  fabSettings: document.getElementById('fabSettings'),
+  settingsOverlay: document.getElementById('settingsOverlay'),
   closeSettings: document.getElementById('closeSettings'),
+
+  // settings content
   currentLangLabel: document.getElementById('currentLangLabel'),
   cycleLangBtn: document.getElementById('cycleLangBtn'),
   toggleDarkQuick: document.getElementById('toggleDarkQuick'),
@@ -458,7 +483,7 @@ async function loadCategoryDuas(categoryFolder, categoryName){
     els.categoriesList.style.display = 'none';
     els.sectionTitle.textContent = categoryName;
     els.duaContainer.innerHTML = '<div class="loading">Loading duas...</div>';
-    // NOTE: uses "douas" per your repo
+    // NOTE: uses "douas" per your repo structure
     const url = `${GITHUB_BASE}douas/${categoryFolder}/${currentLanguage}.json`;
     const cacheKey = `douas_${categoryFolder}_${currentLanguage}`;
     duasData = await fetchJSONWithCache(url, cacheKey);
@@ -493,36 +518,43 @@ function renderCategories(filter=''){
   });
 }
 
-function duaKey(dua){
-  // unique key across categories + language
-  const cat = currentCategoryFolder || 'cat';
-  const lang = currentLanguage || 'en';
-  return `${cat}:${lang}:${dua.id ?? Math.random().toString(36).slice(2)}`;
+function makeDuaKey(dua, catFolder = currentCategoryFolder, lang = currentLanguage){
+  const idPart = dua.id != null ? dua.id : (dua.arabic ? dua.arabic.slice(0,30) : Math.random().toString(36).slice(2));
+  return `${catFolder}:${lang}:${idPart}`;
 }
 
 function renderDuas(filter=''){
   const container = els.duaContainer; container.innerHTML = '';
-  let list = duasData.slice();
+  let list;
 
-  if(filter){
-    const f = filter.toLowerCase();
-    list = list.filter(dua =>
-      (dua.translation && dua.translation.toLowerCase().includes(f)) ||
-      (dua.transliteration && dua.transliteration.toLowerCase().includes(f)) ||
-      (dua.arabic && dua.arabic.includes(filter))
-    );
-  }
-
-  // Favorites view toggle
   if(viewingFavorites){
-    const favKeys = new Set(Object.keys(favorites).filter(k=>favorites[k]));
-    list = list.filter(d => favKeys.has(duaKey(d)));
+    // Render from saved favorites (global)
+    list = Object.values(favorites || {});
+    // filter by search
+    if(filter){
+      const f = filter.toLowerCase();
+      list = list.filter(dua =>
+        (dua.translation && dua.translation.toLowerCase().includes(f)) ||
+        (dua.transliteration && dua.transliteration.toLowerCase().includes(f)) ||
+        (dua.arabic && dua.arabic.includes(filter))
+      );
+    }
+  } else {
+    list = duasData.slice();
+    if(filter){
+      const f = filter.toLowerCase();
+      list = list.filter(dua =>
+        (dua.translation && dua.translation.toLowerCase().includes(f)) ||
+        (dua.transliteration && dua.transliteration.toLowerCase().includes(f)) ||
+        (dua.arabic && dua.arabic.includes(filter))
+      );
+    }
   }
 
   if(!list.length){ container.innerHTML = '<div class="no-results">No duas available</div>'; return; }
 
   list.forEach(dua=>{
-    const key = duaKey(dua);
+    const key = makeDuaKey(dua, dua._catFolder || currentCategoryFolder, dua._lang || currentLanguage);
     const isFav = !!favorites[key];
 
     const d = document.createElement('div'); d.className = 'dua-item';
@@ -556,7 +588,13 @@ function renderDuas(filter=''){
     // Favorite
     d.querySelector('.fav').addEventListener('click', ()=>{
       const nowFav = !favorites[key];
-      favorites[key] = nowFav;
+      if(nowFav){
+        // store full dua object w/ provenance
+        const stored = {...dua, _catFolder: dua._catFolder || currentCategoryFolder, _lang: dua._lang || currentLanguage};
+        favorites[key] = stored;
+      }else{
+        delete favorites[key];
+      }
       localStorage.setItem('favorites', JSON.stringify(favorites));
       d.querySelector('.fav').classList.toggle('active', nowFav);
       toast(nowFav ? 'Added to favorites' : 'Removed from favorites','success',1500);
@@ -567,10 +605,10 @@ function renderDuas(filter=''){
     d.querySelector('.share').addEventListener('click', async ()=>{
       const text = buildDuaPlainText(dua);
       if(navigator.share){
-        try{ await navigator.share({title:'Dua', text}); toast('Shared','success',1500);}catch(e){}
+        try{ await navigator.share({title:'Dua', text}); toast('Shared','success',2000);}catch(e){}
       }else{
         await copyToClipboard(text);
-        toast('Copied for sharing','info',1500);
+        toast('Copied for sharing','info',2000);
       }
     });
 
@@ -582,13 +620,13 @@ function renderDuas(filter=''){
       const a = document.createElement('a');
       a.href = url; a.download = `dua_${dua.id||'item'}.txt`;
       document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-      toast('Saved as file','success',1500);
+      toast('Saved as file','success',2000);
     });
 
     // Copy
     d.querySelector('.copy').addEventListener('click', async ()=>{
       await copyToClipboard(buildDuaPlainText(dua));
-      toast('Copied','success',1500);
+      toast('Copied','success',2000);
     });
 
     container.appendChild(d);
@@ -667,23 +705,18 @@ els.homeBtn.addEventListener('click', ()=>{
   els.favoritesBtn.classList.remove('active');
 });
 els.favoritesBtn.addEventListener('click', ()=>{
-  if(els.categoryDetails.style.display !== 'block'){
-    toast('Open a category first','warn',1600);
-    return;
-  }
-  viewingFavorites = !viewingFavorites;
-  els.favoritesBtn.classList.toggle('active', viewingFavorites);
+  viewingFavorites = true;
+  els.favoritesBtn.classList.add('active');
+  els.categoriesList.style.display = 'none';
+  els.categoryDetails.style.display = 'block';
+  els.sectionTitle.textContent = 'Favorites';
   renderDuas(els.searchBar.value);
 });
-els.settingsBtn.addEventListener('click', ()=> els.settingsSheet.classList.add('show'));
-els.aboutBtn.addEventListener('click', ()=>{
-  // just open About section within settings for simplicity
-  els.settingsSheet.classList.add('show');
-  document.getElementById('aboutSection').setAttribute('open','open');
-});
 
-// Settings sheet close
-els.closeSettings.addEventListener('click', ()=> els.settingsSheet.classList.remove('show'));
+// Settings FAB + Modal
+els.fabSettings.addEventListener('click', ()=> els.settingsOverlay.classList.add('show'));
+els.closeSettings.addEventListener('click', ()=> els.settingsOverlay.classList.remove('show'));
+els.settingsOverlay.addEventListener('click', (e)=>{ if(e.target===els.settingsOverlay) els.settingsOverlay.classList.remove('show') });
 
 // Settings: Display toggles — WORKING instantly
 function syncDisplayControls(){
@@ -702,19 +735,19 @@ els.toggleTranslations.addEventListener('change', ()=>{
   showTranslations = els.toggleTranslations.checked;
   els.toggleTranslationsSwitch.classList.toggle('on', showTranslations);
   savePrefs();
-  // live update: show/hide translation nodes without re-render
   document.querySelectorAll('.dua-translation').forEach(n=>{
     n.style.display = showTranslations ? 'block':'none';
   });
+  toast(showTranslations?'Translations ON':'Translations OFF','info',1200);
 });
 els.toggleTransliterations.addEventListener('change', ()=>{
   showTransliterations = els.toggleTransliterations.checked;
   els.toggleTransliterationsSwitch.classList.toggle('on', showTransliterations);
   savePrefs();
-  // live update
   document.querySelectorAll('.dua-transliteration').forEach(n=>{
     n.style.display = showTransliterations ? 'block':'none';
   });
+  toast(showTransliterations?'Transliteration ON':'Transliteration OFF','info',1200);
 });
 
 els.arabicSize.addEventListener('input', ()=>{
@@ -737,10 +770,27 @@ els.arabicFont.addEventListener('change', ()=>{
   updateFontVars(); savePrefs();
 });
 
-// Settings: theme quick toggle (inside sheet)
+// Settings: theme quick toggle (inside modal)
 els.toggleDarkQuick.addEventListener('click', ()=>{
   const isDark = document.body.style.background !== '' && document.body.style.background !== 'var(--bg)';
   darkModeOn(!isDark);
+});
+
+// Language cycle inside settings
+els.cycleLangBtn.addEventListener('click', ()=>{
+  const langs = ['en','fr','ru','zh','ha'];
+  const i = langs.indexOf(currentLanguage);
+  currentLanguage = langs[(i+1)%langs.length];
+  els.languageText.textContent = currentLanguage.toUpperCase();
+  els.currentLangLabel.textContent = currentLanguage.toUpperCase();
+  savePrefs();
+  // Reset to categories and reload
+  els.categoryDetails.style.display = 'none';
+  els.categoriesList.style.display = 'block';
+  els.sectionTitle.textContent = 'Categories';
+  viewingFavorites = false;
+  els.favoritesBtn.classList.remove('active');
+  loadCategories();
 });
 
 // INIT
@@ -755,3 +805,4 @@ init();
 </script>
 </body>
 </html>
+```0
