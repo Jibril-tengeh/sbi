@@ -1,43 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Adhkar Application</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
 <style>
 /* ============ RESET & THEME VARS ============ */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --primary:#16a34a;
-  --secondary:#0e9f6e;
-  --accent:#f05252;
-  --bg:#f9fafb;
-  --text:#111827;
-  --muted:#6b7280;
-  --border:#e5e7eb;
+  --primary:#6a1b9a;
+  --secondary:#8e24aa;
+  --accent:#ef4444;
+  --bg:#f8fafc;
+  --text:#0f172a;
+  --muted:#64748b;
+  --border:#e2e8f0;
   --card:#ffffff;
+  --card-contrast:#1f2937;
   --radius:14px;
   --shadow:0 8px 24px rgba(0,0,0,.08);
-  --font-arabic-size: 22px;
-  --font-translation-size: 16px;
-  --font-transliteration-size: 16px;
-  --arabic-font: "Amiri", serif;
-  --bottom-header-h: 56px;
+  --font-arabic-size: 1.35rem;
+  --font-translation-size: 1rem;
+  --font-transliteration-size: 1rem;
+  --overlay: rgba(15,23,42,.5);
+  --blur: 10px;
 }
 html,body{height:100%}
 body{
-  background:var(--bg);
-  color:var(--text);
+  background:var(--bg);color:var(--text);
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
-  transition:background .25s,color .25s
+  transition:background .25s,color .25s;
 }
 .theme-fade{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .35s ease;z-index:9999}
 .theme-fade.show{opacity:1}
 
-/* ============ HEADER (TOP) ============ */
+/* ============ HEADER ============ */
 header{
-  position:sticky;top:0;z-index:30;
+  position:sticky;top:0;z-index:20;
   background:linear-gradient(135deg,var(--primary),var(--secondary));
   color:#fff;padding:12px 14px;box-shadow:0 4px 16px rgba(0,0,0,.12);
   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
@@ -51,19 +52,23 @@ header{
 .header-icon:hover{transform:translateY(-1px);background:rgba(255,255,255,.28)}
 .language-text{position:absolute;bottom:-16px;font-size:.68rem;font-weight:600;letter-spacing:.04em}
 
-/* Search bar */
-#searchBarContainer{
-  width:100%;padding:8px;background:rgba(255,255,255,0.2);
-  display:none;
-}
-#searchBar{
-  width:100%;padding:8px 12px;border:none;border-radius:8px;font-size:1rem;
-}
+/* search bar */
+#searchBarContainer{width:100%;padding:8px;background:rgba(255,255,255,0.2);display:none}
+#searchBar{width:100%;padding:10px 12px;border:none;border-radius:10px;font-size:1rem}
 
-/* ============ MAIN ============ */
-.container{max-width:1000px;margin:16px auto calc(var(--bottom-header-h) + 18px);padding:0 14px}
-.section-title-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.section-title{margin:6px 0 6px;color:var(--primary);font-size:1.5rem}
+/* top nav */
+.topnav{display:flex;gap:8px;margin:10px auto 0;max-width:1000px;padding:0 14px 10px}
+.tab-btn{
+  flex:1;border:none;padding:10px 12px;border-radius:10px;cursor:pointer;
+  background:rgba(255,255,255,.18);color:white;font-weight:600;
+  transition:transform .15s,background .15s,opacity .15s
+}
+.tab-btn.active{background:white;color:#0f172a}
+.tab-btn:not(.active):hover{opacity:.9;transform:translateY(-1px)}
+
+/* ============ LAYOUT ============ */
+.container{max-width:1000px;margin:12px auto 100px;padding:0 14px}
+.section-title{text-align:center;margin:8px 0 16px;color:var(--primary);font-size:1.5rem}
 
 /* ============ LISTS ============ */
 .categories-list{list-style:none;max-width:860px;margin:0 auto}
@@ -86,130 +91,152 @@ header{
 .back-btn:hover{transform:translateY(-1px)}
 .dua-list{max-width:860px;margin:0 auto 20px}
 .dua-item{
-  background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:var(--shadow);position:relative
+  background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:14px;box-shadow:var(--shadow);position:relative;overflow:hidden
 }
-.dua-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;color:var(--muted);font-size:.9rem}
+.dua-header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:8px
+}
+.dua-title{font-weight:700;color:var(--primary);font-size:1.05rem}
 .dua-arabic{
-  font-size:var(--font-arabic-size);line-height:2;direction:rtl;text-align:right;margin-bottom:6px;
-  font-family:var(--arabic-font);
+  font-size:var(--font-arabic-size);line-height:2;direction:rtl;text-align:right;margin:6px 0;
+  font-family: var(--arabic-font, "AmiriQuranColored"), "AmiriQuranColored","Amiri-BoldSlanted","amiri-bold","albayan","471btehran","Scheherazade New","Noto Naskh Arabic","Arial";
 }
-.dua-transliteration{font-size:var(--font-transliteration-size);font-style:italic;margin-top:4px;color:#374151}
-.dua-translation{font-size:var(--font-translation-size);margin-top:6px}
-.dua-reference{margin-top:6px;color:var(--muted);font-size:.92rem}
-.dua-actions{
-  display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:10px;padding-top:8px;border-top:1px dashed var(--border)
+.dua-transliteration{
+  font-size:var(--font-transliteration-size);font-style:italic;margin-top:6px;color:#374151
 }
+.dua-translation{font-size:var(--font-translation-size);margin-top:8px}
+.dua-reference{margin-top:8px;color:var(--muted);font-size:.92rem}
+
+/* card actions */
+.card-actions{
+  margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap
+}
+.action-left{display:flex;gap:8px;align-items:center}
+.action-right{display:flex;gap:8px;align-items:center}
 .icon-btn{
-  display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);
-  background:var(--card);color:var(--text);cursor:pointer;transition:transform .12s,border-color .12s,background .12s;
+  border:1px solid var(--border);background:var(--card);color:var(--text);
+  padding:8px 10px;border-radius:10px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;
+  transition:transform .12s,border-color .15s,box-shadow .15s
 }
-.icon-btn:hover{transform:translateY(-1px);border-color:var(--primary)}
-.icon-btn.fav.active{color:#b91c1c;border-color:#b91c1c}
+.icon-btn:hover{transform:translateY(-1px);border-color:var(--primary);box-shadow:0 6px 16px rgba(0,0,0,.10)}
+.icon-btn.active{border-color:var(--primary);color:var(--primary)}
+.copy-badge{font-size:.82rem;color:var(--muted)}
 
 /* ============ STATES ============ */
 .loading,.error,.no-results{text-align:center;color:var(--muted);padding:18px}
 
-/* ============ SETTINGS FAB (bottom-right transparent) ============ */
-.fab{
-  position:fixed;right:15px;bottom:calc(var(--bottom-header-h) - 49px);z-index:60;
-  height:46px;border-radius:999px;border:1px solid rgba(255,255,255,.25);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  background:rgba(0,0,0,0.15);color:#fff;padding:0 12px;
-  backdrop-filter: blur(4px) saturate(120%);
+/* ============ FLOATING SETTINGS BUTTON ============ */
+.fab-settings{
+  position:fixed;right:15px;bottom:15px;z-index:30;
+  width:56px;height:56px;border-radius:999px;
+  backdrop-filter:saturate(140%) blur(6px);
+  background:rgba(15,23,42,.3); /* transparent */
+  border:1px solid rgba(255,255,255,.25);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:0 10px 24px rgba(0,0,0,.25);
+  transition:transform .15s,opacity .15s,background .15s;
 }
-.fab span{font-size:.92rem}
-.fab i{font-size:18px}
-.fab:hover{transform:translateY(-1px)}
+.fab-settings:hover{transform:translateY(-2px);background:rgba(15,23,42,.38)}
 
-/* ============ MODAL (centered) ============ */
+/* ============ SETTINGS PANEL (SHEET) ============ */
+.settings-sheet{
+  position:fixed;right:0;top:0;height:100%;width:92%;max-width:420px;z-index:50;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(12px) saturate(140%);
+  box-shadow:-8px 0 28px rgba(15,23,42,.18);
+  border-left:1px solid var(--border);
+  transform:translateX(105%);transition:transform .25s ease;
+  display:flex;flex-direction:column;
+}
+.settings-sheet.open{transform:translateX(0)}
+.sheet-header{
+  display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff
+}
+.sheet-title{font-weight:800;letter-spacing:.2px}
+.sheet-close{background:rgba(255,255,255,.2);border:none;border-radius:10px;color:#fff;padding:8px 10px;cursor:pointer}
+.sheet-content{padding:14px;overflow:auto}
+
+/* collapsible groups */
+.group{border:1px solid var(--border);border-radius:14px;background:var(--card);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+.group summary{
+  list-style:none;cursor:pointer;padding:12px 14px;font-weight:700;color:var(--primary);
+  display:flex;align-items:center;justify-content:space-between
+}
+.group summary::-webkit-details-marker{display:none}
+.group .group-body{padding:12px 14px;border-top:1px dashed var(--border);display:grid;gap:12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.row label{font-weight:600;color:var(--text);font-size:.98rem}
+.switch{
+  position:relative;width:46px;height:26px;background:#cbd5e1;border-radius:999px;cursor:pointer;transition:background .2s
+}
+.switch:before{
+  content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s
+}
+.switch.active{background:var(--primary)}
+.switch.active:before{transform:translateX(20px)}
+select, input[type="range"], input[type="color"], input[type="number"]{
+  width:160px;max-width:60vw;border:1px solid var(--border);border-radius:10px;padding:8px;background:var(--card);color:var(--text)
+}
+.small-note{font-size:.85rem;color:var(--muted)}
+
+/* theme grid */
+.theme-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.theme-swatch{
+  height:36px;border-radius:10px;border:1px solid var(--border);cursor:pointer;box-shadow:var(--shadow);transition:transform .12s;
+  display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)
+}
+.theme-swatch:hover{transform:translateY(-2px)}
+
+/* ============ POPUP (MODAL / CONFIRM) ============ */
 .modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:saturate(110%) blur(2px);
-  display:none;align-items:center;justify-content:center;z-index:70;
+  position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(var(--blur));
+  display:none;align-items:center;justify-content:center;z-index:60;opacity:0;transition:opacity .2s ease
 }
-.modal-overlay.show{display:flex;animation:fadeIn .18s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-overlay.show{display:flex;opacity:1}
 .modal{
-  width:min(92vw,820px);max-height:80vh;overflow:auto;background:var(--card);color:var(--text);
-  border-radius:16px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.25);
+  width:min(92vw,420px);background:rgba(255,255,255,.92);backdrop-filter:blur(10px) saturate(150%);
+  border:1px solid var(--border);border-radius:16px;box-shadow:0 18px 44px rgba(0,0,0,.25);
+  overflow:hidden;transform:translateY(8px);animation:popin .18s ease forwards
 }
-.modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
-.modal-title{font-weight:800;font-size:1.05rem}
-.modal-body{padding:12px 14px}
+@keyframes popin{to{transform:translateY(0)}}
+.modal-head{display:flex;gap:10px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
+.modal-head .icon{font-size:1.2rem}
+.modal-title{font-weight:800}
+.modal-body{padding:14px 16px;color:var(--text)}
+.modal-actions{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+.btn{
+  border:none;border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:700
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.type-success .modal-head{background:rgba(16,185,129,.12)}
+.type-error .modal-head{background:rgba(239,68,68,.12)}
+.type-info .modal-head{background:rgba(59,130,246,.12)}
+.type-confirm .modal-head{background:rgba(234,179,8,.12)}
+.type-success .icon{color:#10b981}
+.type-error .icon{color:#ef4444}
+.type-info .icon{color:#3b82f6}
+.type-confirm .icon{color:#eab308}
 
-/* collapsible sections */
-.section{border:1px solid var(--border);border-radius:12px;background:var(--card);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
-.section summary{
-  list-style:none;cursor:pointer;padding:12px 14px;font-weight:700;display:flex;align-items:center;justify-content:space-between
-}
-.section summary::-webkit-details-marker{display:none}
-.section .section-body{padding:10px 14px 14px;border-top:1px dashed var(--border)}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
-.row label{font-size:.95rem}
-.row .controls{display:flex;align-items:center;gap:8px}
-.switch{position:relative;width:50px;height:28px;border-radius:999px;background:#e5e7eb;cursor:pointer;flex-shrink:0;border:1px solid var(--border)}
-.switch input{display:none}
-.switch.on{background:#22c55e}
-.thumb{position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:white;box-shadow:var(--shadow);transition:left .18s}
-.switch.on .thumb{left:24px}
-input[type="range"]{width:180px}
-select, input[type="color"]{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)}
+/* ============ ABOUT (no footer credit) ============ */
+.about-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow);max-width:860px;margin:0 auto 20px}
+.about-card h3{color:var(--primary);margin-bottom:6px}
 
-/* ============ THEME GRID ============ */
-.theme-grid{
-  display:grid;
-  grid-template-columns:repeat(3, minmax(0,1fr));
-  gap:10px;
-}
-@media (min-width:560px){ .theme-grid{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
-@media (min-width:820px){ .theme-grid{ grid-template-columns:repeat(5, minmax(0,1fr)); } }
-
-.theme-card{
-  border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow);
-  background:var(--card);display:flex;flex-direction:column;align-items:center;transition:transform .12s,border-color .12s
-}
-.theme-card:hover{transform:translateY(-2px);border-color:var(--primary)}
-.swatch{
-  width:100%;height:56px;display:grid;grid-template-columns:1fr 1fr 1fr;
-}
-.swatch > div{height:56px}
-.theme-name{font-size:.85rem;padding:8px 8px 10px;color:var(--text);text-align:center}
-
-/* ============ BOTTOM HEADER (persistent) ============ */
-.bottom-header{
-  position:fixed;left:0;right:0;bottom:0;z-index:50;
-  height:var(--bottom-header-h);
-  background:var(--card);border-top:1px solid var(--border);box-shadow:0 -4px 18px rgba(0,0,0,.06);
-}
-.bottom-header .bar{
-  max-width:1000px;height:100%;margin:0 auto;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;
-}
-.bh-left,.bh-right{display:flex;gap:8px;align-items:center}
-.pill-btn{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--text);box-shadow:var(--shadow);font-size:.92rem;cursor:pointer}
-.pill-btn.active{border-color:var(--primary);color:var(--primary)}
-
-/* Toasts (copy/share etc.) */
-.toast{
-  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--bottom-header-h) + 18px);
-  background:var(--card);color:var(--text);
-  border:1px solid var(--border);box-shadow:var(--shadow);padding:10px 14px;border-radius:12px;z-index:80;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s
-}
-.toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(-6px)}
-.toast.success{border-color:#16a34a}
-.toast.info{border-color:#2563eb}
-.toast.warn{border-color:#f59e0b}
-.toast.error{border-color:#ef4444}
+/* ============ UTIL ============ */
+.hidden{display:none!important}
+hr.sep{border:none;border-top:1px dashed var(--border);margin:8px 0}
 </style>
 </head>
 <body>
 <div class="theme-fade" id="themeFade"></div>
 
-<!-- ======= HEADER (TOP) ======= -->
+<!-- ======= HEADER ======= -->
 <header>
   <div class="logo"><i class="fas fa-star-and-crescent"></i><span>Adhkar</span></div>
   <div class="header-icons">
-    <!-- Order: search — dark mode — languages -->
+    <!-- ORDER: search — dark — language -->
     <div class="header-icon" id="searchToggle" title="Search"><i class="fas fa-search"></i></div>
-    <div class="header-icon" id="themeToggle" title="Dark / Light"><i class="fas fa-moon"></i></div>
+    <div class="header-icon" id="themeToggle" title="Toggle Dark"><i class="fas fa-moon"></i></div>
     <div class="header-icon" id="languageToggle" title="Language">
       <i class="fas fa-language"></i>
       <div class="language-text" id="languageText">EN</div>
@@ -219,388 +246,398 @@ select, input[type="color"]{padding:8px 10px;border-radius:10px;border:1px solid
   <div id="searchBarContainer">
     <input type="text" id="searchBar" placeholder="Search categories or duas...">
   </div>
+
+  <!-- top tabs -->
+  <div class="topnav">
+    <button class="tab-btn active" id="tabCategories"><i class="fa-solid fa-list"></i>&nbsp;Categories</button>
+    <button class="tab-btn" id="tabFavorites"><i class="fa-solid fa-heart"></i>&nbsp;Favorites</button>
+    <button class="tab-btn" id="tabAbout"><i class="fa-solid fa-circle-info"></i>&nbsp;About</button>
+  </div>
 </header>
 
 <!-- ======= MAIN ======= -->
 <div class="container">
-  <div class="section-title-wrap">
-    <h1 class="section-title"></h1>
-  </div>
+  <h1 class="section-title">Categories</h1>
 
+  <!-- CATEGORIES VIEW -->
   <ul id="categoriesList" class="categories-list">
     <li class="loading">Loading categories...</li>
   </ul>
 
+  <!-- DUA VIEW -->
   <div id="categoryDetails" style="display:none;">
-    <button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
+    <button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i> <span id="backLabel">Back</span></button>
     <div id="duaContainer" class="dua-list"></div>
   </div>
+
+  <!-- FAVORITES VIEW -->
+  <div id="favoritesView" class="dua-list hidden"></div>
+
+  <!-- ABOUT VIEW -->
+  <div id="aboutView" class="hidden">
+    <div class="about-card">
+      <h3>About</h3>
+      <p>This Adhkar app helps you browse categories and duas in multiple languages, customize display, themes and more — fully offline-capable when hosted with your JSON files.</p>
+      <hr class="sep"/>
+      <p><strong>Developed by Jibril SBI TENGEH</strong></p>
+    </div>
+  </div>
 </div>
 
-<!-- ======= FLOATING SETTINGS (transparent with text) ======= -->
-<button class="fab" id="fabSettings" title="Settings" aria-label="Settings">
-  <i class="fa fa-sliders"></i><span></span>
+<!-- ======= FLOATING SETTINGS BUTTON ======= -->
+<button class="fab-settings" id="openSettings" title="Settings">
+  <i class="fa-solid fa-sliders"></i>
 </button>
 
-<!-- ======= SETTINGS MODAL ======= -->
-<div class="modal-overlay" id="settingsOverlay" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+<!-- ======= SETTINGS SHEET ======= -->
+<aside class="settings-sheet" id="settingsSheet" aria-hidden="true">
+  <div class="sheet-header">
+    <div class="sheet-title"><i class="fa-solid fa-sliders"></i> &nbsp;<span id="settingsTitle">Settings</span></div>
+    <button class="sheet-close" id="closeSettings"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="sheet-content">
+
+    <!-- DISPLAY (dropdown) -->
+    <details class="group" id="grpDisplay" open>
+      <summary><span><i class="fa-solid fa-eye"></i> &nbsp;<span id="displayTitle">Display</span></span><i class="fa-solid fa-chevron-down"></i></summary>
+      <div class="group-body">
+        <div class="row">
+          <label id="lblShowTranslation">Show Translations</label>
+          <div class="switch" id="swShowTranslation" role="switch" aria-checked="true" tabindex="0"></div>
+        </div>
+        <div class="row">
+          <label id="lblShowTransliteration">Show Transliteration</label>
+          <div class="switch" id="swShowTransliteration" role="switch" aria-checked="true" tabindex="0"></div>
+        </div>
+        <div class="row">
+          <label id="lblArabicSize">Arabic size</label>
+          <input id="rangeArabic" type="range" min="1.0" max="2.4" step="0.05">
+        </div>
+        <div class="row">
+          <label id="lblTranslationSize">Translation size</label>
+          <input id="rangeTranslation" type="range" min="0.8" max="1.6" step="0.05">
+        </div>
+        <div class="row">
+          <label id="lblTranslitSize">Transliteration size</label>
+          <input id="rangeTranslit" type="range" min="0.8" max="1.6" step="0.05">
+        </div>
+        <div class="row">
+          <label id="lblArabicFont">Arabic Font</label>
+          <select id="selectArabicFont">
+            <option value='"AmiriQuranColored","Amiri-BoldSlanted","amiri-bold","albayan","471btehran","Scheherazade New","Noto Naskh Arabic","Arial"'>Default (Amiri/Scheherazade)</option>
+            <option value='"Amiri-BoldSlanted","amiri-bold","AmiriQuranColored","albayan","471btehran","Arial"'>Amiri-BoldSlanted</option>
+            <option value='"albayan","AmiriQuranColored","Amiri-BoldSlanted","amiri-bold","Arial"'>albayan</option>
+            <option value='"471btehran","AmiriQuranColored","Amiri-BoldSlanted","amiri-bold","Arial"'>471btehran</option>
+            <option value='"AmiriQuranColored","Amiri-BoldSlanted","amiri-bold","albayan","471btehran","Arial"'>AmiriQuranColored</option>
+            <option value='"amiri-bold","Amiri-BoldSlanted","AmiriQuranColored","albayan","471btehran","Arial"'>amiri-bold</option>
+          </select>
+        </div>
+        <div class="small-note" id="noteFonts">These font names must exist on the device to render.</div>
+      </div>
+    </details>
+
+    <!-- THEME -->
+    <details class="group" id="grpTheme">
+      <summary><span><i class="fa-solid fa-palette"></i> &nbsp;<span id="themeTitle">Theme</span></span><i class="fa-solid fa-chevron-down"></i></summary>
+      <div class="group-body">
+        <button class="icon-btn" id="btnOpenThemePicker"><i class="fa-solid fa-swatchbook"></i><span id="openThemePickerLabel">Open Themes</span></button>
+        <div id="themePicker" class="theme-grid hidden"></div>
+
+        <div class="row"><label id="lblDarkMode">Dark mode</label><div class="switch" id="swDarkMode" role="switch" aria-checked="false" tabindex="0"></div></div>
+        <div class="row"><label id="lblSystemDark">Use system dark</label><div class="switch" id="swSystemDark" role="switch" aria-checked="true" tabindex="0"></div></div>
+
+        <hr class="sep">
+        <div class="row"><strong id="lblCustomThemeTitle">Create your theme</strong></div>
+        <div class="row"><label>Primary</label><input type="color" id="cPrimary" value="#6a1b9a"></div>
+        <div class="row"><label>Secondary</label><input type="color" id="cSecondary" value="#8e24aa"></div>
+        <div class="row"><label>Accent</label><input type="color" id="cAccent" value="#ef4444"></div>
+        <div class="row"><label>Background</label><input type="color" id="cBg" value="#f8fafc"></div>
+        <div class="row"><label>Text</label><input type="color" id="cText" value="#0f172a"></div>
+        <div class="row"><label>Card</label><input type="color" id="cCard" value="#ffffff"></div>
+        <div class="row">
+          <button class="btn btn-ghost" id="btnPreviewTheme"><i class="fa-solid fa-eye"></i>&nbsp;<span id="previewLabel">Preview</span></button>
+          <button class="btn btn-primary" id="btnSaveTheme"><i class="fa-solid fa-floppy-disk"></i>&nbsp;<span id="saveThemeLabel">Save</span></button>
+        </div>
+        <div class="small-note" id="noteThemeSave">Your theme is saved locally.</div>
+      </div>
+    </details>
+
+    <!-- LANGUAGE -->
+    <details class="group" id="grpLanguage">
+      <summary><span><i class="fa-solid fa-globe"></i> &nbsp;<span id="languageTitle">Language</span></span><i class="fa-solid fa-chevron-down"></i></summary>
+      <div class="group-body">
+        <div class="row">
+          <label id="lblLangPick">Choose language</label>
+          <select id="selectLanguage">
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="ru">Русский</option>
+            <option value="zh">中文</option>
+            <option value="ha">Hausa</option>
+          </select>
+        </div>
+        <div class="small-note" id="noteLang">Settings will follow your chosen language.</div>
+      </div>
+    </details>
+
+    <!-- ABOUT -->
+    <details class="group" id="grpAbout">
+      <summary><span><i class="fa-solid fa-circle-info"></i> &nbsp;<span id="aboutTitle">About</span></span><i class="fa-solid fa-chevron-down"></i></summary>
+      <div class="group-body">
+        <div><strong>Adhkar</strong> — customizable dhikr & dua app.</div>
+        <div>Version: 1.0</div>
+        <hr class="sep">
+        <div><strong>Developed by Jibril SBI TENGEH</strong></div>
+      </div>
+    </details>
+
+  </div>
+</aside>
+
+<!-- ======= POPUP (UNIFIED) ======= -->
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal type-info" id="modal">
     <div class="modal-head">
-      <div class="modal-title" id="settingsTitle">Settings</div>
-      <button class="header-icon" id="closeSettings" style="width:36px;height:36px;background:rgba(0,0,0,0.05);color:inherit"><i class="fa fa-xmark"></i></button>
+      <div class="icon" id="modalIcon">ℹ️</div>
+      <div class="modal-title" id="modalTitle">Info</div>
     </div>
-    <div class="modal-body">
-      <!-- Display (OPEN by default) -->
-      <details class="section" id="displaySection" open>
-        <summary>
-          <span id="displayTitle">Display</span>
-          <i class="fa fa-chevron-down"></i>
-        </summary>
-        <div class="section-body">
-          <div class="row">
-            <label for="toggleTranslations">Show Translations</label>
-            <div class="controls">
-              <label class="switch" id="toggleTranslationsSwitch">
-                <input type="checkbox" id="toggleTranslations">
-                <span class="thumb"></span>
-              </label>
-            </div>
-          </div>
-          <div class="row">
-            <label for="toggleTransliterations">Show Transliteration</label>
-            <div class="controls">
-              <label class="switch" id="toggleTransliterationsSwitch">
-                <input type="checkbox" id="toggleTransliterations">
-                <span class="thumb"></span>
-              </label>
-            </div>
-          </div>
-
-          <div class="row">
-            <label>Arabic size</label>
-            <div class="controls">
-              <input type="range" id="arabicSize" min="18" max="44" value="22">
-              <span id="arabicSizeVal">22px</span>
-            </div>
-          </div>
-          <div class="row">
-            <label>Translation size</label>
-            <div class="controls">
-              <input type="range" id="translationSize" min="12" max="28" value="16">
-              <span id="translationSizeVal">16px</span>
-            </div>
-          </div>
-          <div class="row">
-            <label>Transliteration size</label>
-            <div class="controls">
-              <input type="range" id="transliterationSize" min="12" max="28" value="16">
-              <span id="transliterationSizeVal">16px</span>
-            </div>
-          </div>
-
-          <div class="row">
-            <label>Arabic Font</label>
-            <div class="controls">
-              <select id="arabicFont">
-                <option value="Amiri-BoldSlanted">Amiri-BoldSlanted</option>
-                <option value="albayan">albayan</option>
-                <option value="471btehran">471btehran</option>
-                <option value="AmiriQuranColored">AmiriQuranColored</option>
-                <option value="amiri-bold">amiri-bold</option>
-                <option value="Amiri">Amiri (system)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </details>
-
-      <!-- Theme -->
-      <details class="section" id="themeSection">
-        <summary>
-          <span id="themeTitle">Theme</span>
-          <i class="fa fa-chevron-down"></i>
-        </summary>
-        <div class="section-body">
-          <div class="row" style="justify-content:flex-start;margin-top:0">
-            <button class="pill-btn" id="toggleDarkQuick"><i class="fa fa-circle-half-stroke"></i> Dark / Light</button>
-          </div>
-
-          <div class="row" style="justify-content:flex-start">
-            <label style="min-width:120px">Choose Theme</label>
-          </div>
-          <div class="theme-grid" id="themeGrid"></div>
-
-          <div class="row" style="margin-top:14px"><label><strong>Create Your Own Theme</strong></label></div>
-          <div class="row">
-            <label>Background</label>
-            <div class="controls"><input type="color" id="customBg" value="#161a23"></div>
-          </div>
-          <div class="row">
-            <label>Text</label>
-            <div class="controls"><input type="color" id="customText" value="#e5e7eb"></div>
-          </div>
-          <div class="row">
-            <label>Card</label>
-            <div class="controls"><input type="color" id="customCard" value="#0f172a"></div>
-          </div>
-          <div class="row">
-            <label>Primary</label>
-            <div class="controls"><input type="color" id="customPrimary" value="#16a34a"></div>
-          </div>
-          <div class="row">
-            <label>Secondary</label>
-            <div class="controls"><input type="color" id="customSecondary" value="#0e9f6e"></div>
-          </div>
-          <div class="row">
-            <label>Accent</label>
-            <div class="controls"><input type="color" id="customAccent" value="#f05252"></div>
-          </div>
-          <div class="row">
-            <label>Border</label>
-            <div class="controls"><input type="color" id="customBorder" value="#334155"></div>
-          </div>
-          <div class="row" style="justify-content:flex-start">
-            <button class="pill-btn" id="applyCustomTheme"><i class="fa fa-palette"></i> Apply Custom Theme</button>
-          </div>
-        </div>
-      </details>
-
-      <!-- Language -->
-      <details class="section" id="languageSection">
-        <summary>
-          <span id="languageTitle">Language</span>
-          <i class="fa fa-chevron-down"></i>
-        </summary>
-        <div class="section-body">
-          <div class="row">
-            <label>Current</label>
-            <div class="controls"><span id="currentLangLabel">EN</span></div>
-          </div>
-          <div class="row">
-            <label>Switch</label>
-            <div class="controls"><button class="pill-btn" id="cycleLangBtn"><i class="fa fa-language"></i> Cycle</button></div>
-          </div>
-        </div>
-      </details>
-
-      <!-- About (ONLY here) -->
-      <details class="section" id="aboutSection">
-        <summary>
-          <span id="aboutTitle">About</span>
-          <i class="fa fa-chevron-down"></i>
-        </summary>
-        <div class="section-body">
-          <p style="margin-bottom:6px">Adhkar & Dua Application</p>
-          <p style="color:var(--muted);font-size:.95rem">Developed by <strong>Jibril SBI TENGEH</strong>.</p>
-        </div>
-      </details>
+    <div class="modal-body" id="modalMessage">Message...</div>
+    <div class="modal-actions" id="modalActions">
+      <button class="btn btn-ghost" id="btnCancel" style="display:none">Cancel</button>
+      <button class="btn btn-primary" id="btnOk">OK</button>
     </div>
   </div>
 </div>
 
-<!-- ======= BOTTOM HEADER ======= -->
-<nav class="bottom-header" aria-label="Bottom header">
-  <div class="bar">
-    <div class="bh-left">
-      <button class="pill-btn" id="homeBtn"><i class="fa fa-house"></i> Home</button>
-      <button class="pill-btn" id="favoritesBtn"><i class="fa fa-heart"></i> Favorites</button>
-    </div>
-    <div class="bh-right"></div>
-  </div>
-</nav>
-
-<!-- ======= TOAST ======= -->
-<div class="toast" id="toast">Done</div>
-
 <script>
-/* ================== CONFIG ================== */
-/* Absolute base path so it works instantly with your GitHub Pages */
-const BASE = "https://jibril-tengeh.github.io/sbi/";
-
-/* ================== THEMES (25 presets) ================== */
-const PRESET_THEMES = [
-  {name:"Leaf", vars:{bg:"#f9fafb",text:"#111827",card:"#ffffff",border:"#e5e7eb",primary:"#16a34a",secondary:"#0e9f6e",accent:"#f05252"}},
-  {name:"Emerald", vars:{bg:"#ecfdf5",text:"#064e3b",card:"#ffffff",border:"#d1fae5",primary:"#10b981",secondary:"#059669",accent:"#ef4444"}},
-  {name:"Forest", vars:{bg:"#0b1411",text:"#e7f8f0",card:"#10201b",border:"#1f2f2a",primary:"#22c55e",secondary:"#16a34a",accent:"#f59e0b"}},
-  {name:"Mint", vars:{bg:"#f0fdfa",text:"#064e3b",card:"#ffffff",border:"#ccfbf1",primary:"#14b8a6",secondary:"#0ea5e9",accent:"#fb7185"}},
-  {name:"Ocean", vars:{bg:"#0b1220",text:"#e5e7eb",card:"#0f172a",border:"#334155",primary:"#3b82f6",secondary:"#06b6d4",accent:"#f59e0b"}},
-  {name:"Sky", vars:{bg:"#f0f9ff",text:"#0c4a6e",card:"#ffffff",border:"#e0f2fe",primary:"#0ea5e9",secondary:"#38bdf8",accent:"#ef4444"}},
-  {name:"Royal", vars:{bg:"#0b1020",text:"#e5e7eb",card:"#111827",border:"#374151",primary:"#6366f1",secondary:"#8b5cf6",accent:"#22c55e"}},
-  {name:"Grape", vars:{bg:"#faf5ff",text:"#4c1d95",card:"#ffffff",border:"#ede9fe",primary:"#8b5cf6",secondary:"#a78bfa",accent:"#ef4444"}},
-  {name:"Lavender", vars:{bg:"#f5f3ff",text:"#3730a3",card:"#ffffff",border:"#e9d5ff",primary:"#7c3aed",secondary:"#6d28d9",accent:"#f59e0b"}},
-  {name:"Cherry", vars:{bg:"#fff1f2",text:"#7f1d1d",card:"#ffffff",border:"#ffe4e6",primary:"#ef4444",secondary:"#fb7185",accent:"#22c55e"}},
-  {name:"Rose", vars:{bg:"#fff1f2",text:"#7a1a38",card:"#ffffff",border:"#ffe4e6",primary:"#f43f5e",secondary:"#e11d48",accent:"#0ea5e9"}},
-  {name:"Sunset", vars:{bg:"#fff7ed",text:"#7c2d12",card:"#ffffff",border:"#ffedd5",primary:"#f97316",secondary:"#f59e0b",accent:"#10b981"}},
-  {name:"Sand", vars:{bg:"#fafaf9",text:"#1f2937",card:"#ffffff",border:"#e7e5e4",primary:"#ca8a04",secondary:"#d97706",accent:"#16a34a"}},
-  {name:"Cocoa", vars:{bg:"#1c1917",text:"#e7e5e4",card:"#292524",border:"#44403c",primary:"#a16207",secondary:"#854d0e",accent:"#22c55e"}},
-  {name:"Slate", vars:{bg:"#0b1220",text:"#e5e7eb",card:"#111827",border:"#374151",primary:"#64748b",secondary:"#94a3b8",accent:"#22c55e"}},
-  {name:"Carbon", vars:{bg:"#0a0a0a",text:"#f3f4f6",card:"#171717",border:"#262626",primary:"#22c55e",secondary:"#3b82f6",accent:"#f59e0b"}},
-  {name:"Nord", vars:{bg:"#2e3440",text:"#e5e9f0",card:"#3b4252",border:"#4c566a",primary:"#88c0d0",secondary:"#81a1c1",accent:"#a3be8c"}},
-  {name:"Dracula", vars:{bg:"#282a36",text:"#f8f8f2",card:"#303241",border:"#3c3f51",primary:"#bd93f9",secondary:"#50fa7b",accent:"#ff79c6"}},
-  {name:"Solar", vars:{bg:"#fdf6e3",text:"#073642",card:"#fffdf5",border:"#eee8d5",primary:"#b58900",secondary:"#268bd2",accent:"#cb4b16"}},
-  {name:"Aqua", vars:{bg:"#ecfeff",text:"#083344",card:"#ffffff",border:"#cffafe",primary:"#06b6d4",secondary:"#0ea5e9",accent:"#10b981"}},
-  {name:"Lime", vars:{bg:"#f7fee7",text:"#1a2e05",card:"#ffffff",border:"#ecfccb",primary:"#84cc16",secondary:"#22c55e",accent:"#f97316"}},
-  {name:"Peach", vars:{bg:"#fff7ed",text:"#7c2d12",card:"#ffffff",border:"#fed7aa",primary:"#fb923c",secondary:"#f97316",accent:"#22c55e"}},
-  {name:"Berry", vars:{bg:"#fdf2f8",text:"#4a044e",card:"#ffffff",border:"#f5d0fe",primary:"#d946ef",secondary:"#a855f7",accent:"#22c55e"}},
-  {name:"Steel", vars:{bg:"#f8fafc",text:"#0f172a",card:"#ffffff",border:"#e2e8f0",primary:"#334155",secondary:"#475569",accent:"#ef4444"}},
-  {name:"Mono", vars:{bg:"#ffffff",text:"#111827",card:"#ffffff",border:"#e5e7eb",primary:"#111827",secondary:"#6b7280",accent:"#ef4444"}},
-];
-
 /* ================== STATE ================== */
-let currentLanguage = localStorage.getItem('lang') || 'en';
+let currentLanguage = 'en';
 let categoriesData = [];
 let duasData = [];
-let currentCategoryFolder = null;
+let showTransliterations = true;
+let showTranslations = true;
+let fontArabic = getComputedStyle(document.documentElement).getPropertyValue('--arabic-font') || '';
+let favorites = JSON.parse(localStorage.getItem('favorites')||'[]');
+let savedItems = JSON.parse(localStorage.getItem('savedDuas')||'[]');
+let useSystemDark = true;
+let darkMode = false;
+let currentThemeKey = localStorage.getItem('themeKey') || 'theme1';
+let customTheme = JSON.parse(localStorage.getItem('customTheme')||'{}');
 
-let favorites = JSON.parse(localStorage.getItem('favorites')||'{}'); // {duaKey: duaObject}
-let viewingFavorites = false;
-
-let showTransliterations = JSON.parse(localStorage.getItem('showTransliterations')||'true');
-let showTranslations = JSON.parse(localStorage.getItem('showTranslations')||'true');
-
-let fontArabic = localStorage.getItem('fontArabic') || 'Amiri';
-let fontSizeArabic = parseInt(localStorage.getItem('fontSizeArabic')||'22',10);
-let fontSizeTranslation = parseInt(localStorage.getItem('fontSizeTranslation')||'16',10);
-let fontSizeTransliteration = parseInt(localStorage.getItem('fontSizeTransliteration')||'16',10);
-
-let themeIndex = parseInt(localStorage.getItem('themeIndex') ?? '0',10);
-if(Number.isNaN(themeIndex)) themeIndex = 0;
-let customTheme = JSON.parse(localStorage.getItem('customTheme') || 'null');
-let darkMode = JSON.parse(localStorage.getItem('darkMode')||'false');
-
-/* ================== UI ELEMENTS ================== */
 const els = {
   categoriesList: document.getElementById('categoriesList'),
   categoryDetails: document.getElementById('categoryDetails'),
   duaContainer: document.getElementById('duaContainer'),
   backBtn: document.getElementById('backBtn'),
+  backLabel: document.getElementById('backLabel'),
   languageText: document.getElementById('languageText'),
   themeToggle: document.getElementById('themeToggle'),
   searchToggle: document.getElementById('searchToggle'),
   searchBarContainer: document.getElementById('searchBarContainer'),
   searchBar: document.getElementById('searchBar'),
-  sectionTitle: document.querySelector('.section-title'),
-  toast: document.getElementById('toast'),
-
-  // bottom header
-  homeBtn: document.getElementById('homeBtn'),
-  favoritesBtn: document.getElementById('favoritesBtn'),
-
-  // settings modal & FAB
-  fabSettings: document.getElementById('fabSettings'),
-  settingsOverlay: document.getElementById('settingsOverlay'),
+  tabCategories: document.getElementById('tabCategories'),
+  tabFavorites: document.getElementById('tabFavorites'),
+  tabAbout: document.getElementById('tabAbout'),
+  favoritesView: document.getElementById('favoritesView'),
+  aboutView: document.getElementById('aboutView'),
+  openSettings: document.getElementById('openSettings'),
+  settingsSheet: document.getElementById('settingsSheet'),
   closeSettings: document.getElementById('closeSettings'),
-
-  // settings content
-  currentLangLabel: document.getElementById('currentLangLabel'),
-  cycleLangBtn: document.getElementById('cycleLangBtn'),
-  toggleDarkQuick: document.getElementById('toggleDarkQuick'),
-
-  // display controls
-  toggleTranslations: document.getElementById('toggleTranslations'),
-  toggleTranslationsSwitch: document.getElementById('toggleTranslationsSwitch'),
-  toggleTransliterations: document.getElementById('toggleTransliterations'),
-  toggleTransliterationsSwitch: document.getElementById('toggleTransliterationsSwitch'),
-  arabicSize: document.getElementById('arabicSize'),
-  arabicSizeVal: document.getElementById('arabicSizeVal'),
-  translationSize: document.getElementById('translationSize'),
-  translationSizeVal: document.getElementById('translationSizeVal'),
-  transliterationSize: document.getElementById('transliterationSize'),
-  transliterationSizeVal: document.getElementById('transliterationSizeVal'),
-  arabicFont: document.getElementById('arabicFont'),
-
-  // themes
-  themeGrid: document.getElementById('themeGrid'),
-  customBg: document.getElementById('customBg'),
-  customText: document.getElementById('customText'),
-  customCard: document.getElementById('customCard'),
-  customPrimary: document.getElementById('customPrimary'),
-  customSecondary: document.getElementById('customSecondary'),
-  customAccent: document.getElementById('customAccent'),
-  customBorder: document.getElementById('customBorder'),
-  applyCustomTheme: document.getElementById('applyCustomTheme'),
+  // display toggles
+  swShowTranslation: document.getElementById('swShowTranslation'),
+  swShowTransliteration: document.getElementById('swShowTransliteration'),
+  rangeArabic: document.getElementById('rangeArabic'),
+  rangeTranslation: document.getElementById('rangeTranslation'),
+  rangeTranslit: document.getElementById('rangeTranslit'),
+  selectArabicFont: document.getElementById('selectArabicFont'),
+  // theme
+  swDarkMode: document.getElementById('swDarkMode'),
+  swSystemDark: document.getElementById('swSystemDark'),
+  btnOpenThemePicker: document.getElementById('btnOpenThemePicker'),
+  themePicker: document.getElementById('themePicker'),
+  cPrimary: document.getElementById('cPrimary'),
+  cSecondary: document.getElementById('cSecondary'),
+  cAccent: document.getElementById('cAccent'),
+  cBg: document.getElementById('cBg'),
+  cText: document.getElementById('cText'),
+  cCard: document.getElementById('cCard'),
+  btnPreviewTheme: document.getElementById('btnPreviewTheme'),
+  btnSaveTheme: document.getElementById('btnSaveTheme'),
+  // language
+  selectLanguage: document.getElementById('selectLanguage'),
+  // modal
+  modalOverlay: document.getElementById('modalOverlay'),
+  modal: document.getElementById('modal'),
+  modalIcon: document.getElementById('modalIcon'),
+  modalTitle: document.getElementById('modalTitle'),
+  modalMessage: document.getElementById('modalMessage'),
+  btnCancel: document.getElementById('btnCancel'),
+  btnOk: document.getElementById('btnOk'),
 };
 
-/* ================== HELPERS ================== */
-function toast(msg,type="info",ms=2000){
-  els.toast.textContent = msg;
-  els.toast.className = `toast ${type} show`;
-  setTimeout(()=>{els.toast.classList.remove('show')}, ms);
+/* ================== THEMES ================== */
+const THEMES = {
+  theme1:{primary:"#6a1b9a",secondary:"#8e24aa",accent:"#ef4444",bg:"#f8fafc",text:"#0f172a",card:"#ffffff"},
+  theme2:{primary:"#16a34a",secondary:"#0e9f6e",accent:"#f05252",bg:"#f9fafb",text:"#111827",card:"#ffffff"},
+  theme3:{primary:"#2563eb",secondary:"#4f46e5",accent:"#ef4444",bg:"#f1f5f9",text:"#0f172a",card:"#ffffff"},
+  theme4:{primary:"#0ea5e9",secondary:"#06b6d4",accent:"#f59e0b",bg:"#f8fafc",text:"#0f172a",card:"#ffffff"},
+  theme5:{primary:"#ea580c",secondary:"#f59e0b",accent:"#10b981",bg:"#fff7ed",text:"#0f172a",card:"#ffffff"},
+  theme6:{primary:"#dc2626",secondary:"#ef4444",accent:"#16a34a",bg:"#fef2f2",text:"#0f172a",card:"#ffffff"},
+  theme7:{primary:"#059669",secondary:"#10b981",accent:"#ef4444",bg:"#f0fdf4",text:"#052e16",card:"#ffffff"},
+  theme8:{primary:"#7c3aed",secondary:"#6d28d9",accent:"#f43f5e",bg:"#f3e8ff",text:"#1e1b4b",card:"#ffffff"},
+  theme9:{primary:"#111827",secondary:"#374151",accent:"#f59e0b",bg:"#f3f4f6",text:"#111827",card:"#ffffff"},
+  theme10:{primary:"#0f766e",secondary:"#115e59",accent:"#ef4444",bg:"#ecfeff",text:"#022c22",card:"#ffffff"},
+  theme11:{primary:"#4338ca",secondary:"#3730a3",accent:"#fb7185",bg:"#eef2ff",text:"#111827",card:"#ffffff"},
+  theme12:{primary:"#3f6212",secondary:"#4d7c0f",accent:"#f97316",bg:"#f7fee7",text:"#052e16",card:"#ffffff"},
+  theme13:{primary:"#155e75",secondary:"#0e7490",accent:"#f472b6",bg:"#ecfeff",text:"#0f172a",card:"#ffffff"},
+  theme14:{primary:"#b91c1c",secondary:"#7f1d1d",accent:"#22c55e",bg:"#fff1f2",text:"#111827",card:"#ffffff"},
+  theme15:{primary:"#dc2626",secondary:"#f97316",accent:"#22d3ee",bg:"#fff7ed",text:"#0f172a",card:"#ffffff"},
+  theme16:{primary:"#1d4ed8",secondary:"#1e40af",accent:"#22c55e",bg:"#eff6ff",text:"#0f172a",card:"#ffffff"},
+  theme17:{primary:"#d946ef",secondary:"#a21caf",accent:"#22c55e",bg:"#fdf4ff",text:"#3b0764",card:"#ffffff"},
+  theme18:{primary:"#fb7185",secondary:"#f43f5e",accent:"#10b981",bg:"#fff1f2",text:"#881337",card:"#ffffff"},
+  theme19:{primary:"#ea580c",secondary:"#c2410c",accent:"#22c55e",bg:"#fff7ed",text:"#7c2d12",card:"#ffffff"},
+  theme20:{primary:"#0284c7",secondary:"#0369a1",accent:"#f97316",bg:"#f0f9ff",text:"#0c4a6e",card:"#ffffff"},
+  theme21:{primary:"#0ea5e9",secondary:"#2563eb",accent:"#0ea5e9",bg:"#0b1220",text:"#e5e7eb",card:"#111827"},
+  theme22:{primary:"#22c55e",secondary:"#16a34a",accent:"#84cc16",bg:"#0b1220",text:"#e5e7eb",card:"#111827"},
+  theme23:{primary:"#f59e0b",secondary:"#f97316",accent:"#ef4444",bg:"#0b1220",text:"#e5e7eb",card:"#111827"},
+  theme24:{primary:"#a78bfa",secondary:"#8b5cf6",accent:"#f472b6",bg:"#0b1220",text:"#e5e7eb",card:"#111827"},
+  theme25:{primary:"#14b8a6",secondary:"#06b6d4",accent:"#f43f5e",bg:"#0b1220",text:"#e5e7eb",card:"#111827"},
+};
+
+/* ================== APPLY THEME ================== */
+function applyTheme(vars){
+  const r = document.documentElement.style;
+  r.setProperty('--primary', vars.primary);
+  r.setProperty('--secondary', vars.secondary);
+  r.setProperty('--accent', vars.accent);
+  r.setProperty('--bg', vars.bg);
+  r.setProperty('--text', vars.text);
+  r.setProperty('--card', vars.card);
+  // border/muted auto
+  const border = darkMode ? 'rgba(255,255,255,.12)' : '#e2e8f0';
+  const muted = darkMode ? '#94a3b8' : '#64748b';
+  r.setProperty('--border', border);
+  r.setProperty('--muted', muted);
+  // update header gradient instantly
+  showThemeFlash();
 }
-function savePrefs(){
-  localStorage.setItem('lang', currentLanguage);
-  localStorage.setItem('showTranslations', JSON.stringify(showTranslations));
-  localStorage.setItem('showTransliterations', JSON.stringify(showTransliterations));
-  localStorage.setItem('fontArabic', fontArabic);
-  localStorage.setItem('fontSizeArabic', fontSizeArabic);
-  localStorage.setItem('fontSizeTranslation', fontSizeTranslation);
-  localStorage.setItem('fontSizeTransliteration', fontSizeTransliteration);
-  localStorage.setItem('themeIndex', themeIndex);
+
+function showThemeFlash(){
+  const f = document.getElementById('themeFade');
+  f.classList.add('show');
+  setTimeout(()=>f.classList.remove('show'),220);
+}
+
+function applyThemeKey(key){
+  currentThemeKey = key;
+  const v = (key==='custom' && Object.keys(customTheme).length)? customTheme : THEMES[key] || THEMES.theme1;
+  applyTheme(v);
+  localStorage.setItem('themeKey', key);
+}
+
+/* ================== DARK MODE ================== */
+function setDarkMode(on){
+  darkMode = on;
+  document.body.classList.toggle('dark', on);
+  if(on){
+    document.documentElement.style.setProperty('--bg', '#0b1220');
+    document.documentElement.style.setProperty('--text', '#e5e7eb');
+    document.documentElement.style.setProperty('--card', '#111827');
+    document.documentElement.style.setProperty('--border', 'rgba(255,255,255,.12)');
+    document.documentElement.style.setProperty('--muted', '#94a3b8');
+  }else{
+    // restore theme colors
+    applyThemeKey(currentThemeKey);
+  }
   localStorage.setItem('darkMode', JSON.stringify(darkMode));
-  if(customTheme) localStorage.setItem('customTheme', JSON.stringify(customTheme));
-}
-function updateFontVars(){
-  document.documentElement.style.setProperty('--font-arabic-size', fontSizeArabic + 'px');
-  document.documentElement.style.setProperty('--font-translation-size', fontSizeTranslation + 'px');
-  document.documentElement.style.setProperty('--font-transliteration-size', fontSizeTransliteration + 'px');
-  document.documentElement.style.setProperty('--arabic-font', `"${fontArabic}", serif`);
+  els.themeToggle.querySelector('i').className = on ? 'fas fa-sun' : 'fas fa-moon';
 }
 
-/* THEME ENGINE */
-function applyVars(vars){
-  for(const [k,v] of Object.entries(vars)){
-    document.documentElement.style.setProperty(`--${k}`, v);
-  }
-}
-function buildDarkOverlay(base){
-  // Ensure readable dark variant regardless of chosen theme
-  return {
-    bg:         "#0b1220",
-    text:       "#e5e7eb",
-    card:       "#0f172a",
-    border:     "#334155",
-    primary:    base.primary || "#3b82f6",
-    secondary:  base.secondary || "#06b6d4",
-    accent:     base.accent || "#f59e0b",
-  };
-}
-function applyTheme(index, useDark = darkMode){
-  const preset = PRESET_THEMES[index] ? PRESET_THEMES[index].vars : PRESET_THEMES[0].vars;
-  const vars = useDark ? {...preset, ...buildDarkOverlay(preset)} : {...preset};
-  applyVars(vars);
-  const icon = els.themeToggle.querySelector('i');
-  icon.className = useDark ? 'fas fa-sun' : 'fas fa-moon';
-}
-function applyCustomTheme(theme, useDark = darkMode){
-  const base = theme || PRESET_THEMES[0].vars;
-  const vars = useDark ? {...base, ...buildDarkOverlay(base)} : {...base};
-  applyVars(vars);
-  const icon = els.themeToggle.querySelector('i');
-  icon.className = useDark ? 'fas fa-sun' : 'fas fa-moon';
+/* ================== POPUP SYSTEM ================== */
+function showPopup({type='info', title='Info', message='', confirm=false, autocloseMs=0}){
+  return new Promise(resolve=>{
+    const overlay = els.modalOverlay;
+    const modal = els.modal;
+    modal.className = 'modal type-' + (confirm?'confirm':type);
+    els.modalTitle.textContent = title;
+    els.modalMessage.textContent = message;
+    let icon = 'ℹ️';
+    if(type==='success') icon='✅';
+    if(type==='error') icon='⚠️';
+    if(type==='info') icon='ℹ️';
+    if(confirm) icon='❓';
+    els.modalIcon.textContent = icon;
+
+    // buttons
+    els.btnCancel.style.display = confirm ? 'inline-block' : 'none';
+    overlay.classList.add('show');
+    overlay.style.display = 'flex';
+    overlay.setAttribute('aria-hidden','false');
+
+    let timer;
+    if(!confirm && autocloseMs>0){
+      timer = setTimeout(()=>{ close('ok'); }, autocloseMs);
+    }
+
+    function close(result){
+      clearTimeout(timer);
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+      setTimeout(()=>{ overlay.style.display='none'; resolve(result==='ok'); },160);
+    }
+    els.btnOk.onclick = ()=>close('ok');
+    els.btnCancel.onclick = ()=>close('cancel');
+    overlay.onclick = (e)=>{ if(e.target===overlay && !confirm) close('ok'); };
+  });
 }
 
-/* ================== FETCHERS (with cache fallback) ================== */
-async function fetchJSONWithCache(url, cacheKey){
+/* ================== FAVORITES ================== */
+function isFav(id){ return favorites.includes(id); }
+function toggleFav(id){
+  if(isFav(id)) favorites = favorites.filter(x=>x!==id);
+  else favorites.push(id);
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+  renderDuas(); renderFavorites();
+}
+
+/* ================== SAVE (LOCAL) ================== */
+function isSaved(id){ return savedItems.includes(id); }
+function toggleSaved(id){
+  if(isSaved(id)) savedItems = savedItems.filter(x=>x!==id);
+  else savedItems.push(id);
+  localStorage.setItem('savedDuas', JSON.stringify(savedItems));
+  renderDuas(); renderFavorites();
+}
+
+/* ================== SHARE/COPY ================== */
+async function shareDua(dua){
+  const textParts = [];
+  if(dua.arabic) textParts.push(dua.arabic);
+  if(showTransliterations && dua.transliteration) textParts.push(dua.transliteration);
+  if(showTranslations && dua.translation) textParts.push(dua.translation);
+  const text = textParts.join('\n\n');
+
   try{
-    const res = await fetch(url, {cache:'no-store'});
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    localStorage.setItem(cacheKey, JSON.stringify({ts:Date.now(), data}));
-    return data;
-  }catch(err){
-    const cached = localStorage.getItem(cacheKey);
-    if(cached){ return JSON.parse(cached).data; }
-    throw err;
+    if(navigator.share){
+      await navigator.share({title:'Dua', text});
+      showPopup({type:'success',title:'Shared',message:'Dua shared successfully.', autocloseMs:2000});
+    }else{
+      await navigator.clipboard.writeText(text);
+      showPopup({type:'success',title:'Copied',message:'Dua copied to clipboard.', autocloseMs:2000});
+    }
+  }catch(e){
+    await navigator.clipboard.writeText(text);
+    showPopup({type:'success',title:'Copied',message:'Dua copied to clipboard.', autocloseMs:2000});
   }
 }
 
+/* ================== FETCHING ================== */
 async function loadCategories(){
   try{
     els.categoriesList.innerHTML = '<li class="loading">Loading categories...</li>';
-    const url = `${BASE}categories/${currentLanguage}.json`;
-    const cacheKey = `categories_${currentLanguage}`;
-    // expected: [{ "id": 1, "title": "...", "folder": "categories_1" }, ...]
-    categoriesData = await fetchJSONWithCache(url, cacheKey);
+    const res = await fetch(`categories/${currentLanguage}.json`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    categoriesData = await res.json();
     renderCategories();
   }catch(err){
     console.error('Categories error:', err);
@@ -608,382 +645,426 @@ async function loadCategories(){
   }
 }
 
-async function loadCategoryDuas(categoryFolder, categoryName){
-  try{
-    currentCategoryFolder = categoryFolder;
-    els.categoryDetails.style.display = 'block';
-    els.categoriesList.style.display = 'none';
-    els.sectionTitle.textContent = categoryName;
-    els.duaContainer.innerHTML = '<div class="loading">Loading duas...</div>';
-    // NOTE: uses "duas" as requested
-    const url = `${BASE}duas/${categoryFolder}/${currentLanguage}.json`;
-    const cacheKey = `duas_${categoryFolder}_${currentLanguage}`;
-    duasData = await fetchJSONWithCache(url, cacheKey);
-    // mark items with folder/lang for favorites keys
-    duasData = duasData.map(d => ({...d, _catFolder: categoryFolder, _lang: currentLanguage}));
-    renderDuas();
-  }catch(err){
-    console.error('Duas error:', err);
-    els.duaContainer.innerHTML = `
-      <div class="error">
-        Failed to load duas.<br/>
-        <small>Checked: <code>duas/${categoryFolder}/${currentLanguage}.json</code></small>
-      </div>`;
-  }
-}
-
-/* ================== RENDERERS ================== */
 function renderCategories(filter=''){
   const ul = els.categoriesList; ul.innerHTML = '';
   let filtered = categoriesData;
-  if(filter) filtered = categoriesData.filter(cat=> (cat.title||'').toLowerCase().includes(filter.toLowerCase()));
+  if(filter){
+    filtered = categoriesData.filter(cat=>cat.title.toLowerCase().includes(filter.toLowerCase()));
+  }
   if(!filtered.length){ ul.innerHTML = '<li class="no-results">No categories available</li>'; return; }
-
   filtered.forEach((cat, idx)=>{
-    const folder = cat.folder || (cat.id ? `categories_${cat.id}` : `categories_${idx+1}`);
     const li = document.createElement('li'); li.className = 'category-item';
     li.innerHTML = `
       <div class="category-arrow"><i class="fas fa-chevron-right"></i></div>
-      <div class="category-title">${cat.title || ('Category ' + (idx+1))}</div>
+      <div class="category-title">${cat.title}</div>
+      <div class="category-count">${idx+1}</div>
     `;
-    li.addEventListener('click', ()=>loadCategoryDuas(folder, cat.title || ('Category ' + (idx+1))));
+    li.addEventListener('click', ()=>loadCategoryDuas(idx+1, cat.title));
     ul.appendChild(li);
   });
 }
 
-function makeDuaKey(dua, catFolder = currentCategoryFolder, lang = currentLanguage){
-  const idPart = dua.id != null ? dua.id : (dua.arabic ? dua.arabic.slice(0,30) : Math.random().toString(36).slice(2));
-  return `${catFolder}:${lang}:${idPart}`;
+async function loadCategoryDuas(categoryId, categoryName){
+  try{
+    els.categoryDetails.style.display = 'block';
+    els.categoriesList.style.display = 'none';
+    document.querySelector('.section-title').textContent = categoryName;
+    els.duaContainer.innerHTML = '<div class="loading">Loading duas...</div>';
+    const res = await fetch(`duas/categories_${categoryId}/${currentLanguage}.json`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    duasData = await res.json();
+    renderDuas();
+  }catch(err){
+    console.error('Duas error:', err);
+    els.duaContainer.innerHTML = '<div class="error">Failed to load duas.</div>';
+  }
+}
+
+function duaCard(dua){
+  const id = dua.id || `${dua.category}_${dua.index || Math.random().toString(36).slice(2)}`;
+  const fav = isFav(id);
+  const saved = isSaved(id);
+  return `
+    <div class="dua-item" data-id="${id}">
+      <div class="dua-header">
+        <div class="dua-title">${dua.title || ''}</div>
+      </div>
+      ${dua.arabic ? `<div class="dua-arabic" style="font-family: var(--arabic-font, ${document.documentElement.style.getPropertyValue('--arabic-font') || '"AmiriQuranColored","Amiri-BoldSlanted","amiri-bold","albayan","471btehran","Scheherazade New","Noto Naskh Arabic","Arial"'} );">${dua.arabic}</div>` : ''}
+      ${showTransliterations && dua.transliteration ? `<div class="dua-transliteration">${dua.transliteration}</div>` : ''}
+      ${showTranslations && dua.translation ? `<div class="dua-translation">${dua.translation}</div>` : ''}
+      ${dua.reference ? `<div class="dua-reference">${dua.reference}</div>` : ''}
+
+      <div class="card-actions">
+        <div class="action-left">
+          <button class="icon-btn btn-share" title="Share"><i class="fa-solid fa-share-nodes"></i><span>Share</span></button>
+          <button class="icon-btn btn-copy" title="Copy"><i class="fa-solid fa-copy"></i><span>Copy</span></button>
+        </div>
+        <div class="action-right">
+          <button class="icon-btn btn-fav ${fav?'active':''}" title="Favorite"><i class="fa-solid fa-heart"></i><span>${fav?'Favorited':'Favorite'}</span></button>
+          <button class="icon-btn btn-save ${saved?'active':''}" title="Save"><i class="fa-solid fa-bookmark"></i><span>${saved?'Saved':'Save'}</span></button>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderDuas(filter=''){
   const container = els.duaContainer; container.innerHTML = '';
-  let list;
-
-  if(viewingFavorites){
-    list = Object.values(favorites || {});
-    if(filter){
-      const f = filter.toLowerCase();
-      list = list.filter(dua =>
-        (dua.translation && dua.translation.toLowerCase().includes(f)) ||
-        (dua.transliteration && dua.transliteration.toLowerCase().includes(f)) ||
-        (dua.arabic && dua.arabic.includes(filter))
-      );
-    }
-  } else {
-    list = duasData.slice();
-    if(filter){
-      const f = filter.toLowerCase();
-      list = list.filter(dua =>
-        (dua.translation && dua.translation.toLowerCase().includes(f)) ||
-        (dua.transliteration && dua.transliteration.toLowerCase().includes(f)) ||
-        (dua.arabic && dua.arabic.includes(filter))
-      );
-    }
+  let filtered = duasData;
+  if(filter){
+    filtered = duasData.filter(dua=> (dua.translation && dua.translation.toLowerCase().includes(filter.toLowerCase())) || (dua.arabic && dua.arabic.includes(filter)));
   }
+  if(!filtered.length){ container.innerHTML = '<div class="no-results">No duas available</div>'; return; }
+  const frag = document.createDocumentFragment();
+  filtered.forEach(dua=>{
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = duaCard(dua);
+    const node = wrapper.firstElementChild;
 
-  if(!list.length){ container.innerHTML = '<div class="no-results">No duas available</div>'; return; }
-
-  list.forEach(dua=>{
-    const key = makeDuaKey(dua, dua._catFolder || currentCategoryFolder, dua._lang || currentLanguage);
-    const isFav = !!favorites[key];
-
-    const d = document.createElement('div'); d.className = 'dua-item';
-
-    d.innerHTML = `
-      <div class="dua-header">
-        <div class="ref-left">${dua.reference ? dua.reference : ''}</div>
-        <div class="ref-right"></div>
-      </div>
-
-      ${dua.arabic ? `<div class="dua-arabic">${dua.arabic}</div>` : ''}
-
-      <div class="dua-transliteration" style="display:${showTransliterations && dua.transliteration ? 'block':'none'}">
-        ${dua.transliteration ? dua.transliteration : ''}
-      </div>
-
-      <div class="dua-translation" style="display:${showTranslations && dua.translation ? 'block':'none'}">
-        ${dua.translation ? dua.translation : ''}
-      </div>
-
-      ${dua.source ? `<div class="dua-reference">${dua.source}</div>` : ''}
-
-      <div class="dua-actions">
-        <button class="icon-btn fav ${isFav?'active':''}" title="Favorite"><i class="fa fa-heart"></i></button>
-        <button class="icon-btn share" title="Share"><i class="fa fa-share-nodes"></i></button>
-        <button class="icon-btn save" title="Save"><i class="fa fa-download"></i></button>
-        <button class="icon-btn copy" title="Copy"><i class="fa fa-copy"></i></button>
-      </div>
-    `;
-
-    // Favorite
-    d.querySelector('.fav').addEventListener('click', ()=>{
-      const nowFav = !favorites[key];
-      if(nowFav){
-        const stored = {...dua, _catFolder: dua._catFolder || currentCategoryFolder, _lang: dua._lang || currentLanguage};
-        favorites[key] = stored;
-      }else{
-        delete favorites[key];
-      }
-      localStorage.setItem('favorites', JSON.stringify(favorites));
-      d.querySelector('.fav').classList.toggle('active', nowFav);
-      toast(nowFav ? 'Added to favorites' : 'Removed from favorites','success',1500);
-      if(viewingFavorites && !nowFav){ d.remove(); if(!els.duaContainer.children.length) container.innerHTML = '<div class="no-results">No duas available</div>'; }
+    // attach actions
+    node.querySelector('.btn-share').addEventListener('click', ()=>shareDua(dua));
+    node.querySelector('.btn-copy').addEventListener('click', async ()=>{
+      const parts = [];
+      if(dua.arabic) parts.push(dua.arabic);
+      if(showTransliterations && dua.transliteration) parts.push(dua.transliteration);
+      if(showTranslations && dua.translation) parts.push(dua.translation);
+      await navigator.clipboard.writeText(parts.join('\n\n'));
+      showPopup({type:'success',title:'Copied',message:'Dua copied to clipboard.', autocloseMs:2000});
+    });
+    node.querySelector('.btn-fav').addEventListener('click', ()=>{
+      const id = node.getAttribute('data-id');
+      toggleFav(id);
+    });
+    node.querySelector('.btn-save').addEventListener('click', ()=>{
+      const id = node.getAttribute('data-id');
+      toggleSaved(id);
+      showPopup({type:'success',title:'Saved',message:'Saved locally on this device.', autocloseMs:2000});
     });
 
-    // Share
-    d.querySelector('.share').addEventListener('click', async ()=>{
-      const text = buildDuaPlainText(dua);
-      if(navigator.share){
-        try{ await navigator.share({title:'Dua', text}); toast('Shared','success',2000);}catch(e){}
-      }else{
-        await copyToClipboard(text);
-        toast('Copied for sharing','info',2000);
-      }
-    });
-
-    // Save
-    d.querySelector('.save').addEventListener('click', ()=>{
-      const text = buildDuaPlainText(dua);
-      const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `dua_${dua.id||'item'}.txt`;
-      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-      toast('Saved as file','success',2000);
-    });
-
-    // Copy
-    d.querySelector('.copy').addEventListener('click', async ()=>{
-      await copyToClipboard(buildDuaPlainText(dua));
-      toast('Copied','success',2000);
-    });
-
-    container.appendChild(d);
+    frag.appendChild(node);
   });
+  container.appendChild(frag);
 }
 
-function buildDuaPlainText(dua){
-  let t = '';
-  if(dua.arabic) t += dua.arabic + '\n\n';
-  if(showTransliterations && dua.transliteration) t += dua.transliteration + '\n\n';
-  if(showTranslations && dua.translation) t += dua.translation + '\n\n';
-  if(dua.reference) t += '('+dua.reference+')\n';
-  if(dua.source) t += 'Source: '+dua.source+'\n';
-  return t.trim();
-}
-
-async function copyToClipboard(text){
-  try{ await navigator.clipboard.writeText(text); }
-  catch(e){
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    try{ document.execCommand('copy'); }catch(_){}
-    document.body.removeChild(ta);
+function renderFavorites(){
+  const view = els.favoritesView; view.innerHTML = '';
+  if(!favorites.length){
+    view.innerHTML = `<div class="no-results">No favorites yet.</div>`;
+    return;
   }
-}
-
-/* ================== THEMES UI ================== */
-function renderThemeGrid(){
-  els.themeGrid.innerHTML = '';
-  PRESET_THEMES.forEach((t, idx)=>{
-    const card = document.createElement('div');
-    card.className = 'theme-card';
-    card.innerHTML = `
-      <div class="swatch">
-        <div style="background:${t.vars.bg}"></div>
-        <div style="background:${t.vars.card}"></div>
-        <div style="background:${t.vars.primary}"></div>
-      </div>
-      <div class="theme-name">${t.name}</div>
-    `;
-    card.addEventListener('click', ()=>{
-      themeIndex = idx;
-      customTheme = null; // switching to preset
-      applyTheme(themeIndex, darkMode);
-      savePrefs();
-      toast(`Theme: ${t.name}`, 'info', 1200);
-    });
-    els.themeGrid.appendChild(card);
+  // Build from current duasData + best-effort lookup
+  const items = [];
+  const pushFrom = (arr)=>arr.forEach(dua=>{
+    const id = dua.id || `${dua.category}_${dua.index || ''}`;
+    if(favorites.includes(id)){
+      items.push(dua);
+    }
   });
+  pushFrom(duasData);
+  // Render
+  if(!items.length){
+    view.innerHTML = `<div class="no-results">Your favorites will appear here.</div>`;
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  items.forEach(dua=>{
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = duaCard(dua);
+    const node = wrapper.firstElementChild;
+    node.querySelector('.btn-share').addEventListener('click', ()=>shareDua(dua));
+    node.querySelector('.btn-copy').addEventListener('click', async ()=>{
+      const parts = [];
+      if(dua.arabic) parts.push(dua.arabic);
+      if(showTransliterations && dua.transliteration) parts.push(dua.transliteration);
+      if(showTranslations && dua.translation) parts.push(dua.translation);
+      await navigator.clipboard.writeText(parts.join('\n\n'));
+      showPopup({type:'success',title:'Copied',message:'Dua copied to clipboard.', autocloseMs:2000});
+    });
+    node.querySelector('.btn-fav').addEventListener('click', ()=>{
+      const id = node.getAttribute('data-id');
+      toggleFav(id);
+    });
+    node.querySelector('.btn-save').addEventListener('click', ()=>{
+      const id = node.getAttribute('data-id');
+      toggleSaved(id);
+      showPopup({type:'success',title:'Saved',message:'Saved locally on this device.', autocloseMs:2000});
+    });
+    frag.appendChild(node);
+  });
+  view.appendChild(frag);
 }
-els.applyCustomTheme.addEventListener('click', ()=>{
-  customTheme = {
-    bg: els.customBg.value,
-    text: els.customText.value,
-    card: els.customCard.value,
-    border: els.customBorder.value,
-    primary: els.customPrimary.value,
-    secondary: els.customSecondary.value,
-    accent: els.customAccent.value
-  };
-  applyCustomTheme(customTheme, darkMode);
-  savePrefs();
-  toast('Custom theme applied','success',1500);
-});
 
-/* ================== EVENTS ================== */
-// Language cycle (top header icon)
+/* ================== UI EVENTS ================== */
+/* header toggles */
 document.getElementById('languageToggle').addEventListener('click', ()=>{
   const langs = ['en','fr','ru','zh','ha'];
   const i = langs.indexOf(currentLanguage);
   currentLanguage = langs[(i+1)%langs.length];
   els.languageText.textContent = currentLanguage.toUpperCase();
-  els.currentLangLabel.textContent = currentLanguage.toUpperCase();
-  savePrefs();
-  // reset view
+  localStorage.setItem('language', currentLanguage);
+  // refresh lists
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
-  els.sectionTitle.textContent = 'Categories';
-  viewingFavorites = false;
-  els.favoritesBtn.classList.remove('active');
+  document.querySelector('.section-title').textContent = 'Categories';
   loadCategories();
 });
 
-// Back button
 els.backBtn.addEventListener('click', ()=>{
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
-  els.sectionTitle.textContent = 'Categories';
-  viewingFavorites = false;
-  els.favoritesBtn.classList.remove('active');
+  document.querySelector('.section-title').textContent = 'Categories';
 });
 
-// Dark / Light toggles
-function toggleDark(){
-  darkMode = !darkMode;
-  if(customTheme) applyCustomTheme(customTheme, darkMode);
-  else applyTheme(themeIndex, darkMode);
-  savePrefs();
-}
-els.themeToggle.addEventListener('click', toggleDark);
-els.toggleDarkQuick.addEventListener('click', toggleDark);
+// Dark icon toggler (quick)
+els.themeToggle.addEventListener('click', ()=>{
+  const on = !(darkMode);
+  setDarkMode(on);
+});
 
-// Search UI
+// Search toggle
 els.searchToggle.addEventListener('click', ()=>{
   els.searchBarContainer.style.display = els.searchBarContainer.style.display === 'none' ? 'block' : 'none';
   els.searchBar.focus();
 });
+
+// Search input filter (contextual)
 els.searchBar.addEventListener('input', ()=>{
-  if(els.categoryDetails.style.display === 'block'){ renderDuas(els.searchBar.value); }
-  else{ renderCategories(els.searchBar.value); }
+  if(els.categoryDetails.style.display === 'block'){
+    renderDuas(els.searchBar.value);
+  } else {
+    renderCategories(els.searchBar.value);
+  }
 });
 
-// Bottom header buttons
-els.homeBtn.addEventListener('click', ()=>{
+/* top tabs */
+function setTab(btn){
+  [els.tabCategories, els.tabFavorites, els.tabAbout].forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const isCat = btn===els.tabCategories;
+  const isFav = btn===els.tabFavorites;
+  const isAbout = btn===els.tabAbout;
+  document.querySelector('.section-title').textContent = isCat ? 'Categories' : isFav ? 'Favorites' : 'About';
+  els.categoriesList.classList.toggle('hidden', !isCat);
   els.categoryDetails.style.display = 'none';
-  els.categoriesList.style.display = 'block';
-  els.sectionTitle.textContent = 'Categories';
-  viewingFavorites = false;
-  els.favoritesBtn.classList.remove('active');
-});
-els.favoritesBtn.addEventListener('click', ()=>{
-  viewingFavorites = true;
-  els.favoritesBtn.classList.add('active');
-  els.categoriesList.style.display = 'none';
-  els.categoryDetails.style.display = 'block';
-  els.sectionTitle.textContent = 'Favorites';
-  renderDuas(els.searchBar.value);
-});
-
-// Settings FAB + Modal
-els.fabSettings.addEventListener('click', ()=> els.settingsOverlay.classList.add('show'));
-els.closeSettings.addEventListener('click', ()=> els.settingsOverlay.classList.remove('show'));
-els.settingsOverlay.addEventListener('click', (e)=>{ if(e.target===els.settingsOverlay) els.settingsOverlay.classList.remove('show') });
-
-// Settings: Display toggles — WORKING instantly
-function syncDisplayControls(){
-  els.toggleTranslations.checked = !!showTranslations;
-  els.toggleTransliterations.checked = !!showTransliterations;
-  els.toggleTranslationsSwitch.classList.toggle('on', !!showTranslations);
-  els.toggleTransliterationsSwitch.classList.toggle('on', !!showTransliterations);
-
-  els.arabicSize.value = fontSizeArabic; els.arabicSizeVal.textContent = fontSizeArabic+'px';
-  els.translationSize.value = fontSizeTranslation; els.translationSizeVal.textContent = fontSizeTranslation+'px';
-  els.transliterationSize.value = fontSizeTransliteration; els.transliterationSizeVal.textContent = fontSizeTransliteration+'px';
-
-  els.arabicFont.value = fontArabic;
+  els.favoritesView.classList.toggle('hidden', !isFav);
+  els.aboutView.classList.toggle('hidden', !isAbout);
+  if(isFav) renderFavorites();
 }
-els.toggleTranslations.addEventListener('change', ()=>{
-  showTranslations = els.toggleTranslations.checked;
-  els.toggleTranslationsSwitch.classList.toggle('on', showTranslations);
-  savePrefs();
-  document.querySelectorAll('.dua-translation').forEach(n=>{
-    n.style.display = showTranslations ? 'block':'none';
-  });
-  toast(showTranslations?'Translations ON':'Translations OFF','info',1200);
+els.tabCategories.addEventListener('click', ()=>setTab(els.tabCategories));
+els.tabFavorites.addEventListener('click', ()=>setTab(els.tabFavorites));
+els.tabAbout.addEventListener('click', ()=>setTab(els.tabAbout));
+
+/* settings sheet */
+els.openSettings.addEventListener('click', ()=>els.settingsSheet.classList.add('open'));
+els.closeSettings.addEventListener('click', ()=>els.settingsSheet.classList.remove('open'));
+
+/* switches helpers */
+function bindSwitch(el, initial, onChange){
+  function set(v){
+    el.classList.toggle('active', v);
+    el.setAttribute('aria-checked', v?'true':'false');
+    onChange(v);
+  }
+  el.addEventListener('click', ()=>set(!el.classList.contains('active')));
+  el.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault(); set(!el.classList.contains('active'));} });
+  set(initial);
+}
+
+/* Display toggles */
+bindSwitch(els.swShowTranslation, true, (v)=>{
+  showTranslations = v; localStorage.setItem('showTranslations', JSON.stringify(v)); renderDuas();
 });
-els.toggleTransliterations.addEventListener('change', ()=>{
-  showTransliterations = els.toggleTransliterations.checked;
-  els.toggleTransliterationsSwitch.classList.toggle('on', showTransliterations);
-  savePrefs();
-  document.querySelectorAll('.dua-transliteration').forEach(n=>{
-    n.style.display = showTransliterations ? 'block':'none';
-  });
-  toast(showTransliterations?'Transliteration ON':'Transliteration OFF','info',1200);
+bindSwitch(els.swShowTransliteration, true, (v)=>{
+  showTransliterations = v; localStorage.setItem('showTransliterations', JSON.stringify(v)); renderDuas();
 });
 
-els.arabicSize.addEventListener('input', ()=>{
-  fontSizeArabic = parseInt(els.arabicSize.value,10);
-  els.arabicSizeVal.textContent = fontSizeArabic+'px';
-  updateFontVars(); savePrefs();
-});
-els.translationSize.addEventListener('input', ()=>{
-  fontSizeTranslation = parseInt(els.translationSize.value,10);
-  els.translationSizeVal.textContent = fontSizeTranslation+'px';
-  updateFontVars(); savePrefs();
-});
-els.transliterationSize.addEventListener('input', ()=>{
-  fontSizeTransliteration = parseInt(els.transliterationSize.value,10);
-  els.transliterationSizeVal.textContent = fontSizeTransliteration+'px';
-  updateFontVars(); savePrefs();
-});
-els.arabicFont.addEventListener('change', ()=>{
-  fontArabic = els.arabicFont.value;
-  updateFontVars(); savePrefs();
+/* Font sizes + font family */
+function applyFontSizes(){
+  document.documentElement.style.setProperty('--font-arabic-size', `${parseFloat(els.rangeArabic.value)}rem`);
+  document.documentElement.style.setProperty('--font-translation-size', `${parseFloat(els.rangeTranslation.value)}rem`);
+  document.documentElement.style.setProperty('--font-transliteration-size', `${parseFloat(els.rangeTranslit.value)}rem`);
+  localStorage.setItem('sizes', JSON.stringify({
+    a:els.rangeArabic.value,t:els.rangeTranslation.value,l:els.rangeTranslit.value
+  }));
+}
+[els.rangeArabic, els.rangeTranslation, els.rangeTranslit].forEach(r=>r.addEventListener('input', applyFontSizes));
+
+els.selectArabicFont.addEventListener('change', ()=>{
+  const value = els.selectArabicFont.value;
+  document.documentElement.style.setProperty('--arabic-font', value);
+  localStorage.setItem('arabicFont', value);
+  renderDuas();
 });
 
-// Language cycle inside settings
-els.cycleLangBtn.addEventListener('click', ()=>{
-  const langs = ['en','fr','ru','zh','ha'];
-  const i = langs.indexOf(currentLanguage);
-  currentLanguage = langs[(i+1)%langs.length];
+/* Theme switches */
+bindSwitch(els.swDarkMode, JSON.parse(localStorage.getItem('darkMode')||'false'), (v)=>setDarkMode(v));
+bindSwitch(els.swSystemDark, JSON.parse(localStorage.getItem('useSystemDark')||'true'), (v)=>{
+  useSystemDark = v; localStorage.setItem('useSystemDark', JSON.stringify(v));
+  if(v){
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    setDarkMode(mq.matches);
+  }
+});
+
+/* System dark listener */
+const mqDark = window.matchMedia('(prefers-color-scheme: dark)');
+mqDark.addEventListener('change', (e)=>{ if(useSystemDark) setDarkMode(e.matches); });
+
+/* Theme picker grid */
+function buildThemeGrid(){
+  const grid = els.themePicker; grid.innerHTML='';
+  Object.keys(THEMES).forEach((k,i)=>{
+    const t = THEMES[k];
+    const sw = document.createElement('div');
+    sw.className = 'theme-swatch';
+    sw.style.background = `linear-gradient(135deg, ${t.primary}, ${t.secondary})`;
+    sw.textContent = i+1;
+    sw.title = `Theme ${i+1}`;
+    sw.addEventListener('click', ()=>{ applyThemeKey(k); showPopup({type:'success',title:'Theme',message:`Theme ${i+1} applied.`, autocloseMs:2000}); });
+    grid.appendChild(sw);
+  });
+  const swc = document.createElement('div');
+  swc.className='theme-swatch';
+  swc.style.background='linear-gradient(135deg,#111827,#334155)';
+  swc.textContent='C';
+  swc.title='Custom';
+  swc.addEventListener('click', ()=>{ applyThemeKey('custom'); showPopup({type:'success',title:'Theme',message:'Custom theme applied.', autocloseMs:2000}); });
+  grid.appendChild(swc);
+}
+els.btnOpenThemePicker.addEventListener('click', ()=>{
+  els.themePicker.classList.toggle('hidden');
+  if(!els.themePicker.dataset.built){ buildThemeGrid(); els.themePicker.dataset.built='1'; }
+});
+
+/* Preview/save custom theme */
+els.btnPreviewTheme.addEventListener('click', ()=>{
+  const v = {
+    primary: els.cPrimary.value, secondary: els.cSecondary.value, accent: els.cAccent.value,
+    bg: els.cBg.value, text: els.cText.value, card: els.cCard.value
+  };
+  applyTheme(v);
+});
+els.btnSaveTheme.addEventListener('click', ()=>{
+  customTheme = {
+    primary: els.cPrimary.value, secondary: els.cSecondary.value, accent: els.cAccent.value,
+    bg: els.cBg.value, text: els.cText.value, card: els.cCard.value
+  };
+  localStorage.setItem('customTheme', JSON.stringify(customTheme));
+  applyThemeKey('custom');
+  showPopup({type:'success',title:'Saved',message:'Custom theme saved.', autocloseMs:2000});
+});
+
+/* Language picker (in settings) */
+els.selectLanguage.addEventListener('change', ()=>{
+  currentLanguage = els.selectLanguage.value;
   els.languageText.textContent = currentLanguage.toUpperCase();
-  els.currentLangLabel.textContent = currentLanguage.toUpperCase();
-  savePrefs();
-  // Reset to categories and reload
+  localStorage.setItem('language', currentLanguage);
+  // reload categories
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
-  els.sectionTitle.textContent = 'Categories';
-  viewingFavorites = false;
-  els.favoritesBtn.classList.remove('active');
+  document.querySelector('.section-title').textContent = 'Categories';
   loadCategories();
 });
 
 /* ================== INIT ================== */
-function renderThemeGridOnce(){ renderThemeGrid(); }
-function initTheme(){
-  renderThemeGridOnce();
-  if(customTheme){
-    // set pickers from saved
-    els.customBg.value        = customTheme.bg;
-    els.customText.value      = customTheme.text;
-    els.customCard.value      = customTheme.card;
-    els.customBorder.value    = customTheme.border;
-    els.customPrimary.value   = customTheme.primary;
-    els.customSecondary.value = customTheme.secondary;
-    els.customAccent.value    = customTheme.accent;
-    applyCustomTheme(customTheme, darkMode);
-  } else {
-    applyTheme(themeIndex, darkMode);
-  }
-}
-function init(){
+function restoreSettings(){
+  const lang = localStorage.getItem('language');
+  if(lang){ currentLanguage = lang; }
   els.languageText.textContent = currentLanguage.toUpperCase();
-  els.currentLangLabel.textContent = currentLanguage.toUpperCase();
-  updateFontVars();
-  syncDisplayControls();
-  initTheme();
+  els.selectLanguage.value = currentLanguage;
+
+  const st = JSON.parse(localStorage.getItem('showTranslations')||'true');
+  const sl = JSON.parse(localStorage.getItem('showTransliterations')||'true');
+  showTranslations = st; showTransliterations = sl;
+  // reflect switches
+  els.swShowTranslation.classList.toggle('active', st);
+  els.swShowTranslation.setAttribute('aria-checked', st?'true':'false');
+  els.swShowTransliteration.classList.toggle('active', sl);
+  els.swShowTransliteration.setAttribute('aria-checked', sl?'true':'false');
+
+  const sizes = JSON.parse(localStorage.getItem('sizes')||'{}');
+  els.rangeArabic.value = sizes.a || 1.35;
+  els.rangeTranslation.value = sizes.t || 1.0;
+  els.rangeTranslit.value = sizes.l || 1.0;
+  applyFontSizes();
+
+  const af = localStorage.getItem('arabicFont');
+  if(af){ document.documentElement.style.setProperty('--arabic-font', af); els.selectArabicFont.value = af; }
+
+  useSystemDark = JSON.parse(localStorage.getItem('useSystemDark')||'true');
+  els.swSystemDark.classList.toggle('active', useSystemDark);
+  els.swSystemDark.setAttribute('aria-checked', useSystemDark?'true':'false');
+
+  const dm = JSON.parse(localStorage.getItem('darkMode')||'false');
+  setDarkMode(dm);
+  els.swDarkMode.classList.toggle('active', dm);
+  els.swDarkMode.setAttribute('aria-checked', dm?'true':'false');
+
+  // theme
+  applyThemeKey(currentThemeKey);
+}
+
+function i18nApply(){
+  // Minimal: update labels based on language if needed. (Keep English defaults)
+  const dict = {
+    en:{Back:'Back',Settings:'Settings',Display:'Display',Theme:'Theme',Language:'Language',About:'About',
+        'Show Translations':'Show Translations','Show Transliteration':'Show Transliteration',
+        'Arabic size':'Arabic size','Translation size':'Translation size','Transliteration size':'Transliteration size',
+        'Arabic Font':'Arabic Font','Open Themes':'Open Themes','Dark mode':'Dark mode','Use system dark':'Use system dark',
+        'Create your theme':'Create your theme','Preview':'Preview','Save':'Save','Choose language':'Choose language',
+        'Settings will follow your chosen language.':'Settings will follow your chosen language.'},
+    fr:{Back:'Retour',Settings:'Paramètres',Display:'Affichage',Theme:'Thème',Language:'Langue',About:'À propos',
+        'Show Translations':'Afficher les traductions','Show Transliteration':'Afficher la translittération',
+        'Arabic size':'Taille arabe','Translation size':'Taille traduction','Transliteration size':'Taille translittération',
+        'Arabic Font':'Police arabe','Open Themes':'Ouvrir les thèmes','Dark mode':'Mode sombre','Use system dark':'Suivre le système',
+        'Create your theme':'Créer votre thème','Preview':'Aperçu','Save':'Enregistrer','Choose language':'Choisir la langue',
+        'Settings will follow your chosen language.':'Les paramètres suivent votre langue.'},
+    ru:{Back:'Назад',Settings:'Настройки',Display:'Отображение',Theme:'Тема',Language:'Язык',About:'О приложении',
+        'Show Translations':'Показывать перевод','Show Transliteration':'Показывать транслитерацию',
+        'Arabic size':'Размер арабского','Translation size':'Размер перевода','Transliteration size':'Размер транслитерации',
+        'Arabic Font':'Арабский шрифт','Open Themes':'Открыть темы','Dark mode':'Тёмный режим','Use system dark':'Системная тема',
+        'Create your theme':'Создать свою тему','Preview':'Предпросмотр','Save':'Сохранить','Choose language':'Выбрать язык',
+        'Settings will follow your chosen language.':'Настройки зависят от языка.'},
+    zh:{Back:'返回',Settings:'设置',Display:'显示',Theme:'主题',Language:'语言',About:'关于',
+        'Show Translations':'显示翻译','Show Transliteration':'显示转写',
+        'Arabic size':'阿拉伯文字大小','Translation size':'翻译文字大小','Transliteration size':'转写文字大小',
+        'Arabic Font':'阿拉伯字体','Open Themes':'打开主题','Dark mode':'深色模式','Use system dark':'跟随系统',
+        'Create your theme':'创建自定义主题','Preview':'预览','Save':'保存','Choose language':'选择语言',
+        'Settings will follow your chosen language.':'设置将遵循所选语言。'},
+    ha:{Back:'Koma baya',Settings:'Saituna',Display:'Nuni',Theme:'Jigo',Language:'Harshe',About:'Game da',
+        'Show Translations':'Nuna fassara','Show Transliteration':'Nuna rubutun canji',
+        'Arabic size':'Girman Larabci','Translation size':'Girman fassara','Transliteration size':'Girman rubutun canji',
+        'Arabic Font':'Rubutun Larabci','Open Themes':'Buɗe jigogi','Dark mode':'Yanayin duhu','Use system dark':'Bi tsarin',
+        'Create your theme':'Ƙirƙiri jigonka','Preview':'Dubawa','Save':'Ajiye','Choose language':'Zaɓi harshe',
+        'Settings will follow your chosen language.':'Saituna za su bi harshenka.'},
+  }[currentLanguage]||null;
+
+  if(!dict) return;
+  els.backLabel.textContent = dict.Back;
+  document.getElementById('settingsTitle').textContent = dict.Settings;
+  document.getElementById('displayTitle').textContent = dict.Display;
+  document.getElementById('themeTitle').textContent = dict.Theme;
+  document.getElementById('languageTitle').textContent = dict.Language;
+  document.getElementById('aboutTitle').textContent = dict.About;
+  document.getElementById('lblShowTranslation').textContent = dict['Show Translations'];
+  document.getElementById('lblShowTransliteration').textContent = dict['Show Transliteration'];
+  document.getElementById('lblArabicSize').textContent = dict['Arabic size'];
+  document.getElementById('lblTranslationSize').textContent = dict['Translation size'];
+  document.getElementById('lblTranslitSize').textContent = dict['Transliteration size'];
+  document.getElementById('lblArabicFont').textContent = dict['Arabic Font'];
+  document.getElementById('openThemePickerLabel').textContent = dict['Open Themes'];
+  document.getElementById('lblDarkMode').textContent = dict['Dark mode'];
+  document.getElementById('lblSystemDark').textContent = dict['Use system dark'];
+  document.getElementById('lblCustomThemeTitle').textContent = dict['Create your theme'];
+  document.getElementById('previewLabel').textContent = dict['Preview'];
+  document.getElementById('saveThemeLabel').textContent = dict['Save'];
+  document.getElementById('lblLangPick').textContent = dict['Choose language'];
+  document.getElementById('noteLang').textContent = dict['Settings will follow your chosen language.'];
+}
+
+function init(){
+  restoreSettings();
+  i18nApply();
   loadCategories();
 }
 init();
