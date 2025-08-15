@@ -114,7 +114,7 @@ header{
   position:fixed;right:15px;bottom:calc(var(--bottom-header-h) + 15px);z-index:60;
   width:52px;height:52px;border-radius:999px;border:none;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  background:transparent;color:#111827;
+  background:transparent;color:var(--text);
 }
 .fab i{font-size:22px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
 .fab:hover{transform:translateY(-1px)}
@@ -127,7 +127,7 @@ header{
 .modal-overlay.show{display:flex;animation:fadeIn .18s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .modal{
-  width:min(92vw,720px);max-height:80vh;overflow:auto;background:var(--card);color:var(--text);
+  width:min(92vw,820px);max-height:80vh;overflow:auto;background:var(--card);color:var(--text);
   border-radius:16px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.25);
 }
 .modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
@@ -140,17 +140,37 @@ header{
   list-style:none;cursor:pointer;padding:12px 14px;font-weight:700;display:flex;align-items:center;justify-content:space-between
 }
 .section summary::-webkit-details-marker{display:none}
-.section .section-body{padding:10px 14px 12px;border-top:1px dashed var(--border)}
+.section .section-body{padding:10px 14px 14px;border-top:1px dashed var(--border)}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
 .row label{font-size:.95rem}
 .row .controls{display:flex;align-items:center;gap:8px}
-.switch{position:relative;width:48px;height:26px;border-radius:999px;background:#e5e7eb;cursor:pointer;flex-shrink:0;border:1px solid var(--border)}
+.switch{position:relative;width:50px;height:28px;border-radius:999px;background:#e5e7eb;cursor:pointer;flex-shrink:0;border:1px solid var(--border)}
 .switch input{display:none}
 .switch.on{background:#22c55e}
-.thumb{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:white;box-shadow:var(--shadow);transition:left .18s}
+.thumb{position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:white;box-shadow:var(--shadow);transition:left .18s}
 .switch.on .thumb{left:24px}
-input[type="range"]{width:160px}
-select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)}
+input[type="range"]{width:180px}
+select, input[type="color"]{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)}
+
+/* ============ THEME GRID ============ */
+.theme-grid{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:10px;
+}
+@media (min-width:560px){ .theme-grid{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
+@media (min-width:820px){ .theme-grid{ grid-template-columns:repeat(5, minmax(0,1fr)); } }
+
+.theme-card{
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow);
+  background:var(--card);display:flex;flex-direction:column;align-items:center;transition:transform .12s,border-color .12s
+}
+.theme-card:hover{transform:translateY(-2px);border-color:var(--primary)}
+.swatch{
+  width:100%;height:56px;display:grid;grid-template-columns:1fr 1fr 1fr;
+}
+.swatch > div{height:56px}
+.theme-name{font-size:.85rem;padding:8px 8px 10px;color:var(--text);text-align:center}
 
 /* ============ BOTTOM HEADER (persistent) ============ */
 .bottom-header{
@@ -176,9 +196,6 @@ select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);backgr
 .toast.info{border-color:#2563eb}
 .toast.warn{border-color:#f59e0b}
 .toast.error{border-color:#ef4444}
-
-/* Dark mode helper (quick) */
-.dark body{background:#0b1020;color:#e5e7eb}
 </style>
 </head>
 <body>
@@ -190,7 +207,7 @@ select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);backgr
   <div class="header-icons">
     <!-- Order: search — dark mode — languages -->
     <div class="header-icon" id="searchToggle" title="Search"><i class="fas fa-search"></i></div>
-    <div class="header-icon" id="themeToggle" title="Toggle Sun/Moon"><i class="fas fa-moon"></i></div>
+    <div class="header-icon" id="themeToggle" title="Dark / Light"><i class="fas fa-moon"></i></div>
     <div class="header-icon" id="languageToggle" title="Language">
       <i class="fas fa-language"></i>
       <div class="language-text" id="languageText">EN</div>
@@ -241,19 +258,19 @@ select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);backgr
           <div class="row">
             <label for="toggleTranslations">Show Translations</label>
             <div class="controls">
-              <div class="switch" id="toggleTranslationsSwitch">
+              <label class="switch" id="toggleTranslationsSwitch">
                 <input type="checkbox" id="toggleTranslations">
                 <span class="thumb"></span>
-              </div>
+              </label>
             </div>
           </div>
           <div class="row">
             <label for="toggleTransliterations">Show Transliteration</label>
             <div class="controls">
-              <div class="switch" id="toggleTransliterationsSwitch">
+              <label class="switch" id="toggleTransliterationsSwitch">
                 <input type="checkbox" id="toggleTransliterations">
                 <span class="thumb"></span>
-              </div>
+              </label>
             </div>
           </div>
 
@@ -302,8 +319,46 @@ select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);backgr
           <i class="fa fa-chevron-down"></i>
         </summary>
         <div class="section-body">
+          <div class="row" style="justify-content:flex-start;margin-top:0">
+            <button class="pill-btn" id="toggleDarkQuick"><i class="fa fa-circle-half-stroke"></i> Dark / Light</button>
+          </div>
+
           <div class="row" style="justify-content:flex-start">
-            <button class="pill-btn" id="toggleDarkQuick"><i class="fa fa-circle-half-stroke"></i> Quick Dark/Light</button>
+            <label style="min-width:120px">Choose Theme</label>
+          </div>
+          <div class="theme-grid" id="themeGrid"></div>
+
+          <div class="row" style="margin-top:14px"><label><strong>Create Your Own Theme</strong></label></div>
+          <div class="row">
+            <label>Background</label>
+            <div class="controls"><input type="color" id="customBg" value="#161a23"></div>
+          </div>
+          <div class="row">
+            <label>Text</label>
+            <div class="controls"><input type="color" id="customText" value="#e5e7eb"></div>
+          </div>
+          <div class="row">
+            <label>Card</label>
+            <div class="controls"><input type="color" id="customCard" value="#0f172a"></div>
+          </div>
+          <div class="row">
+            <label>Primary</label>
+            <div class="controls"><input type="color" id="customPrimary" value="#16a34a"></div>
+          </div>
+          <div class="row">
+            <label>Secondary</label>
+            <div class="controls"><input type="color" id="customSecondary" value="#0e9f6e"></div>
+          </div>
+          <div class="row">
+            <label>Accent</label>
+            <div class="controls"><input type="color" id="customAccent" value="#f05252"></div>
+          </div>
+          <div class="row">
+            <label>Border</label>
+            <div class="controls"><input type="color" id="customBorder" value="#334155"></div>
+          </div>
+          <div class="row" style="justify-content:flex-start">
+            <button class="pill-btn" id="applyCustomTheme"><i class="fa fa-palette"></i> Apply Custom Theme</button>
           </div>
         </div>
       </details>
@@ -348,7 +403,7 @@ select{padding:8px 10px;border-radius:10px;border:1px solid var(--border);backgr
       <button class="pill-btn" id="homeBtn"><i class="fa fa-house"></i> Home</button>
       <button class="pill-btn" id="favoritesBtn"><i class="fa fa-heart"></i> Favorites</button>
     </div>
-    <div class="bh-right"><!-- intentionally empty --></div>
+    <div class="bh-right"></div>
   </div>
 </nav>
 
@@ -362,10 +417,39 @@ const GITHUB_REPO  = "sbi";
 const GITHUB_BRANCH= "main";
 const GITHUB_BASE  = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`;
 
+/* ================== THEMES (25 presets) ================== */
+const PRESET_THEMES = [
+  {name:"Leaf",        vars:{bg:"#f9fafb",text:"#111827",card:"#ffffff",border:"#e5e7eb",primary:"#16a34a",secondary:"#0e9f6e",accent:"#f05252"}},
+  {name:"Emerald",     vars:{bg:"#ecfdf5",text:"#064e3b",card:"#ffffff",border:"#d1fae5",primary:"#10b981",secondary:"#059669",accent:"#ef4444"}},
+  {name:"Forest",      vars:{bg:"#0b1411",text:"#e7f8f0",card:"#10201b",border:"#1f2f2a",primary:"#22c55e",secondary:"#16a34a",accent:"#f59e0b"}},
+  {name:"Mint",        vars:{bg:"#f0fdfa",text:"#064e3b",card:"#ffffff",border:"#ccfbf1",primary:"#14b8a6",secondary:"#0ea5e9",accent:"#fb7185"}},
+  {name:"Ocean",       vars:{bg:"#0b1220",text:"#e5e7eb",card:"#0f172a",border:"#334155",primary:"#3b82f6",secondary:"#06b6d4",accent:"#f59e0b"}},
+  {name:"Sky",         vars:{bg:"#f0f9ff",text:"#0c4a6e",card:"#ffffff",border:"#e0f2fe",primary:"#0ea5e9",secondary:"#38bdf8",accent:"#ef4444"}},
+  {name:"Royal",       vars:{bg:"#0b1020",text:"#e5e7eb",card:"#111827",border:"#374151",primary:"#6366f1",secondary:"#8b5cf6",accent:"#22c55e"}},
+  {name:"Grape",       vars:{bg:"#faf5ff",text:"#4c1d95",card:"#ffffff",border:"#ede9fe",primary:"#8b5cf6",secondary:"#a78bfa",accent:"#ef4444"}},
+  {name:"Lavender",    vars:{bg:"#f5f3ff",text:"#3730a3",card:"#ffffff",border:"#e9d5ff",primary:"#7c3aed",secondary:"#6d28d9",accent:"#f59e0b"}},
+  {name:"Cherry",      vars:{bg:"#fff1f2",text:"#7f1d1d",card:"#ffffff",border:"#ffe4e6",primary:"#ef4444",secondary:"#fb7185",accent:"#22c55e"}},
+  {name:"Rose",        vars:{bg:"#fff1f2",text:"#7a1a38",card:"#ffffff",border:"#ffe4e6",primary:"#f43f5e",secondary:"#e11d48",accent:"#0ea5e9"}},
+  {name:"Sunset",      vars:{bg:"#fff7ed",text:"#7c2d12",card:"#ffffff",border:"#ffedd5",primary:"#f97316",secondary:"#f59e0b",accent:"#10b981"}},
+  {name:"Sand",        vars:{bg:"#fafaf9",text:"#1f2937",card:"#ffffff",border:"#e7e5e4",primary:"#ca8a04",secondary:"#d97706",accent:"#16a34a"}},
+  {name:"Cocoa",       vars:{bg:"#1c1917",text:"#e7e5e4",card:"#292524",border:"#44403c",primary:"#a16207",secondary:"#854d0e",accent:"#22c55e"}},
+  {name:"Slate",       vars:{bg:"#0b1220",text:"#e5e7eb",card:"#111827",border:"#374151",primary:"#64748b",secondary:"#94a3b8",accent:"#22c55e"}},
+  {name:"Carbon",      vars:{bg:"#0a0a0a",text:"#f3f4f6",card:"#171717",border:"#262626",primary:"#22c55e",secondary:"#3b82f6",accent:"#f59e0b"}},
+  {name:"Nord",        vars:{bg:"#2e3440",text:"#e5e9f0",card:"#3b4252",border:"#4c566a",primary:"#88c0d0",secondary:"#81a1c1",accent:"#a3be8c"}},
+  {name:"Dracula",     vars:{bg:"#282a36",text:"#f8f8f2",card:"#303241",border:"#3c3f51",primary:"#bd93f9",secondary:"#50fa7b",accent:"#ff79c6"}},
+  {name:"Solar",       vars:{bg:"#fdf6e3",text:"#073642",card:"#fffdf5",border:"#eee8d5",primary:"#b58900",secondary:"#268bd2",accent:"#cb4b16"}},
+  {name:"Aqua",        vars:{bg:"#ecfeff",text:"#083344",card:"#ffffff",border:"#cffafe",primary:"#06b6d4",secondary:"#0ea5e9",accent:"#10b981"}},
+  {name:"Lime",        vars:{bg:"#f7fee7",text:"#1a2e05",card:"#ffffff",border:"#ecfccb",primary:"#84cc16",secondary:"#22c55e",accent:"#f97316"}},
+  {name:"Peach",       vars:{bg:"#fff7ed",text:"#7c2d12",card:"#ffffff",border:"#fed7aa",primary:"#fb923c",secondary:"#f97316",accent:"#22c55e"}},
+  {name:"Berry",       vars:{bg:"#fdf2f8",text:"#4a044e",card:"#ffffff",border:"#f5d0fe",primary:"#d946ef",secondary:"#a855f7",accent:"#22c55e"}},
+  {name:"Steel",       vars:{bg:"#f8fafc",text:"#0f172a",card:"#ffffff",border:"#e2e8f0",primary:"#334155",secondary:"#475569",accent:"#ef4444"}},
+  {name:"Mono",        vars:{bg:"#ffffff",text:"#111827",card:"#ffffff",border:"#e5e7eb",primary:"#111827",secondary:"#6b7280",accent:"#ef4444"}},
+];
+
 /* ================== STATE ================== */
 let currentLanguage = localStorage.getItem('lang') || 'en';
-let categoriesData = [];   // [{ id, title, folder }, ...]
-let duasData = [];         // current category duas
+let categoriesData = [];
+let duasData = [];
 let currentCategoryFolder = null;
 
 let favorites = JSON.parse(localStorage.getItem('favorites')||'{}'); // {duaKey: duaObject}
@@ -378,6 +462,11 @@ let fontArabic = localStorage.getItem('fontArabic') || 'Amiri';
 let fontSizeArabic = parseInt(localStorage.getItem('fontSizeArabic')||'22',10);
 let fontSizeTranslation = parseInt(localStorage.getItem('fontSizeTranslation')||'16',10);
 let fontSizeTransliteration = parseInt(localStorage.getItem('fontSizeTransliteration')||'16',10);
+
+let themeIndex = parseInt(localStorage.getItem('themeIndex') ?? '0',10);
+if(Number.isNaN(themeIndex)) themeIndex = 0;
+let customTheme = JSON.parse(localStorage.getItem('customTheme') || 'null');
+let darkMode = JSON.parse(localStorage.getItem('darkMode')||'false');
 
 /* ================== UI ELEMENTS ================== */
 const els = {
@@ -419,6 +508,17 @@ const els = {
   transliterationSize: document.getElementById('transliterationSize'),
   transliterationSizeVal: document.getElementById('transliterationSizeVal'),
   arabicFont: document.getElementById('arabicFont'),
+
+  // themes
+  themeGrid: document.getElementById('themeGrid'),
+  customBg: document.getElementById('customBg'),
+  customText: document.getElementById('customText'),
+  customCard: document.getElementById('customCard'),
+  customPrimary: document.getElementById('customPrimary'),
+  customSecondary: document.getElementById('customSecondary'),
+  customAccent: document.getElementById('customAccent'),
+  customBorder: document.getElementById('customBorder'),
+  applyCustomTheme: document.getElementById('applyCustomTheme'),
 };
 
 /* ================== HELPERS ================== */
@@ -435,6 +535,9 @@ function savePrefs(){
   localStorage.setItem('fontSizeArabic', fontSizeArabic);
   localStorage.setItem('fontSizeTranslation', fontSizeTranslation);
   localStorage.setItem('fontSizeTransliteration', fontSizeTransliteration);
+  localStorage.setItem('themeIndex', themeIndex);
+  localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  if(customTheme) localStorage.setItem('customTheme', JSON.stringify(customTheme));
 }
 function updateFontVars(){
   document.documentElement.style.setProperty('--font-arabic-size', fontSizeArabic + 'px');
@@ -442,9 +545,39 @@ function updateFontVars(){
   document.documentElement.style.setProperty('--font-transliteration-size', fontSizeTransliteration + 'px');
   document.documentElement.style.setProperty('--arabic-font', `"${fontArabic}", serif`);
 }
-function darkModeOn(isOn){
-  document.body.style.background = isOn ? '#0b1020' : 'var(--bg)';
-  document.body.style.color = isOn ? '#e5e7eb' : 'var(--text)';
+
+/* THEME ENGINE */
+function applyVars(vars){
+  for(const [k,v] of Object.entries(vars)){
+    document.documentElement.style.setProperty(`--${k}`, v);
+  }
+}
+function buildDarkOverlay(base){
+  // Ensure readable dark variant regardless of chosen theme
+  return {
+    bg:         "#0b1220",
+    text:       "#e5e7eb",
+    card:       "#0f172a",
+    border:     "#334155",
+    primary:    base.primary || "#3b82f6",
+    secondary:  base.secondary || "#06b6d4",
+    accent:     base.accent || "#f59e0b",
+  };
+}
+function applyTheme(index, useDark = darkMode){
+  const preset = PRESET_THEMES[index] ? PRESET_THEMES[index].vars : PRESET_THEMES[0].vars;
+  const vars = useDark ? {...preset, ...buildDarkOverlay(preset)} : {...preset};
+  applyVars(vars);
+  // update icon for header dark mode
+  const icon = els.themeToggle.querySelector('i');
+  icon.className = useDark ? 'fas fa-sun' : 'fas fa-moon';
+}
+function applyCustomTheme(theme, useDark = darkMode){
+  const base = theme || PRESET_THEMES[0].vars;
+  const vars = useDark ? {...base, ...buildDarkOverlay(base)} : {...base};
+  applyVars(vars);
+  const icon = els.themeToggle.querySelector('i');
+  icon.className = useDark ? 'fas fa-sun' : 'fas fa-moon';
 }
 
 /* ================== FETCHERS (with cache fallback) ================== */
@@ -528,9 +661,7 @@ function renderDuas(filter=''){
   let list;
 
   if(viewingFavorites){
-    // Render from saved favorites (global)
     list = Object.values(favorites || {});
-    // filter by search
     if(filter){
       const f = filter.toLowerCase();
       list = list.filter(dua =>
@@ -589,7 +720,6 @@ function renderDuas(filter=''){
     d.querySelector('.fav').addEventListener('click', ()=>{
       const nowFav = !favorites[key];
       if(nowFav){
-        // store full dua object w/ provenance
         const stored = {...dua, _catFolder: dua._catFolder || currentCategoryFolder, _lang: dua._lang || currentLanguage};
         favorites[key] = stored;
       }else{
@@ -653,6 +783,45 @@ async function copyToClipboard(text){
   }
 }
 
+/* ================== THEMES UI ================== */
+function renderThemeGrid(){
+  els.themeGrid.innerHTML = '';
+  PRESET_THEMES.forEach((t, idx)=>{
+    const card = document.createElement('div');
+    card.className = 'theme-card';
+    card.innerHTML = `
+      <div class="swatch">
+        <div style="background:${t.vars.bg}"></div>
+        <div style="background:${t.vars.card}"></div>
+        <div style="background:${t.vars.primary}"></div>
+      </div>
+      <div class="theme-name">${t.name}</div>
+    `;
+    card.addEventListener('click', ()=>{
+      themeIndex = idx;
+      customTheme = null; // switching to preset
+      applyTheme(themeIndex, darkMode);
+      savePrefs();
+      toast(`Theme: ${t.name}`, 'info', 1200);
+    });
+    els.themeGrid.appendChild(card);
+  });
+}
+els.applyCustomTheme.addEventListener('click', ()=>{
+  customTheme = {
+    bg: els.customBg.value,
+    text: els.customText.value,
+    card: els.customCard.value,
+    border: els.customBorder.value,
+    primary: els.customPrimary.value,
+    secondary: els.customSecondary.value,
+    accent: els.customAccent.value
+  };
+  applyCustomTheme(customTheme, darkMode);
+  savePrefs();
+  toast('Custom theme applied','success',1500);
+});
+
 /* ================== EVENTS ================== */
 // Language cycle (top header icon)
 document.getElementById('languageToggle').addEventListener('click', ()=>{
@@ -666,6 +835,8 @@ document.getElementById('languageToggle').addEventListener('click', ()=>{
   els.categoryDetails.style.display = 'none';
   els.categoriesList.style.display = 'block';
   els.sectionTitle.textContent = 'Categories';
+  viewingFavorites = false;
+  els.favoritesBtn.classList.remove('active');
   loadCategories();
 });
 
@@ -678,13 +849,15 @@ els.backBtn.addEventListener('click', ()=>{
   els.favoritesBtn.classList.remove('active');
 });
 
-// Theme toggle (top header quick)
-els.themeToggle.addEventListener('click', ()=>{
-  const icon = els.themeToggle.querySelector('i');
-  const isMoon = icon.classList.contains('fa-moon');
-  icon.className = isMoon ? 'fas fa-sun' : 'fas fa-moon';
-  darkModeOn(isMoon);
-});
+// Dark / Light toggles
+function toggleDark(){
+  darkMode = !darkMode;
+  if(customTheme) applyCustomTheme(customTheme, darkMode);
+  else applyTheme(themeIndex, darkMode);
+  savePrefs();
+}
+els.themeToggle.addEventListener('click', toggleDark);
+els.toggleDarkQuick.addEventListener('click', toggleDark);
 
 // Search UI
 els.searchToggle.addEventListener('click', ()=>{
@@ -770,12 +943,6 @@ els.arabicFont.addEventListener('change', ()=>{
   updateFontVars(); savePrefs();
 });
 
-// Settings: theme quick toggle (inside modal)
-els.toggleDarkQuick.addEventListener('click', ()=>{
-  const isDark = document.body.style.background !== '' && document.body.style.background !== 'var(--bg)';
-  darkModeOn(!isDark);
-});
-
 // Language cycle inside settings
 els.cycleLangBtn.addEventListener('click', ()=>{
   const langs = ['en','fr','ru','zh','ha'];
@@ -793,16 +960,32 @@ els.cycleLangBtn.addEventListener('click', ()=>{
   loadCategories();
 });
 
-// INIT
+/* ================== INIT ================== */
+function initTheme(){
+  renderThemeGrid();
+  if(customTheme){
+    // set pickers from saved
+    els.customBg.value        = customTheme.bg;
+    els.customText.value      = customTheme.text;
+    els.customCard.value      = customTheme.card;
+    els.customBorder.value    = customTheme.border;
+    els.customPrimary.value   = customTheme.primary;
+    els.customSecondary.value = customTheme.secondary;
+    els.customAccent.value    = customTheme.accent;
+    applyCustomTheme(customTheme, darkMode);
+  } else {
+    applyTheme(themeIndex, darkMode);
+  }
+}
 function init(){
   els.languageText.textContent = currentLanguage.toUpperCase();
   els.currentLangLabel.textContent = currentLanguage.toUpperCase();
   updateFontVars();
   syncDisplayControls();
+  initTheme();
   loadCategories();
 }
 init();
 </script>
 </body>
 </html>
-```0
